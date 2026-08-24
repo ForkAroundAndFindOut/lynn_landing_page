@@ -20,6 +20,7 @@
   --radius-md: 0.875rem;
   --content: 75rem;
   --font-serif: Georgia, "Times New Roman", serif;
+  --type-reading: 1.5rem;
 }
 
 * {
@@ -36,7 +37,7 @@ body {
   color: var(--ink);
   background: var(--cream);
   font-family: var(--font-serif);
-  font-size: 1rem;
+  font-size: var(--type-reading);
   line-height: 1.6;
   text-rendering: optimizeLegibility;
 }
@@ -171,7 +172,7 @@ button:disabled {
 }
 
 .brand-copy strong {
-  font-size: 0.95rem;
+  font-size: var(--type-reading);
 }
 
 .brand-copy span {
@@ -187,7 +188,7 @@ button:disabled {
 
 .nav-links > a:not(.button) {
   color: rgba(255, 255, 255, 0.88);
-  font-size: 0.94rem;
+  font-size: var(--type-reading);
   text-decoration: none;
 }
 
@@ -219,14 +220,14 @@ button:disabled {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 2.8rem;
-  padding: 0.7rem 1.1rem;
+  min-height: 3.75rem;
+  padding: 0.75rem 1.25rem;
   color: var(--navy);
   background: var(--pink);
   border: 1px solid transparent;
   border-radius: 999px;
   box-shadow: 0 0.5rem 1.4rem rgba(0, 0, 80, 0.14);
-  font-size: 0.94rem;
+  font-size: var(--type-reading);
   font-weight: 700;
   line-height: 1.2;
   text-align: center;
@@ -241,13 +242,13 @@ button:disabled {
 }
 
 .button-small {
-  min-height: 2.45rem;
-  padding: 0.55rem 0.9rem;
+  min-height: 3.25rem;
+  padding: 0.55rem 1rem;
 }
 
 .button-primary {
-  min-height: 3.25rem;
-  padding: 0.85rem 1.45rem;
+  min-height: 4rem;
+  padding: 0.85rem 1.5rem;
 }
 
 .button-full {
@@ -393,7 +394,7 @@ button:disabled {
   max-width: 36rem;
   margin: 1.7rem 0 0;
   color: rgba(255, 255, 255, 0.88);
-  font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+  font-size: var(--type-reading);
   line-height: 1.55;
 }
 
@@ -419,7 +420,7 @@ button:disabled {
   display: grid;
   gap: 0.3rem;
   color: rgba(255, 255, 255, 0.87);
-  font-size: 0.88rem;
+  font-size: var(--type-reading);
   line-height: 1.35;
 }
 
@@ -461,7 +462,7 @@ button:disabled {
   max-width: 31rem;
   margin: 0.9rem 0 1.45rem;
   color: var(--text-muted);
-  font-size: 0.95rem;
+  font-size: var(--type-reading);
 }
 
 .form-grid {
@@ -482,8 +483,9 @@ button:disabled {
   display: block;
   margin-bottom: 0.38rem;
   color: var(--navy);
-  font-size: 0.85rem;
+  font-size: var(--type-reading);
   font-weight: 700;
+  line-height: 1.25;
 }
 
 .required-mark {
@@ -493,8 +495,8 @@ button:disabled {
 .field input,
 .field select {
   width: 100%;
-  min-height: 3.15rem;
-  padding: 0.68rem 0.8rem;
+  min-height: 3.75rem;
+  padding: 0.68rem 0.9rem;
   color: var(--ink);
   background: rgba(255, 255, 255, 0.84);
   border: 1px solid rgba(0, 0, 128, 0.24);
@@ -571,7 +573,7 @@ button:disabled {
 .intro-copy {
   max-width: 35rem;
   color: var(--text-muted);
-  font-size: 1.08rem;
+  font-size: var(--type-reading);
 }
 
 .intro-copy p:first-child {
@@ -596,7 +598,7 @@ button:disabled {
 .section-heading > p {
   max-width: 34rem;
   color: var(--text-muted);
-  font-size: 1.05rem;
+  font-size: var(--type-reading);
 }
 
 .service-carousel {
@@ -655,7 +657,7 @@ button:disabled {
 .service-slide p:last-of-type {
   margin: 0.75rem 0 0;
   color: var(--text-muted);
-  font-size: 0.95rem;
+  font-size: var(--type-reading);
 }
 
 .service-arrow {
@@ -674,8 +676,8 @@ button:disabled {
 
 .icon-button,
 .pause-button {
-  min-width: 2.8rem;
-  min-height: 2.8rem;
+  min-width: 3.75rem;
+  min-height: 3.75rem;
   color: var(--navy);
   background: transparent;
   border: 1px solid rgba(0, 0, 128, 0.35);
@@ -693,9 +695,9 @@ button:disabled {
 
 .pause-button {
   min-width: auto;
-  padding: 0.45rem 0.8rem;
+  padding: 0.55rem 1rem;
   border-radius: 999px;
-  font-size: 0.8rem;
+  font-size: var(--type-reading);
 }
 
 .section-heading {
@@ -747,7 +749,7 @@ button:disabled {
 .process-list h3 {
   margin: 2.3rem 0 0.75rem;
   color: var(--white);
-  font-size: 1.45rem;
+  font-size: 1.75rem;
   font-weight: 400;
   line-height: 1.15;
 }
@@ -755,7 +757,7 @@ button:disabled {
 .process-list p {
   margin: 0;
   color: rgba(255, 255, 255, 0.77);
-  font-size: 0.92rem;
+  font-size: var(--type-reading);
 }
 
 .testimonials-section {
@@ -820,7 +822,7 @@ button:disabled {
 .testimonial-card blockquote {
   margin: 1.4rem 0;
   color: var(--navy);
-  font-size: clamp(1.2rem, 2.2vw, 1.55rem);
+  font-size: clamp(1.5rem, 2.2vw, 1.75rem);
   font-style: italic;
   line-height: 1.4;
 }
@@ -852,7 +854,7 @@ button:disabled {
   color: var(--navy);
   background: transparent;
   border: 0;
-  font-size: 1.12rem;
+  font-size: var(--type-reading);
   font-weight: 400;
   text-align: left;
 }
@@ -925,7 +927,7 @@ button:disabled {
 
 .site-footer nav a {
   color: rgba(255, 255, 255, 0.78);
-  font-size: 0.86rem;
+  font-size: var(--type-reading);
   text-decoration: none;
 }
 
@@ -934,13 +936,12 @@ button:disabled {
 }
 
 .js .service-carousel:not(.is-static) .service-window {
-  min-height: 18.8rem;
+  display: grid;
   overflow: hidden;
 }
 
 .js .service-carousel:not(.is-static) .service-slide {
-  position: absolute;
-  inset: 0;
+  grid-area: 1 / 1;
   margin: 0;
   opacity: 0;
   pointer-events: none;
@@ -987,6 +988,36 @@ button:disabled {
 }
 
 @media (max-width: 56rem) {
+  .nav-toggle {
+    display: block;
+  }
+
+  .nav-links {
+    position: absolute;
+    top: calc(100% + 0.55rem);
+    right: 1rem;
+    left: 1rem;
+    display: none;
+    align-items: stretch;
+    padding: 0.75rem;
+    background: var(--navy-deep);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow);
+  }
+
+  .nav-links.is-open {
+    display: grid;
+  }
+
+  .nav-links > a:not(.button) {
+    padding: 0.7rem;
+  }
+
+  .nav-links .button {
+    margin-top: 0.2rem;
+  }
+
   .hero {
     min-height: auto;
   }
@@ -1034,50 +1065,12 @@ button:disabled {
     width: min(var(--content), calc(100% - 2rem));
   }
 
-  .nav {
-    min-height: 4.7rem;
-  }
-
-  .nav-toggle {
-    display: block;
-  }
-
-  .nav-links {
-    position: absolute;
-    top: calc(100% + 0.55rem);
-    right: 1rem;
-    left: 1rem;
-    display: none;
-    align-items: stretch;
-    padding: 0.75rem;
-    background: var(--navy-deep);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow);
-  }
-
-  .nav-links.is-open {
-    display: grid;
-  }
-
-  .nav-links > a:not(.button) {
-    padding: 0.7rem;
-  }
-
-  .nav-links .button {
-    margin-top: 0.2rem;
-  }
-
-  .brand-copy strong {
-    font-size: 0.86rem;
-  }
-
   .brand-copy span {
     font-size: 0.65rem;
   }
 
   .hero {
-    padding-top: 4.7rem;
+    padding-top: 5.25rem;
   }
 
   .hero h1 {
@@ -1114,9 +1107,6 @@ button:disabled {
     padding: 2rem 0;
   }
 
-  .js .service-carousel:not(.is-static) .service-window {
-    min-height: 21.5rem;
-  }
 }
 
 @media (max-width: 27rem) {

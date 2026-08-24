@@ -6,11 +6,28 @@ The approved plan and verification contract live in [IMPLEMENTATION_SPEC.md](IMP
 
 ## Local preview
 
-This site has no package dependencies or build step. From the repository root, serve it with a local static server:
+This site has no package dependencies. Build the same clean static asset bundle used by Cloudflare Workers, then serve it from the generated directory:
+
+    node build.mjs
+    py -m http.server 4173 --directory dist
+
+Then open http://127.0.0.1:4173.
+
+To preview directly from the repository root during content work, you can also run:
 
     py -m http.server 4173
 
-Then open http://127.0.0.1:4173.
+## Cloudflare Workers previews
+
+The repository is configured as one asset-only Worker named `lynn-landing-page`. `build.mjs` copies only the public site files into `dist/`; project documentation and source-control files are not included in the deployment.
+
+Workers Builds should use these commands:
+
+    Build command: node build.mjs
+    Production deploy command: npx wrangler deploy
+    Non-production deploy command: npx wrangler versions upload
+
+`main` is the production branch. Enable non-production branch builds for `scrolling-reveal` and `floating-card`. Each successful non-production build creates a Worker version preview and a stable branch preview alias without changing production. Preview URLs remain enabled in `wrangler.jsonc`.
 
 ## Current form behavior
 

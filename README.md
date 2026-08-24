@@ -23,9 +23,11 @@ The repository is configured as one asset-only Worker named `lynn-landing-page`.
 
 Workers Builds should use these commands:
 
-    Build command: node build.mjs
-    Production deploy command: npx wrangler deploy
-    Non-production deploy command: npx wrangler versions upload
+    Build command: None
+    Production deploy command: node build.mjs && npx wrangler deploy
+    Non-production version command: node build.mjs && npx wrangler versions upload
+
+The deploy and version commands build `dist/` themselves so each deployment is self-contained even when Workers Builds omits the separate build step.
 
 `main` is the production branch. Enable non-production branch builds for `scrolling-reveal` and `floating-card`. Each successful non-production build creates a Worker version preview and a stable branch preview alias without changing production. Preview URLs remain enabled in `wrangler.jsonc`.
 

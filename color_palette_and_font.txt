@@ -1,0 +1,8 @@
+| Color      | Hex       | RGB               | Intended use |
+| ---------- | --------- | ----------------- | ------------ |
+| Navy Blue  | `#000080` | **0, 0, 128**     | Primary text, headings, and background |
+| Gold       | `#FFD700` | **255, 215, 0**   | Highlights and icons |
+| Slate Gray | `#808080` | **128, 128, 128** | Borders, background, and secondary text |
+| Pink       | `#FFC0CB` | **255, 192, 203** | Call to action, used sparingly |
+
+Font: Georgia

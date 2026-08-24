@@ -1,7 +1,22 @@
 (function () {
   "use strict";
 
-  document.documentElement.classList.add("js");
+  var root = document.documentElement;
+  var forceReducedMotion =
+    new URLSearchParams(window.location.search).get("motion") === "reduce";
+  var reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  root.classList.add("js");
+
+  function hasReducedMotion() {
+    return forceReducedMotion || reducedMotionQuery.matches;
+  }
+
+  function syncReducedMotionClass() {
+    root.classList.toggle("motion-reduced", hasReducedMotion());
+  }
+
+  syncReducedMotionClass();
 
   var navToggle = document.querySelector("[data-nav-toggle]");
   var navLinks = document.querySelector("[data-nav-links]");
@@ -32,6 +47,83 @@
       }
     });
   }
+
+  var scrollRevealTargets = Array.prototype.slice.call(
+    document.querySelectorAll("[data-scroll-reveal]")
+  );
+  var scrollRevealObserver = null;
+
+  function revealTarget(target) {
+    target.classList.add("is-revealed");
+
+    if (scrollRevealObserver) {
+      scrollRevealObserver.unobserve(target);
+    }
+  }
+
+  function stopScrollReveal() {
+    root.classList.remove("has-scroll-reveal");
+
+    if (scrollRevealObserver) {
+      scrollRevealObserver.disconnect();
+      scrollRevealObserver = null;
+    }
+
+    scrollRevealTargets.forEach(function (target) {
+      target.classList.add("is-revealed");
+    });
+  }
+
+  function startScrollReveal() {
+    if (
+      hasReducedMotion() ||
+      !scrollRevealTargets.length ||
+      !("IntersectionObserver" in window) ||
+      scrollRevealObserver
+    ) {
+      return;
+    }
+
+    root.classList.add("has-scroll-reveal");
+    scrollRevealObserver = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            revealTarget(entry.target);
+          }
+        });
+      },
+      {
+        rootMargin: "0px 0px -8%",
+        threshold: 0.16
+      }
+    );
+
+    scrollRevealTargets.forEach(function (target) {
+      scrollRevealObserver.observe(target);
+    });
+  }
+
+  function syncScrollReveal() {
+    syncReducedMotionClass();
+
+    if (hasReducedMotion()) {
+      stopScrollReveal();
+    } else {
+      startScrollReveal();
+    }
+  }
+
+  document.addEventListener("focusin", function (event) {
+    var target = event.target.closest("[data-scroll-reveal]");
+
+    if (target) {
+      revealTarget(target);
+    }
+  });
+
+  syncScrollReveal();
+  reducedMotionQuery.addEventListener("change", syncScrollReveal);
 
   var form = document.getElementById("contact-form");
   var submitButton = document.querySelector("[data-form-submit]");
@@ -136,9 +228,6 @@
     var nextButton = carousel.querySelector("[data-service-next]");
     var pauseButton = carousel.querySelector("[data-service-pause]");
     var status = carousel.querySelector("[data-service-status]");
-    var motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    var forceReducedMotion =
-      new URLSearchParams(window.location.search).get("motion") === "reduce";
     var currentIndex = 0;
     var isTransitioning = false;
     var userPaused = false;
@@ -196,7 +285,7 @@
     function startAutoplay() {
       stopAutoplay();
 
-      if (forceReducedMotion || motionQuery.matches || userPaused) {
+      if (forceReducedMotion || reducedMotionQuery.matches || userPaused) {
         return;
       }
 
@@ -223,7 +312,7 @@
     function move(direction) {
       if (
         forceReducedMotion ||
-        motionQuery.matches ||
+        reducedMotionQuery.matches ||
         isTransitioning ||
         slides.length < 2
       ) {
@@ -272,13 +361,13 @@
       }
     }
 
-    if (forceReducedMotion || motionQuery.matches) {
+    if (forceReducedMotion || reducedMotionQuery.matches) {
       applyStaticMode();
     } else {
       restoreAnimatedMode();
     }
 
-    motionQuery.addEventListener("change", function (event) {
+    reducedMotionQuery.addEventListener("change", function (event) {
       if (forceReducedMotion || event.matches) {
         applyStaticMode();
       } else {
@@ -357,10 +446,7 @@
   }
 
   function motionQueryForTestimonials() {
-    return (
-      new URLSearchParams(window.location.search).get("motion") === "reduce" ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    );
+    return forceReducedMotion || reducedMotionQuery.matches;
   }
 
   if (testimonialPrevious) {

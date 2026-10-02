@@ -1,55 +1,68 @@
-# Lynn Renezeder Fractional HR Consulting
+# Stacked card layout proof of concept
 
-Single-page static landing-page implementation for Lynn Renezeder — Fractional HR Consulting.
+An isolated exploration for Lynn Renezeder’s static Fractional HR Consulting site. The parent branch is `codex/card-layout`, based on `main` at `0b10b41b59e717da2cc6f83f9e950250541eac3d`. Existing branches and production are retained. Future card-layout experiments can branch from this parent.
 
-The approved plan and verification contract live in [IMPLEMENTATION_SPEC.md](IMPLEMENTATION_SPEC.md). The color/type source of truth lives in [color_palette_and_font.txt](color_palette_and_font.txt).
+[STACKED_CARD_SPEC.md](STACKED_CARD_SPEC.md) is the supplied implementation brief. The existing [IMPLEMENTATION_SPEC.md](IMPLEMENTATION_SPEC.md) remains as historical site context; this POC brief supersedes its layout and form design for this branch only. Existing Georgia typography, semantic navy/gold/pink tokens, core service language, privacy rules, and static build workflow are retained. The example engagement is explicitly illustrative and no client claims or personal contact information have been added.
 
-## Local preview
+Desktop layout, form fields, dimensions, and motion presets are exploratory defaults, not final design approval. The form validates and reviews values in memory; finishing says **Demo complete. Nothing was sent.** Nothing is stored or transmitted.
 
-This site has no package dependencies. Build the same clean static asset bundle used by Cloudflare Workers, then serve it from the generated directory:
+## Run locally
 
-    node build.mjs
-    py -m http.server 4173 --directory dist
+No package installation is needed for the website, build, or unit tests. Use the existing Node.js and Python installations:
 
-Then open http://127.0.0.1:4173.
+```powershell
+node --test tests/*.test.mjs
+node build.mjs
+python -m http.server 4188 --bind 127.0.0.1 --directory dist
+```
 
-To preview directly from the repository root during content work, you can also run:
+Open [the local preview](http://127.0.0.1:4188). `npm test` and `npm run build` are equivalent conveniences. The build copies public assets only; documentation, tests, verification evidence, and Git metadata are excluded. `dist/revision.json` reports the source commit and SHA-256 hashes of all website assets.
 
-    py -m http.server 4173
+## Review route
 
-## Cloudflare Workers previews
+1. At approximately 390 × 844, use the arrows or drag **open space** inside the card. Text stays selectable. Move slowly up, reverse before release, then try a quick flick. Check left, right, and bottom arrivals and reverse departures.
+2. Compare Balanced, Crisp, and Gentle in **POC review**. The panel is for testing only. Optional gesture-state output is off by default.
+3. Try **Read as page**, then **Use card view**. Short screens, enlarged content that cannot fit, and reduced motion use native document flow. A narrow screen alone does not force clipped cards.
+4. On desktop, compare Staggered cards and Read as document. DOM reading order stays the same; the wheel remains native.
+5. **Get in touch** in the header jumps to the contact card. Its separate button expands the form. Open it, submit empty details to see errors, then enter test values and a long message. Review, edit, finish, close, and reopen to check draft retention.
+6. Use keyboard arrows/Home/End while focus is in the deck or its controls; Tab through the modal and Escape to close. Try reduced motion, no JavaScript, text enlargement, and orientation changes.
 
-The repository is configured as one asset-only Worker named `lynn-landing-page`. `build.mjs` copies only the public site files into `dist/`; project documentation and source-control files are not included in the deployment.
+Demo URL options can be combined:
 
-Workers Builds should use these commands:
+| Query | Behavior |
+| --- | --- |
+| `?preset=crisp` / `?preset=gentle` | Choose a settlement preset |
+| `?desktop=conventional` | One-column desktop comparison |
+| `?motion=reduce` | Reduced motion document flow; OS reduction always wins |
+| `?view=page` | Start in native reading mode |
+| `?debug=1` | Show gesture state inside the review panel |
+| `#services`, `#how-it-works`, `#example`, `#working-together`, `#contact` | Select the same section in every layout |
 
-    Build command: None
-    Production deploy command: node build.mjs && npx wrangler deploy
-    Non-production version command: node build.mjs && npx wrangler versions upload
+## Cloudflare branch preview
 
-The deploy and version commands build `dist/` themselves so each deployment is self-contained even when Workers Builds omits the separate build step.
+This repository uses an asset-only Worker named `lynn-landing-page`, with version URLs enabled in `wrangler.jsonc`. `main` is production. **Use version upload for this test branch; do not run `wrangler deploy`, promote a version, or change production routing.**
 
-`main` is the production branch. Enable non-production branch builds for `scrolling-reveal` and `floating-card`. Each successful non-production build creates a Worker version preview and a stable branch preview alias without changing production. Preview URLs remain enabled in `wrangler.jsonc`.
+The existing Workers Builds commands are:
 
-## Current form behavior
+```text
+Build command: None
+Production deploy command (existing main only): node build.mjs && npx wrangler deploy
+Non-production version command: node build.mjs && npx wrangler versions upload
+```
 
-The Contact Us form intentionally performs client-side validation only. It does not send data and explicitly tells visitors that protected delivery is not connected. The later Cloudflare phase must add bot protection, server-side validation, rate limiting, delivery handling, and real accessible success/failure feedback before any public launch.
+Allow `codex/card-layout` in non-production branch builds alongside any existing allowed branches. A push to this new branch can then create a version preview. Do not remove existing branches or migrate the existing Worker’s preview system as part of this POC.
 
-## Preview SEO behavior
+With authenticated Wrangler, an explicit version upload can create the review alias without touching production:
 
-The page is intentionally marked noindex, nofollow until a production domain exists. Before production, replace the preview SEO configuration with the canonical URL, robots/sitemap configuration, Open Graph image metadata, and approved Organization JSON-LD described in the implementation specification.
+```powershell
+node build.mjs
+npx wrangler versions upload --preview-alias card-layout --message 'Stacked card layout proof of concept'
+```
 
-## Verification checklist
+Record the actual returned URL and deployed revision in [verification/VERIFICATION.md](verification/VERIFICATION.md), then compare `/revision.json` and run hosted browser checks. A guessed alias is not deployment evidence.
 
-- Test desktop and responsive layouts at 320, 375, 768, 1024, and 1440 CSS pixels.
-- Test keyboard navigation, focus states, form validation, FAQ controls, menu controls, testimonial controls, and the service carousel.
-- Test prefers-reduced-motion and the backdrop-filter fallback. For a repeatable local reduced-motion check, open http://127.0.0.1:4173/?motion=reduce.
-- Inspect the browser console and network panel for errors, rejected promises, and failed required assets.
-- Run accessibility, performance, and SEO audits before release.
+## Verification
 
-## Important launch gates
+`tests/motion.test.mjs` checks deterministic paths, reverse continuity, release projection, bounds, queued navigation, cancellation, and interrupted state cleanup. Browser coverage and unavailable devices are recorded in [verification/VERIFICATION.md](verification/VERIFICATION.md). Browser automation is development tooling only and is not bundled into the site.
 
-- Replace or remove every Sample testimonial — replace before launch card.
-- Approve all credentials, service copy, FAQ copy, and metadata.
-- Add the separate bot-protected form backend.
-- Remove preview indexing restrictions only after the production domain is configured and verified.
+Physical iPhone Safari and Android touch/keyboard behavior require device review. Emulated pointers and screenshots do not establish native touch quality or performance. This is a non-delivering, noindex preview, not a production launch.

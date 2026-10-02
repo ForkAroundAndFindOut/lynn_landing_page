@@ -97,6 +97,10 @@ window.addEventListener('scroll', () => {
     if (index !== deck.index) deck.jump(index, { focus: false });
   });
 }, { passive: true });
+// Seed a deep link before enabling motion. Startup font/viewport measurements
+// must not cancel an animated jump and lose the requested section.
+const initialIndex = cards.findIndex(card => `#${card.id}` === location.hash);
+if (initialIndex >= 0) deck.jump(initialIndex, { focus: false });
 layout.refresh();
-followHash();
+if (initialIndex >= 0 && layout.mode === 'flow') cards[initialIndex].scrollIntoView({ block: 'start' });
 updateControls();

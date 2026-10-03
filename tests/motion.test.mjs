@@ -51,6 +51,24 @@ test('gesture travel stops at neighbors and deck boundaries', () => {
   assert.equal(positionFromTravel(2, -30, 120, 6), 1.75);
 });
 
+test('centered scale compensation exposes 10px and 20px at every card height', () => {
+  for (const cardHeight of [360, 503, 590]) {
+    const poses = evaluateStack({ ...geometry, position: 3, cardHeight });
+    for (const pose of poses) {
+      const depth = 3 - pose.index;
+      const exposed = -(pose.y + cardHeight * (1 - pose.scale) / 2);
+      assert.ok(Math.abs(exposed - depth * 10) < 1e-9);
+    }
+    for (const progress of [0.001, 0.25, 0.75, 0.999]) {
+      const poses = evaluateStack({ ...geometry, position: 2 + progress, cardHeight });
+      for (const pose of poses.filter(pose => pose.index <= 2)) {
+        const depth = Math.min(2 + progress - pose.index, 2);
+        assert.ok(Math.abs(pose.y + cardHeight * (1 - pose.scale) / 2 + depth * 10) < 1e-9);
+      }
+    }
+  }
+});
+
 test('slow releases, midpoint ties, and flick projection choose the intended neighbor', () => {
   assert.equal(decide({ position: 2.49 }), 2);
   assert.equal(decide({ position: 2.5 }), 2);

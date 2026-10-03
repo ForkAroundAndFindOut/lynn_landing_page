@@ -1,0 +1,12 @@
+{
+  "capture": "Playwright Chromium at 390 by 844 CSS pixels, mouse pointer interaction",
+  "source": "Local preview after startup section-link fix; same application assets as hosted revision 58af3ff2d8073a4e7aefbc0904e2e0f88399b23f",
+  "format": "WebM, VP8, 390x844, 25fps",
+  "verifiedWith": "Existing Playwright FFmpeg build 1011 metadata inspection",
+  "recordings": [
+    { "file": "slow-reversible-drag.webm", "seconds": 3.52, "shows": "Slow progress and reversal along the same card path, followed by return to origin" },
+    { "file": "short-flick.webm", "seconds": 2.00, "shows": "Short 36-pixel upward pointer flick and completed settlement" },
+    { "file": "contact-expansion.webm", "seconds": 2.92, "shows": "Contact card expanding into the whole-form dialog and closing" }
+  ],
+  "limitation": "These recordings do not establish native phone touch, keyboard, or performance quality."
+}

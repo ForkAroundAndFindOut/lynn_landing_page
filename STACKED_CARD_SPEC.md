@@ -1,5 +1,7 @@
 This specification defines a buildable proof of concept for a website whose content arrives as a layered stack of rounded cards. It tests the mobile gesture, visible depth, alternative desktop layouts, and a contact card that expands into a roomy form overlay.
 
+Implementation amendment, October 3, 2026: the owner approved touch swipes starting on ordinary text as well as open space, later desktop entrances, a cookie remembering review settings, and reload always restarting at the top. These requirements supersede the corresponding original defaults below. The existing card paths, presets, reversible tracking, native reading fallback, and simulated contact behavior are retained. The owner's reported device QA applies only to the earlier Cloudflare build; automated local and hosted checks are recorded separately.
+
 The source is the design discussion in this task. The mobile stacking and reversible gesture are established requirements. Desktop presentation, exact dimensions, form fields, and motion tuning remain exploratory. The defaults below make the prototype buildable without presenting those choices as final design approval.
 
 Deliverable: the proof of concept implemented in the existing GitHub repository and deployed to Cloudflare for preview, with a working preview URL, a short review guide, and browser verification evidence. Use the repository and Cloudflare deployment configuration already known to the implementing session and project. This document requests the specification only; no website has been implemented or deployed.
@@ -86,7 +88,9 @@ The stage clips incoming cards to the viewport or stage boundary. Its padding mu
 
 Maintain an active card index, a gesture origin index, a continuous signed transition amount, an animation state, and an overlay state. The primary browsing states are idle, dragging, and settling. Form and reading overlays suspend deck input.
 
-At gesture start, remember the settled card index and pointer position. Wait for approximately 6 pixels of movement before classifying the gesture. A deck drag requires vertical movement at least 1.2 times horizontal movement. Do not begin a deck gesture from links, buttons, form controls, selectable text, or an open overlay.
+At gesture start, remember the settled card index and pointer position. Wait for approximately 6 pixels of movement before classifying the gesture. A deck drag requires vertical movement at least 1.2 times horizontal movement. Touch starts may originate on ordinary active-card text or open space, excluding nested links, buttons, form controls, editable regions, custom interactive roles, no-drag regions, and an open overlay. Mouse text selection remains native.
+
+Do not prevent pending touch pointerdown or explicitly capture before acquiring a vertical drag. A pending touch yields permanently after 350 milliseconds, checking both the timer and event timestamp, so long presses remain native. Selection or a context menu also yields without clearing the selection. Suppress selection only during an acquired drag. Capture transfer from a touched descendant must not be mistaken for loss of the stage's capture. A second touch anywhere cancels to origin and yields to pinch zoom until all contacts end. Clean up timers, capture, and temporary selection styles on every exit.
 
 Let upward travel be positive:
 
@@ -122,7 +126,7 @@ The enhanced mobile deck owns vertical browsing gestures only inside its non-int
 
 Place native scrolling overlays outside the deck's gesture-constrained ancestors. Setting pan-y on a child cannot recover scrolling when an ancestor already disallows it. Suspend deck listeners during overlays rather than trying to let the same gesture scroll the form and turn a card.
 
-Preserve text selection. If a text region is excluded from gesture handling, the visible previous and next controls remain available. Do not prevent native gestures globally, capture wheel events across the page, or disable zoom.
+Preserve native long-press text selection and mouse selection. Ordinary touch swipes work across text and open space; previous and next controls remain available. Do not prevent native gestures globally, capture wheel events across the page, or disable zoom.
 
 ### Controls and rapid input
 
@@ -168,13 +172,15 @@ Keep direct finger tracking immediate in every preset. A preset changes settleme
 
 Expose these choices through a small POC review panel or documented demo URLs. Keep tuning numbers and implementation terminology out of ordinary website content. Optional debug indicators belong to the review panel and are off by default.
 
+Remember motion preset, desktop layout, the review reduced-motion override, debug visibility, and review-panel open state in a versioned host-only cookie for 30 days (Path=/, SameSite=Lax, Secure on HTTPS). Restore controls before initial geometry/motion evaluation; OS reduced motion always wins. Valid URL options override saved settings on initial entry; invalid values are ignored. Changing review settings saves the new choices and removes conflicting review query parameters while preserving unrelated parameters. Reset review settings clears the cookie and query overrides and applies defaults, keeping the panel open until the next reload. Ordinary reload always restarts at the first card/page top with preferences retained; newly opened section links still select their destination. Invalid or blocked cookies must not break controls, and persistence failures show a short panel notice. Never persist form values or section history. Local and hosted preferences are separate by hostname.
+
 ## Desktop and responsive presentation
 
 Provide two desktop views using the same content and contact behavior. The staggered view is the proposed initial desktop choice, not an approved final layout.
 
 In the staggered view, use two columns within a centered container of approximately 1120–1200 pixels, with about a 32-pixel gap and a 24–40-pixel vertical offset between columns. Several cards may be read simultaneously. Use predictable row order in the DOM; do not use dense grid packing that changes reading order.
 
-Cards fade and slide into place as normal scrolling brings them into view. Start with 24–40 pixels of displacement, no more than about 4 degrees of rotation, and a 260–340 millisecond entrance. Trigger once per card per page view; scrolling back up must not make previously read content disappear. Match entrance directions to the mobile sequence while keeping desktop movement small.
+Cards fade and slide into place as normal scrolling brings them into view. Use 24–40 pixels of displacement and no more than about 4 degrees of rotation. Trigger when a card reaches 15 percent of viewport height above the bottom edge (computed in pixels), wait 80 milliseconds, then fade for 380 milliseconds. Prepare pending entrances without a visible-then-hidden flash. Trigger once per card per page view; scrolling back up or restoring staggered layout must not make previously viewed content disappear. Direct section navigation reveals its destination immediately. Match entrance directions to the mobile sequence while keeping desktop movement small; desktop timing does not change mobile presets.
 
 Do not intercept the desktop wheel or force one wheel event to advance one card. Keep native scrolling, selection, keyboard reading, and links. Shadows and offsets communicate layering; cards must not cover another card's readable text or controls.
 
@@ -201,6 +207,8 @@ The overlay uses most of the available phone width and height and a comfortable 
 Include a top-right close button with the accessible name Close contact form and a practical touch target. Escape closes the overlay. Backdrop clicking may close as a proposed default, but must not clear a draft. A pointer gesture starting inside the dialog and ending outside must not count as a backdrop click.
 
 On close, return visually to the contact card where feasible and restore focus to the opener. Preserve entered data in memory for the page lifetime. Do not clear data merely because the user closes the form, changes layout, or navigates to another card. Do not store contact data in local storage, analytics, console logs, or a URL.
+
+Changing OS/review reduced motion during an entrance or dialog opening/closing must cancel motion into its valid readable endpoint immediately, preserving focus and draft values. Background layout stays locked until closing completes. A pointer starting inside the dialog and ending outside must not count as a backdrop close.
 
 ### Details and review
 

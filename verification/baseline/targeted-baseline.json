@@ -1,0 +1,10 @@
+{
+  "checkedAt": "2026-10-03",
+  "baseURL": "https://codex-card-layout-lynn-landing-page.nrct6ycww6.workers.dev",
+  "revision": "58af3ff2d8073a4e7aefbc0904e2e0f88399b23f",
+  "method": "Chromium 1228 executable, 390x844 hasTouch context; Input.dispatchTouchEvent; desktop 1440x900 IntersectionObserver constructor probe",
+  "touchTextStart": {"target": "hero-title", "travel": 40, "state": "idle", "position": "0.000", "implicitCapture": "hero-title"},
+  "touchBlankStart": {"target": "top", "travel": 40, "state": "dragging", "position": "0.346", "captureTransfer": "top -> deck-stage", "cancelState": "idle", "cancelPosition": "0.000"},
+  "desktopObserver": {"threshold": 0.08},
+  "limitations": "Browser touch input emulated. Native iPhone Safari, Android Chrome, and real-device performance unverified. Existing hosted build only; no full old suite repeated."
+}

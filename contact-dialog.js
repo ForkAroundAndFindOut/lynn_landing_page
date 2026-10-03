@@ -138,6 +138,12 @@ export function setupContact({ dialog, opener, sourceCard, beforeOpen, onClose, 
     });
   }
 
+  function refreshMotion() {
+    if (!isReduced()) return;
+    if (phase === 'opening') finishOpen(generation);
+    else if (phase === 'closing') finishClose();
+  }
+
   function errorFor(name) {
     const value = fields[name].value.trim();
     if (name === 'name' && !value) return 'Please enter your name.';
@@ -298,5 +304,5 @@ export function setupContact({ dialog, opener, sourceCard, beforeOpen, onClose, 
 
   // The no-script fallback stays disabled until the complete interaction is ready.
   opener.disabled = false;
-  return { open, close, get isOpen() { return phase !== 'closed'; } };
+  return { open, close, refreshMotion, get isOpen() { return phase !== 'closed'; } };
 }

@@ -68,7 +68,7 @@ export function evaluatePose({ index, id = index, progress, width, height, prese
  * A continuous u gives identical poses whether approached forwards or backwards.
  * At most three resting layers and one adjacent arrival are returned.
  */
-export function evaluateStack({ position, count, width, height, ids = [], preset = 'balanced' }) {
+export function evaluateStack({ position, count, width, height, cardHeight = 0, ids = [], preset = 'balanced' }) {
   if (count < 1) return [];
   const u = clamp(position, 0, count - 1);
   const base = Math.floor(u);
@@ -78,12 +78,16 @@ export function evaluateStack({ position, count, width, height, ids = [], preset
     const depth = u - index;
     // Fade the oldest exposed edge away as the fourth painted card arrives.
     const edgeOpacity = depth > 2 ? 3 - depth : 1;
+    const visibleDepth = Math.min(depth, 2);
+    const scale = 1 - MOTION.layerScale * visibleDepth;
     layers.push({
       index,
       x: 0,
-      y: depth === 0 ? 0 : -MOTION.layerOffset * Math.min(depth, 2),
+      // Centered scaling otherwise pulls the top edge back toward the active
+      // card. Compensate using card height, independently of path/stage height.
+      y: depth === 0 ? 0 : -MOTION.layerOffset * visibleDepth - cardHeight * (1 - scale) / 2,
       angle: 0,
-      scale: 1 - MOTION.layerScale * Math.min(depth, 2),
+      scale,
       opacity: (1 - Math.min(depth, 2) * 0.06) * edgeOpacity,
       shadow: 1 - Math.min(depth, 2) * 0.2,
       zIndex: index + 1,

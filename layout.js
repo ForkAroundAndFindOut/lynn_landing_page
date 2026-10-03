@@ -6,27 +6,87 @@ export function setupLayout({ stage, cards, deck, settings, isBlocked, onMode })
   let initialized = false;
   const entered = new Set();
   const entrances = new Map();
-  const observer = new IntersectionObserver(entries => {
-    for (const entry of entries) {
-      if (!entry.isIntersecting || entered.has(entry.target)) continue;
-      entered.add(entry.target);
-      if (mode !== 'flow' || settings.reduced || settings.desktop !== 'staggered' || innerWidth < 900) continue;
-      const i = cards.indexOf(entry.target);
-      const direction = (i - 1 + 3) % 3;
-      const transform = i === 0 ? 'none' : direction === 2 ? 'translateY(28px) rotate(2deg)' : `translateX(${direction === 0 ? -28 : 28}px) rotate(${direction === 0 ? -2 : 2}deg)`;
-      const animation = entry.target.animate([{ opacity: 0, transform }, { opacity: 1, transform: 'none' }], { duration: 300, easing: 'ease-out' });
-      entrances.set(entry.target, animation);
-      animation.finished.then(() => entrances.delete(entry.target)).catch(() => {});
+  let observer;
+  let observerKey;
+  let observerGeneration = 0;
+  let initialEntrance;
+
+  function revealCard(card) {
+    if (!card) return;
+    entered.add(card);
+    delete card.dataset.entrance;
+    entrances.get(card)?.cancel();
+    entrances.delete(card);
+    observer?.unobserve(card);
+  }
+
+  function animateEntrance(card) {
+    if (entered.has(card)) return;
+    if (mode !== 'flow' || settings.reduced || settings.desktop !== 'staggered' || innerWidth < 900 || isBlocked()) { revealCard(card); return; }
+    entered.add(card);
+    observer?.unobserve(card);
+    const i = cards.indexOf(card);
+    const direction = (i - 1 + 3) % 3;
+    const transform = i === 0 ? 'none' : direction === 2 ? 'translateY(28px) rotate(2deg)' : `translateX(${direction === 0 ? -28 : 28}px) rotate(${direction === 0 ? -2 : 2}deg)`;
+    // Pending CSS is cleared only after an animation with backwards fill owns
+    // opacity, so the delay cannot flash visible content before the fade.
+    const animation = card.animate([{ opacity: 0, transform }, { opacity: 1, transform: 'none' }], { delay: 80, duration: 380, easing: 'ease-out', fill: 'backwards' });
+    entrances.set(card, animation);
+    delete card.dataset.entrance;
+    animation.finished.then(() => { if (entrances.get(card) === animation) entrances.delete(card); }).catch(() => {});
+  }
+
+  function refreshEntrances(viewportHeight) {
+    const eligible = mode === 'flow' && !settings.reduced && settings.desktop === 'staggered' && innerWidth >= 900 && typeof IntersectionObserver !== 'undefined' && Boolean(cards[0]?.animate);
+    const inset = Math.round(viewportHeight * 0.15);
+    const key = `${mode}:${eligible}:${inset}`;
+    if (key === observerKey) return;
+    observerKey = key;
+    observer?.disconnect();
+    const generation = ++observerGeneration;
+    entrances.forEach(animation => animation.cancel());
+    entrances.clear();
+    if (!eligible) {
+      for (const card of cards) {
+        // Content actually in view is already read; switching presentation
+        // must not hide it again when animated desktop mode is restored.
+        const rect = card.getBoundingClientRect();
+        if (mode === 'flow' && rect.top < viewportHeight && rect.bottom > 0) entered.add(card);
+        delete card.dataset.entrance;
+      }
     }
-  }, { threshold: 0.08 });
-  cards.forEach(card => observer.observe(card));
+    if (mode !== 'flow' || typeof IntersectionObserver === 'undefined') return;
+    observer = new IntersectionObserver(entries => {
+      if (generation !== observerGeneration || mode !== 'flow') return;
+      for (const entry of entries) {
+        // Edge adjacency counts with threshold zero; ignoring a zero ratio can
+        // miss the next threshold notification and strand a pending card.
+        if (!entry.isIntersecting) continue;
+        if (eligible) animateEntrance(entry.target);
+        else revealCard(entry.target);
+      }
+    }, { rootMargin: eligible ? `0px 0px -${inset}px 0px` : '0px', threshold: 0 });
+    for (const card of cards) {
+      if (entered.has(card) || card.getBoundingClientRect().bottom <= 0) { revealCard(card); continue; }
+      if (eligible) card.dataset.entrance = 'pending';
+      observer.observe(card);
+    }
+  }
 
   function refresh() {
     frame = 0;
+    // Reduced motion also cancels background entrances during a locked form.
+    if (settings.reduced) {
+      observer?.disconnect();
+      observerKey = undefined;
+      observerGeneration += 1;
+      initialEntrance?.cancel();
+      entrances.forEach(animation => animation.cancel());
+      entrances.clear();
+      cards.forEach(card => { delete card.dataset.entrance; });
+    }
     if (isBlocked()) return;
     deck.settle();
-    entrances.forEach(animation => animation.cancel());
-    entrances.clear();
     const previous = mode;
     const viewportHeight = window.visualViewport?.height ?? innerHeight;
     const viewportWidth = window.visualViewport?.width ?? innerWidth;
@@ -49,7 +109,7 @@ export function setupLayout({ stage, cards, deck, settings, isBlocked, onMode })
       if (neededHeight > currentHeight) stage.style.setProperty('--card-height', `${neededHeight}px`);
       if (neededHeight <= stageHeight - 42) {
         mode = 'deck';
-        reason = 'Card view: drag open space vertically, or use the arrows.';
+        reason = 'Card view: swipe text or open space vertically, or use the arrows.';
       } else {
         mode = 'flow';
         reason = 'Reading view keeps enlarged or compact-screen content fully visible.';
@@ -60,6 +120,7 @@ export function setupLayout({ stage, cards, deck, settings, isBlocked, onMode })
     }
     document.body.dataset.mode = mode;
     deck.setEnabled(mode === 'deck');
+    refreshEntrances(viewportHeight);
     const navigation = document.querySelector('.deck-navigation');
     if (!narrow && navigation.contains(document.activeElement)) cards[deck.index].querySelector('h1,h2').focus({ preventScroll: true });
     navigation.hidden = !narrow;
@@ -73,18 +134,19 @@ export function setupLayout({ stage, cards, deck, settings, isBlocked, onMode })
       if (mode === 'flow') cards[deck.index].scrollIntoView({ block: 'start' });
       else window.scrollTo(0, 0);
     }
-    if (!initialized && mode === 'deck' && deck.index === 0 && !settings.reduced) cards[0].animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300 });
+    if (!initialized && mode === 'deck' && deck.index === 0 && !settings.reduced) initialEntrance = cards[0].animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300 });
     initialized = true;
     onMode(mode);
   }
   function schedule() { if (!frame) frame = requestAnimationFrame(refresh); }
   window.addEventListener('resize', schedule);
   window.visualViewport?.addEventListener('resize', schedule);
+  stage.addEventListener('focusin', event => { if (mode === 'flow') revealCard(event.target.closest('.card')); });
   // Font enlargement can occur independently of a viewport resize.
   const fontProbe = document.createElement('span');
   fontProbe.setAttribute('aria-hidden', 'true');
   Object.assign(fontProbe.style, { position: 'absolute', visibility: 'hidden', width: '1em', height: '1em', pointerEvents: 'none' });
   document.body.append(fontProbe);
   new ResizeObserver(schedule).observe(fontProbe);
-  return { refresh, get mode() { return mode; }, toggleReading() { readAsPage = !readAsPage; refresh(); } };
+  return { refresh, revealCard, get mode() { return mode; }, toggleReading() { readAsPage = !readAsPage; refresh(); } };
 }

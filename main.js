@@ -3,6 +3,18 @@ import { setupContact } from './contact-dialog.js';
 import { setupSettings } from './demo-settings.js';
 import { setupLayout } from './layout.js';
 
+const restartingReview = performance.getEntriesByType('navigation')[0]?.type === 'reload';
+if (restartingReview) {
+  const restoration = history.scrollRestoration;
+  history.scrollRestoration = 'manual';
+  history.replaceState(null, '', `${location.pathname}${location.search}#top`);
+  window.scrollTo(0, 0);
+  window.addEventListener('pageshow', () => requestAnimationFrame(() => {
+    window.scrollTo(0, 0);
+    history.scrollRestoration = restoration;
+  }), { once: true });
+}
+
 const stage = document.querySelector('#deck-stage');
 const cards = [...stage.querySelectorAll('.card')];
 const previous = document.querySelector('#previous-card');
@@ -14,7 +26,7 @@ let contact;
 let debugObserver;
 let readingFrame = 0;
 let trackReading = false;
-const settings = setupSettings(() => { deck.settle(); layout.refresh(); updateDebug(); });
+const settings = setupSettings(() => { deck.settle(); contact?.refreshMotion(); layout.refresh(); updateDebug(); });
 
 function updateControls() {
   previous.disabled = top.disabled = deck.index === 0;
@@ -41,6 +53,7 @@ const deck = createDeck({
     document.querySelector('#card-status').textContent = `Card ${index + 1} of ${cards.length}: ${heading.textContent}`;
     if (focus) {
       trackReading = false;
+      layout?.revealCard(cards[index]);
       const target = focusContact ? opener : heading;
       if (layout?.mode === 'flow') cards[index].scrollIntoView({ block: 'start' });
       target.focus({ preventScroll: true });
@@ -102,5 +115,7 @@ window.addEventListener('scroll', () => {
 const initialIndex = cards.findIndex(card => `#${card.id}` === location.hash);
 if (initialIndex >= 0) deck.jump(initialIndex, { focus: false });
 layout.refresh();
+if (!restartingReview && initialIndex >= 0) layout.revealCard(cards[initialIndex]);
 if (initialIndex >= 0 && layout.mode === 'flow') cards[initialIndex].scrollIntoView({ block: 'start' });
+if (restartingReview) window.scrollTo(0, 0);
 updateControls();

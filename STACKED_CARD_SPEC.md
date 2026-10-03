@@ -4,7 +4,7 @@ Implementation amendment, October 3, 2026: the owner approved touch swipes start
 
 The source is the design discussion in this task. The mobile stacking and reversible gesture are established requirements. Desktop presentation, exact dimensions, form fields, and motion tuning remain exploratory. The defaults below make the prototype buildable without presenting those choices as final design approval.
 
-Deliverable: the proof of concept implemented in the existing GitHub repository and deployed to Cloudflare for preview, with a working preview URL, a short review guide, and browser verification evidence. Use the repository and Cloudflare deployment configuration already known to the implementing session and project. This document requests the specification only; no website has been implemented or deployed.
+Deliverable: the proof of concept implemented in the existing GitHub repository and deployed to Cloudflare for preview, with a working preview URL, a short review guide, and browser verification evidence. Use the repository and Cloudflare deployment configuration already known to the implementing session and project. This document defines the acceptance criteria; implementation and deployed results are recorded in verification/VERIFICATION.md.
 
 ## Scope and decisions
 
@@ -90,7 +90,7 @@ Maintain an active card index, a gesture origin index, a continuous signed trans
 
 At gesture start, remember the settled card index and pointer position. Wait for approximately 6 pixels of movement before classifying the gesture. A deck drag requires vertical movement at least 1.2 times horizontal movement. Touch starts may originate on ordinary active-card text or open space, excluding nested links, buttons, form controls, editable regions, custom interactive roles, no-drag regions, and an open overlay. Mouse text selection remains native.
 
-Do not prevent pending touch pointerdown or explicitly capture before acquiring a vertical drag. A pending touch yields permanently after 350 milliseconds, checking both the timer and event timestamp, so long presses remain native. Selection or a context menu also yields without clearing the selection. Suppress selection only during an acquired drag. Capture transfer from a touched descendant must not be mistaken for loss of the stage's capture. A second touch anywhere cancels to origin and yields to pinch zoom until all contacts end. Clean up timers, capture, and temporary selection styles on every exit.
+Do not prevent pending touch pointerdown or explicitly capture before acquiring a vertical drag. Card mode prioritizes swiping: cancel an early selectstart only while an eligible touch is pending before its 350ms deadline, retaining the candidate so movement can acquire the swipe. A pending touch yields permanently after 350 milliseconds, checking both the timer and event timestamp, so a deliberate hold can use native selection. The cutoff is application tuning, not a universal native long-press threshold. An existing/noncollapsed selection or a context menu yields without clearing selection. Suppress selection through scoped CSS only during an acquired drag. Keep semantic HTML text inside the cards; extra text boxes are unnecessary. Capture transfer from a touched descendant must not be mistaken for loss of the stage's capture. A second touch anywhere cancels to origin and yields to pinch zoom until all contacts end. Clean up timers, capture, and temporary selection styles on every exit.
 
 Let upward travel be positive:
 
@@ -329,7 +329,7 @@ Do not tune elaborate surface effects before gesture continuity, form scrolling,
 | JavaScript disabled | Cards remain readable in normal order and the form does not imply real delivery |
 | Cloudflare preview | The deployed preview URL loads the intended repository revision and its assets; mobile gestures, desktop layouts, and contact demo work on the hosted site |
 
-Acceptance is a checklist for the future implementation, not a claim that these checks have passed.
+Acceptance defines required behavior, not a substitute for test evidence. Passed checks and unavailable browser/device coverage are recorded in verification/VERIFICATION.md.
 
 ## Verification and review deliverables
 

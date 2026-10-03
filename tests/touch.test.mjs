@@ -170,12 +170,12 @@ test('event timestamps enforce the hold deadline even when the timer callback is
   h.clean();
 });
 
-test('native selection and context menu yield without clearing or suppressing pending selection', (t) => {
+test('hold selection, actual selection and context menu yield without clearing native selection', (t) => {
   const h = touchHarness(t);
   for (const name of ['selectstart', 'selectionchange', 'contextmenu']) {
     h.down();
     if (name === 'selectionchange') h.selection.isCollapsed = false;
-    assert.equal(h.dispatch(name).defaultPrevented, false);
+    assert.equal(h.dispatch(name, name === 'selectstart' ? { timeStamp: 350 } : {}).defaultPrevented, false);
     h.move();
     assert.equal(h.deck.state, 'idle');
     if (name === 'selectionchange') assert.equal(h.selection.isCollapsed, false);
@@ -188,6 +188,46 @@ test('native selection and context menu yield without clearing or suppressing pe
   h.move();
   h.up();
   h.clean();
+});
+
+test('early touch selectstart is suppressed while the candidate survives to a reversible 6px drag', (t) => {
+  const h = touchHarness(t);
+  h.deck.jump(2);
+  const target = h.element('p', {}, h.cards[2]);
+  assert.equal(h.down({ target }).defaultPrevented, false);
+  assert.equal(h.dispatch('selectstart', { target, timeStamp: 100 }).defaultPrevented, true);
+  assert.equal(h.timers.size, 1, 'selection suppression must retain the pending candidate');
+  assert.equal(h.captures.size, 0);
+  assert.equal(h.stage.classList.contains('is-deck-dragging'), false);
+  assert.equal(h.move({ target, clientY: 394, timeStamp: 110 }).defaultPrevented, true);
+  assert.equal(h.deck.state, 'dragging');
+  assert.ok(h.deck.position > 2);
+  h.move({ target, clientY: 450, timeStamp: 140 });
+  assert.ok(h.deck.position < 2, 'the same contact can reverse the acquired drag');
+  h.move({ target, clientY: 400, timeStamp: 240 });
+  assert.equal(h.deck.position, 2);
+  h.up({ target, clientY: 400, timeStamp: 340 });
+  assert.equal(h.deck.index, 2);
+  h.clean();
+});
+
+test('hold selectstart at or after 350ms stays native even when the timer callback is delayed', (t) => {
+  const h = touchHarness(t);
+  for (const heldFor of [350, 500]) {
+    h.down();
+    h.advance(heldFor, false);
+    assert.equal(h.timers.size, 1, 'the timer deliberately has not fired');
+    assert.equal(h.dispatch('selectstart').defaultPrevented, false);
+    assert.equal(h.timers.size, 0);
+    h.move();
+    assert.equal(h.deck.state, 'idle', 'yielding selection prevents reacquisition by that contact');
+    h.selection.isCollapsed = false;
+    h.dispatch('selectionchange');
+    assert.equal(h.selection.isCollapsed, false);
+    h.up();
+    h.clean();
+    h.selection.isCollapsed = true;
+  }
 });
 
 test('an acquired drag suppresses selectstart only inside the stage and releases the scope on completion', (t) => {

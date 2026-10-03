@@ -217,6 +217,40 @@ await check('touch implicit capture transfers to stage and genuine capture loss 
   await session.detach(); return { captures, method: 'Native Chromium touch dispatch and releasePointerCapture, not synthetic lostpointercapture' };
 }));
 
+await check('early touch selection attempt allows swipe while a held touch yields to selection', async () => isolated({}, async (page, context) => {
+  const session = await context.newCDPSession(page);
+  const attemptSelection = () => page.locator('#hero-title').evaluate(el => {
+    const event = new Event('selectstart', { bubbles: true, cancelable: true });
+    el.dispatchEvent(event);
+    return { defaultPrevented: event.defaultPrevented, collapsed: window.getSelection().isCollapsed };
+  });
+  let start = await textPoint(page);
+  await touch(session, 'touchStart', [start]); await page.waitForTimeout(100);
+  const early = await attemptSelection();
+  assert.equal(early.defaultPrevented, true, 'pending touch candidate suppresses early accidental selection');
+  assert.equal(early.collapsed, true);
+  await touchTravel(page, session, start, 40);
+  const drag = await state(page);
+  assert.equal(drag.state, 'dragging'); assert.ok(drag.position > .2);
+  assert.equal(await page.evaluate(() => window.getSelection().isCollapsed), true);
+  await touch(session, 'touchCancel'); await settled(page, 0);
+  start = await textPoint(page); await touch(session, 'touchStart', [start]);
+  await page.waitForTimeout(410);
+  const held = await attemptSelection();
+  assert.equal(held.defaultPrevented, false, 'held touch permits native selection');
+  await touchTravel(page, session, start, 40);
+  assert.equal((await state(page)).state, 'idle'); assert.equal((await state(page)).position, 0);
+  await touch(session, 'touchEnd'); await settled(page, 0);
+  await page.evaluate(() => window.getSelection().removeAllRanges());
+  // Mouse text-selection remains native even though the same text is a touch
+  // candidate. Synthetic selectstart tests cancellation policy, not OS UI.
+  start = await textPoint(page); await page.mouse.move(start.x, start.y); await page.mouse.down();
+  const mouse = await attemptSelection(); assert.equal(mouse.defaultPrevented, false);
+  await page.mouse.up(); await settled(page, 0);
+  await session.detach();
+  return { early, held, mouse, dragProgress: drag.position, method: 'selectstart events explicitly synthetic; movement uses Chromium CDP touch input. Native device selection and long-press UI remain unverified.' };
+}));
+
 await check('touch hold, context menu, horizontal intent, and additional touch cancel cleanly', async () => isolated({}, async (page, context) => {
   const session = await context.newCDPSession(page);
   let start = await textPoint(page);

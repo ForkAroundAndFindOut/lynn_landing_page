@@ -316,7 +316,9 @@ export function createDeck({ stage, cards, onChange = () => {}, isBlocked = () =
   stage.addEventListener('pointerleave', (event) => { if (state !== 'dragging') cancelGesture(event); });
   stage.addEventListener('contextmenu', () => cancelGesture());
   stage.addEventListener('selectstart', (event) => {
-    if (gesture && state === 'dragging') event.preventDefault();
+    // Favor an ordinary touch swipe until its hold deadline. Event time also
+    // permits intentional hold selection when the timer callback is delayed.
+    if (gesture && (state === 'dragging' || (gesture.pointerType === 'touch' && event.timeStamp < gesture.deadline))) event.preventDefault();
     else cancelGesture();
   });
   document.addEventListener('selectionchange', () => { if (hasSelection()) cancelGesture(); });

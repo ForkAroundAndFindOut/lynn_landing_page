@@ -296,6 +296,182 @@ await check('two-touch pinch preserves browser zoom and cancels deck gesture', a
   return { ...zoom, deckAction, method: 'Chromium CDP two-touch emulation; actual browser pinch scaling is observational, not real-device validation' };
 }));
 
+// Wheel checks use browser-dispatched input. Mode normalization and lifecycle
+// notifications are explicitly synthetic; this is not physical trackpad coverage.
+async function wheelProbe(page) {
+  await page.evaluate(() => {
+    window.__wheelEvents = [];
+    window.addEventListener('wheel', event => window.__wheelEvents.push({
+      x: event.deltaX, y: event.deltaY, mode: event.deltaMode, ctrl: event.ctrlKey,
+      prevented: event.defaultPrevented, trusted: event.isTrusted,
+      target: event.target.id || event.target.tagName,
+    }), { passive: true });
+  });
+}
+async function wheelStep(page, deltaY, deltaX = 0, delay = 45) {
+  await page.mouse.wheel(deltaX, deltaY); await page.waitForTimeout(delay);
+}
+async function wheelPoint(page) {
+  const point = await textPoint(page); await page.mouse.move(point.x, point.y); return point;
+}
+
+await check('wheel browser input gives continuous reversible progress in touch and PC deck contexts', async () => {
+  const measurements = [];
+  for (const [width, height, hasTouch] of [[390, 844, true], [800, 900, false]]) {
+    await isolated({ viewport: { width, height }, hasTouch }, async page => {
+      assert.equal((await state(page)).mode, 'deck'); await wheelProbe(page); await wheelPoint(page);
+      await wheelStep(page, 12); const first = await state(page);
+      assert.equal(first.state, 'wheeling'); assert.ok(first.position > .05 && first.position < .5);
+      const poses = await page.locator('.card').evaluateAll(cards => cards.map(card => card.style.transform));
+      await wheelStep(page, 12); const second = await state(page);
+      assert.ok(second.position > first.position && second.position < 1);
+      await wheelStep(page, -12); const reversed = await state(page);
+      assert.ok(Math.abs(reversed.position - first.position) < .002);
+      assert.deepEqual(await page.locator('.card').evaluateAll(cards => cards.map(card => card.style.transform)), poses);
+      await wheelStep(page, -12); await settled(page, 0);
+      assert.equal(await page.evaluate(() => scrollY), 0);
+      const events = await page.evaluate(() => window.__wheelEvents);
+      assert.equal(events.length, 4); assert.ok(events.every(event => event.trusted && event.prevented));
+      measurements.push({ width, height, hasTouch, first: first.position, second: second.position, reversed: reversed.position });
+    });
+  }
+  return { measurements, method: 'Playwright page.mouse.wheel through Chromium input; physical PC/Mac trackpad remains unverified' };
+});
+
+await check('wheel burst inertia cannot skip cards and fresh reverse bursts navigate', async () => isolated({ hasTouch: false, viewport: { width: 800, height: 900 } }, async page => {
+  await wheelPoint(page); await wheelStep(page, 160);
+  for (const delta of [100, 80, 50, 30, 15, 8, 4]) {
+    await wheelStep(page, delta, 0, 75); assert.ok((await state(page)).position <= 1);
+  }
+  // Maintain an uninterrupted low-delta tail well beyond animation duration.
+  for (let i = 0; i < 10; i++) { await wheelStep(page, 1, 0, 90); assert.ok((await state(page)).position <= 1); }
+  await settled(page, 1); await page.waitForTimeout(650);
+  await wheelPoint(page); await wheelStep(page, 90); await settled(page, 2); await page.waitForTimeout(650);
+  await wheelPoint(page); await wheelStep(page, -90); await settled(page, 1);
+  await page.waitForTimeout(650); await wheelPoint(page); await wheelStep(page, -90); await settled(page, 0);
+  await page.waitForTimeout(650); await wheelPoint(page); await wheelStep(page, -180); await settled(page, 0);
+  await page.locator('.header-contact').click(); await settled(page, 5);
+  await wheelPoint(page); await wheelStep(page, 180); await settled(page, 5);
+  return { method: 'Browser-dispatched wheel including a sustained inertia tail, deliberate quiet gaps, reversal, and both deck bounds' };
+}));
+
+await check('wheel line and page delta modes normalize and retain cancellable listener policy', async () => {
+  const measurements = [];
+  for (const deltaMode of [1, 2]) await isolated({ hasTouch: false }, async page => {
+    const event = await page.locator('#hero-title').evaluate((el, deltaMode) => {
+      const wheel = new WheelEvent('wheel', { bubbles: true, cancelable: true, deltaY: 1, deltaMode });
+      el.dispatchEvent(wheel); return { prevented: wheel.defaultPrevented, trusted: wheel.isTrusted };
+    }, deltaMode);
+    assert.equal(event.prevented, true); assert.equal(event.trusted, false);
+    await settled(page, 1); measurements.push({ deltaMode, ...event });
+  });
+  return { measurements, method: 'Synthetic WheelEvent deltaMode=1/2; actual browser input above covers pixel-mode wheel dispatch' };
+});
+
+await check('wheel horizontal intent and control-modified browser zoom input bypass the deck', async () => isolated({ hasTouch: false }, async page => {
+  await wheelProbe(page); await wheelPoint(page);
+  await wheelStep(page, 12, 180); await settled(page, 0);
+  const horizontal = await page.evaluate(() => window.__wheelEvents.at(-1));
+  assert.equal(horizontal.trusted, true); assert.equal(horizontal.prevented, false);
+  await page.keyboard.down('Control');
+  try { await wheelStep(page, -60); } finally { await page.keyboard.up('Control'); }
+  await page.waitForTimeout(400);
+  const zoom = await page.evaluate(() => window.__wheelEvents.at(-1));
+  assert.equal(zoom.ctrl, true); assert.equal(zoom.trusted, true); assert.equal(zoom.prevented, false);
+  assert.ok((await state(page)).state !== 'wheeling');
+  assert.ok((await state(page)).position === 0 || (await state(page)).mode === 'flow');
+  return { horizontal, zoom, method: 'Browser-dispatched horizontal and Control+wheel; browser zoom policy is uncancelled, actual physical pinch scaling remains unverified' };
+}));
+
+await check('wheel nested scrolling and input controls retain their native paths', async () => isolated({ hasTouch: false }, async page => {
+  await wheelProbe(page);
+  await page.locator('#top .card-body').evaluate(body => {
+    const scroller = document.createElement('div'); scroller.id = 'wheel-test-scroller';
+    scroller.style.cssText = 'height:65px;overflow:auto;position:absolute;left:35px;top:230px;width:180px;z-index:99;background:white';
+    scroller.innerHTML = '<div style="height:700px">Nested reading content</div>'; body.append(scroller);
+    const input = document.createElement('input'); input.id = 'wheel-test-input';
+    input.style.cssText = 'position:absolute;left:35px;top:320px;width:160px;z-index:99'; body.append(input);
+  });
+  let box = await page.locator('#wheel-test-scroller').boundingBox();
+  await page.mouse.move(box.x + 50, box.y + 25); await wheelStep(page, 180, 0, 150);
+  assert.ok(await page.locator('#wheel-test-scroller').evaluate(el => el.scrollTop > 0));
+  await settled(page, 0); assert.equal(await page.evaluate(() => window.__wheelEvents.at(-1).prevented), false);
+  await page.locator('#wheel-test-input').fill('Preserved control');
+  box = await page.locator('#wheel-test-input').boundingBox();
+  await page.mouse.move(box.x + 25, box.y + 10); await wheelStep(page, 180); await settled(page, 0);
+  assert.equal(await page.evaluate(() => window.__wheelEvents.at(-1).prevented), false);
+  assert.equal(await page.locator('#wheel-test-input').inputValue(), 'Preserved control');
+  await page.locator('#next-card').click(); await settled(page, 1);
+  return { method: 'Browser wheel scrolls a bounded nested overflow fixture; editable input and existing navigation controls remain usable' };
+}));
+
+await check('wheel contact textarea scrolls while dialog locks deck position', async () => isolated({ hasTouch: false }, async page => {
+  await page.locator('.header-contact').click(); await settled(page, 5);
+  await page.locator('#open-contact').click(); await page.waitForTimeout(400); await wheelProbe(page);
+  await page.locator('#message').fill('A long inquiry line for native textarea scrolling.\n'.repeat(120));
+  await page.locator('#message').evaluate(el => { el.scrollTop = 0; });
+  const box = await page.locator('#message').boundingBox();
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2); await wheelStep(page, 180, 0, 150);
+  const scrolled = await page.locator('#message').evaluate(el => el.scrollTop);
+  assert.ok(scrolled > 0); await settled(page, 5);
+  assert.equal(await page.evaluate(() => window.__wheelEvents.at(-1).prevented), false);
+  await page.locator('#name').fill('Wheel Tester'); assert.equal(await page.locator('#name').inputValue(), 'Wheel Tester');
+  await page.keyboard.press('Escape'); await page.waitForTimeout(400); await settled(page, 5);
+  return { textareaScrollTop: scrolled, method: 'Native browser wheel input inside contact textarea; no background card navigation' };
+}));
+
+await check('wheel desktop, reduced motion, and Read as page keep native document scrolling', async () => {
+  const measurements = [];
+  for (const variant of ['desktop', 'reduced', 'reading']) {
+    const options = variant === 'desktop' ? { viewport: { width: 1280, height: 900 }, hasTouch: false }
+      : variant === 'reduced' ? { reducedMotion: 'reduce', hasTouch: false } : { hasTouch: false };
+    await isolated(options, async page => {
+      if (variant === 'reading') await page.locator('#read-mode').click();
+      await page.waitForTimeout(200); assert.equal((await state(page)).mode, 'flow');
+      await page.evaluate(() => scrollTo(0, 0)); await wheelProbe(page);
+      await page.mouse.move(190, 400); await wheelStep(page, 500, 0, 300);
+      const y = await page.evaluate(() => scrollY); assert.ok(y > 100);
+      assert.equal(await page.evaluate(() => window.__wheelEvents.at(-1).prevented), false);
+      assert.equal(await page.locator('.card[inert]').count(), 0); measurements.push({ variant, scrollY: y });
+    });
+  }
+  return { measurements, method: 'Browser-dispatched wheel in each normal document flow mode' };
+});
+
+await check('wheel lifecycle cancellation clears release timers across blur, resize, reading and reduced motion', async () => {
+  for (const variant of ['blur', 'resize', 'reading', 'reduced']) await isolated({ hasTouch: false }, async page => {
+    await wheelPoint(page); await wheelStep(page, 12); assert.equal((await state(page)).state, 'wheeling');
+    if (variant === 'blur') await page.evaluate(() => window.dispatchEvent(new Event('blur')));
+    if (variant === 'resize') await page.setViewportSize({ width: 1280, height: 900 });
+    if (variant === 'reading') await page.locator('#read-mode').click();
+    if (variant === 'reduced') await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.waitForTimeout(900);
+    assert.ok((await state(page)).state !== 'wheeling');
+    if (variant === 'resize') await page.setViewportSize({ width: 390, height: 844 });
+    if (variant === 'reading') await page.locator('#read-mode').click();
+    if (variant === 'reduced') await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await settled(page, 0); await page.waitForTimeout(650); await settled(page, 0);
+    await wheelPoint(page); await wheelStep(page, 90); await settled(page, 1);
+  });
+  return { method: 'Native viewport/media/control changes; window blur is explicitly synthetic. Subsequent wheel input verifies no stale gesture/timer interference.' };
+});
+
+await check('PC touchscreen and mouse pointer paths work alongside wheel navigation', async () => {
+  const measurements = [];
+  for (const [width, height, hasTouch] of [[390, 844, true], [800, 900, false]]) await isolated({ viewport: { width, height }, hasTouch }, async (page, context) => {
+    const session = await context.newCDPSession(page); const start = await textPoint(page);
+    await touch(session, 'touchStart', [start]); await touchTravel(page, session, start, 90, 130);
+    assert.equal((await state(page)).state, 'dragging'); await touch(session, 'touchEnd'); await settled(page, 1);
+    await page.waitForTimeout(650); await wheelPoint(page); await wheelStep(page, 90); await settled(page, 2);
+    await page.locator('#go-top').click(); await settled(page, 0);
+    const blank = await blankPoint(page); await page.mouse.move(blank.x, blank.y); await page.mouse.down();
+    await page.mouse.move(blank.x, blank.y - 100, { steps: 8 }); await page.waitForTimeout(100);
+    assert.equal((await state(page)).state, 'dragging'); await page.mouse.up(); await settled(page, 1);
+    await session.detach(); measurements.push({ width, height, hasTouch, touch: 'CDP', mouse: 'Playwright' });
+  });
+  return { measurements, method: 'CDP touchscreen input in touch-capable mobile and narrow non-touch PC contexts; physical Windows touchscreen remains unverified' };
+});
+
 await check('all review controls and panel persist, reload starts at top, fresh links survive', async () => isolated({}, async (page, context) => {
   await page.locator('#review-settings summary').click();
   await page.locator('#motion-preset').selectOption('gentle');

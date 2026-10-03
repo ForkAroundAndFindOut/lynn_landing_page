@@ -2,6 +2,8 @@
 
 Date: 2026-10-03 (America/Los_Angeles).
 
+The trackpad/wheel follow-up below records the latest input-support work. The earlier selection, settings, layout, and recording evidence is retained as the preceding acceptance baseline.
+
 ## Isolation
 
 The POC is implemented in a managed worktree on the new `codex/card-layout` branch, based on `main` at `0b10b41b59e717da2cc6f83f9e950250541eac3d`. The original checkout remains on `main`. No production deploy or merge is part of this work.
@@ -21,7 +23,17 @@ Existing remote branches are `main`, `floating-card`, and `scrolling-reveal`, wi
 
 Production baseline: https://lynn-landing-page.nrct6ycww6.workers.dev/ returned HTTP 200. Its HTML SHA-256 (UTF-8 response content) before this work was `4e48750db67c9167ae8cde0d95bc5eaf4f326e9613143f39b976474e50c8cae3`. Active production version in the dashboard: `b19c9862` (100%).
 
-## Automated and visual checks
+## Trackpad and wheel follow-up
+
+The owner reported that two-finger PC trackpad scrolling did not advance cards on the hosted preview. Chromium wheel input reproduced that failure on revision `8b368c6` at both 390 × 844 and 800 × 900; the 1280 × 900 desktop flow scrolled normally. [Wheel baseline](wheel/baseline.json) records the separate delivery paths.
+
+Card mode now handles vertical wheel input over its stage. Pixel, line (16px), and page (stage-height) deltas drive the existing motion path with 80px of normalized travel per card, a 16px wheel commitment threshold, and a 180ms quiet interval. A burst is bounded to one adjacent card, reversal discards overshoot and retraces immediately, and residual settlement input is consumed without queued navigation. Touch drag thresholds and presets are unchanged. Wide desktop, reading, reduced-motion, form fields, nested scroll areas, zoom, horizontal input, and selected text retain native behavior. Pointer input, explicit navigation, resizing, overlays, mode changes, tab hiding, and blur clear wheel state.
+
+The focused unit suite has 50 passing tests, including 12 new wheel cases. The [local combined browser report](wheel/local/browser-results.md) records 52 PASS, 0 FAIL, and 1 UNVERIFIED (known unavailable WebKit engine), with 797 GET requests and no browser errors or submissions. It covers real Chromium wheel-event delivery, synthetic line/page units, touch-pointer delivery at phone and PC widths, and the previous touch/settings/desktop/dialog regressions. Existing motion recordings are retained; the recording-generation check was not repeated. The precommit report identifies the prior HEAD with candidate asset hashes. Hosted evidence will be added after the version-preview upload is verified.
+
+The provisional wheel thresholds are application tuning; there is no reliable cross-browser signal separating a wheel notch from a trackpad momentum stream. Automated Chromium input does not establish physical PC/Mac trackpad inertia, actual desktop touchscreen behavior, native Safari, or phone/tablet keyboard and long-press behavior. These remain device-QA requirements. The experimental delayed swipe hint is excluded from this parent branch.
+
+## Earlier automated and visual checks
 
 - `node --test tests/*.test.mjs`: 38 passing tests for deterministic motion, measured stack depth, touch arbitration and interruption cleanup, cookie schema, query precedence, and persistence failures.
 - `node build.mjs`: public static assets plus revision/hash metadata generated successfully.

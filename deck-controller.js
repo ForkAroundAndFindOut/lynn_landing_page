@@ -1,7 +1,11 @@
 import { MOTION, clamp, easeOut, evaluateStack, positionFromTravel, presetFor, releaseTarget, releaseVelocity, travelDistance } from './motion.js';
+import { WHEEL, normalizeWheel, wheelTravel, wheelTarget } from './wheel-input.js';
 
 const INTERACTIVE_START = 'a, button, input, textarea, select, option, label, summary, [contenteditable], [data-no-drag], [role="button"], [role="link"], [role="checkbox"], [role="combobox"], [role="listbox"], [role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"], [role="option"], [role="radio"], [role="slider"], [role="spinbutton"], [role="switch"], [role="tab"], [role="textbox"], [role="treeitem"]';
 const MOUSE_EXCLUDED_START = `${INTERACTIVE_START}, p, h1, h2, h3, h4, h5, h6, li, span, strong, em, small, blockquote, code, pre, dt, dd`;
+// Links and ordinary buttons accept wheel navigation just as on a native page.
+// Form controls and scrolling widgets retain their own wheel behavior.
+const WHEEL_EXCLUDED = 'input, textarea, select, option, [contenteditable], [data-no-drag], [data-no-wheel], [role="combobox"], [role="listbox"], [role="slider"], [role="spinbutton"], [role="textbox"], [role="tree"]';
 const TOUCH_HOLD_DELAY = 350;
 const OWNED_STYLES = ['transform', 'opacity', 'visibility', 'z-index', 'will-change', '--card-shadow-strength'];
 
@@ -21,6 +25,8 @@ export function createDeck({ stage, cards, onChange = () => {}, isBlocked = () =
   let fade = 1;
   let holdTimer = 0;
   let multiTouch = false;
+  let wheel = null;
+  let wheelTimer = 0;
   const touchContacts = new Set();
   const ids = cards.map((card) => card.id);
 
@@ -82,6 +88,7 @@ export function createDeck({ stage, cards, onChange = () => {}, isBlocked = () =
     cancelFrame();
     animation = null;
     state = 'idle';
+    if (wheel?.phase === 'settling' && !wheelTimer) wheel = null;
     position = index = clamp(target, 0, cards.length - 1);
     fade = 1;
     if (enabled) { syncSemantics(); render(); }
@@ -127,13 +134,14 @@ export function createDeck({ stage, cards, onChange = () => {}, isBlocked = () =
   function settle() {
     const target = releaseTarget({ position, origin: index, distance: 1, count: cards.length, passedDeadZone: false });
     pending = null;
+    resetWheel();
     releaseCapture();
     finish(target, {}, target !== announcedIndex);
     return index;
   }
 
   function measure() {
-    if (state !== 'idle' || gesture) settle();
+    if (state !== 'idle' || gesture || wheel) settle();
     height = stage.clientHeight || stage.getBoundingClientRect().height || height;
     width = cards[index]?.offsetWidth || width;
     cardHeight = cards[index]?.offsetHeight || 0;
@@ -163,6 +171,7 @@ export function createDeck({ stage, cards, onChange = () => {}, isBlocked = () =
 
   function navigate(delta, { focus = true } = {}) {
     if (!enabled || isBlocked() || !delta) return;
+    if (wheel) settle();
     const direction = Math.sign(delta);
     if (state === 'settling') { pending = { delta: direction, options: { focus } }; return; }
     if (state === 'dragging') return;
@@ -210,7 +219,63 @@ export function createDeck({ stage, cards, onChange = () => {}, isBlocked = () =
     return selection && !selection.isCollapsed;
   }
 
+  function resetWheel() {
+    if (wheelTimer) clearTimeout(wheelTimer);
+    wheelTimer = 0;
+    wheel = null;
+  }
+
+  function cancelWheel() { if (wheel) settle(); }
+
+  function nestedScroller(target) {
+    for (let node = target; node && node !== stage; node = node.parentElement) {
+      if (node.scrollHeight > node.clientHeight && /^(auto|scroll|overlay)$/.test(window.getComputedStyle(node).overflowY)) return true;
+    }
+    return false;
+  }
+
+  function wheelQuiet() {
+    if (wheelTimer) clearTimeout(wheelTimer);
+    wheelTimer = setTimeout(() => {
+      wheelTimer = 0;
+      if (!wheel) return;
+      if (!enabled || isBlocked() || document.hidden) { settle(); return; }
+      if (wheel.phase === 'tracking') {
+        const target = wheelTarget(wheel.origin, wheel.travel, cards.length);
+        wheel.phase = 'settling';
+        animateTo(target, { focus: false });
+      } else if (state === 'idle') wheel = null;
+    }, WHEEL.quiet);
+  }
+
+  stage.addEventListener('wheel', (event) => {
+    if (!enabled || isBlocked() || document.hidden) { cancelWheel(); return; }
+    const delta = normalizeWheel(event, height);
+    if (!delta || !delta.y || Math.abs(delta.y) < Math.abs(delta.x) * MOTION.verticalRatio || event.ctrlKey || event.metaKey || event.shiftKey || hasSelection() || event.target.closest(WHEEL_EXCLUDED) || nestedScroller(event.target)) {
+      cancelWheel();
+      return;
+    }
+    if (gesture || multiTouch || state === 'dragging') return;
+    const targetCard = event.target.closest('.card');
+    if (targetCard && targetCard !== cards[index]) return;
+    event.preventDefault();
+    // Never call navigate here: its keyboard queue would replay inertial tails.
+    // Keep a consumed burst locked until both settlement and quiet have passed.
+    if (state === 'settling' || wheel?.phase === 'settling') {
+      wheel ||= { phase: 'settling' };
+      wheelQuiet();
+      return;
+    }
+    wheel ||= { origin: index, travel: 0, phase: 'tracking' };
+    wheel.travel = wheelTravel(wheel.origin, wheel.travel, delta.y, cards.length);
+    position = wheel.origin + wheel.travel / WHEEL.distance;
+    state = 'wheeling';
+    queueRender();
+    wheelQuiet();
+  }, { passive: false });
+
   function trackTouchDown(event) {
+    cancelWheel();
     if (event.pointerType !== 'touch') return;
     touchContacts.add(event.pointerId);
     if (touchContacts.size > 1) {
@@ -314,22 +379,22 @@ export function createDeck({ stage, cards, onChange = () => {}, isBlocked = () =
     if (event.target === stage && !stage.hasPointerCapture(event.pointerId)) cancelGesture(event);
   });
   stage.addEventListener('pointerleave', (event) => { if (state !== 'dragging') cancelGesture(event); });
-  stage.addEventListener('contextmenu', () => cancelGesture());
+  stage.addEventListener('contextmenu', () => { cancelWheel(); cancelGesture(); });
   stage.addEventListener('selectstart', (event) => {
     // Favor an ordinary touch swipe until its hold deadline. Event time also
     // permits intentional hold selection when the timer callback is delayed.
     if (gesture && (state === 'dragging' || (gesture.pointerType === 'touch' && event.timeStamp < gesture.deadline))) event.preventDefault();
-    else cancelGesture();
+    else { cancelWheel(); cancelGesture(); }
   });
-  document.addEventListener('selectionchange', () => { if (hasSelection()) cancelGesture(); });
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      touchContacts.clear();
-      multiTouch = false;
-      if (gesture) cancelGesture();
-      else settle();
-    }
-  });
+  document.addEventListener('selectionchange', () => { if (hasSelection()) { cancelWheel(); cancelGesture(); } });
+  function interruptInput() {
+    touchContacts.clear();
+    multiTouch = false;
+    if (gesture) cancelGesture();
+    else settle();
+  }
+  document.addEventListener('visibilitychange', () => { if (document.hidden) interruptInput(); });
+  window.addEventListener?.('blur', interruptInput);
 
   return { setEnabled, measure, navigate, jump, settle, get index() { return index; }, get position() { return position; }, get state() { return state; } };
 }

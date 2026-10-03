@@ -1,0 +1,76 @@
+{
+  "checkedAt": "2026-10-03T19:10:06.924Z",
+  "baseURL": "https://codex-card-layout-lynn-landing-page.nrct6ycww6.workers.dev",
+  "revision": {
+    "revision": "8b368c6def916313b45174e90b97e9e9f6bf34d4",
+    "assets": {
+      "index.html": "8716f65aebf2b4ad426dedb6b1ac1497d0a85655cb91d0f4b108db91033f94e1",
+      "styles.css": "1656a3178471e6e26c1af5984eb9ed04332ef8fbc5ef92e8c5c2aef199eb4b65",
+      "main.js": "f868e8c6af79ad1cc0ecbd82f9c4baf2b98a83c3b4d27f0cd219e48bba5701cf",
+      "deck-controller.js": "0f6a5e56178cb2ce6d095da3923e5fc891b0e23aa5a9b50e76df78b0943ff0d2",
+      "motion.js": "43b0850a3388b378fc4d003f40bddd6375ebf3f07318be555e50d9f4dafb5041",
+      "layout.js": "068da7e28ce0a3ecc79d90a17fe1ac163e71e81396c4a07c56b1519cb0cc83e3",
+      "contact-dialog.js": "deadb51618db4ca8d011d6aaf5781bc0eae2f01d80463c7096be83520148953b",
+      "demo-settings.js": "e89eeecedb88ca7b1428948be8f841eb54d71799af9a7a089c29af4d292196ae",
+      "favicon.svg": "7993edfb7fa472661ba552f25bbea5eecb841a65da7f04ace9956e1898248b94"
+    }
+  },
+  "results": [
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "hasTouch": true,
+      "before": {
+        "mode": "deck",
+        "state": "idle",
+        "position": 0,
+        "scrollY": 0
+      },
+      "after": {
+        "mode": "deck",
+        "state": "idle",
+        "position": 0,
+        "scrollY": 0
+      }
+    },
+    {
+      "viewport": {
+        "width": 800,
+        "height": 900
+      },
+      "hasTouch": false,
+      "before": {
+        "mode": "deck",
+        "state": "idle",
+        "position": 0,
+        "scrollY": 0
+      },
+      "after": {
+        "mode": "deck",
+        "state": "idle",
+        "position": 0,
+        "scrollY": 0
+      }
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "hasTouch": false,
+      "before": {
+        "mode": "flow",
+        "position": null,
+        "scrollY": 0
+      },
+      "after": {
+        "mode": "flow",
+        "position": null,
+        "scrollY": 320
+      }
+    }
+  ],
+  "method": "Playwright page.mouse.wheel through Chromium browser input; physical trackpad and Safari remain unverified"
+}

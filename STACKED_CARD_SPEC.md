@@ -2,6 +2,8 @@ This specification defines a buildable proof of concept for a website whose cont
 
 Implementation amendment, October 3, 2026: the owner approved touch swipes starting on ordinary text as well as open space, later desktop entrances, a cookie remembering review settings, and reload always restarting at the top. These requirements supersede the corresponding original defaults below. The existing card paths, presets, reversible tracking, native reading fallback, and simulated contact behavior are retained. The owner's reported device QA applies only to the earlier Cloudflare build; automated local and hosted checks are recorded separately.
 
+Input-support amendment, October 3, 2026: card mode also accepts vertical trackpad and mouse-wheel input. Phone/tablet and desktop touchscreen swipes continue through Pointer Events; wide desktop and reading layouts retain native document scrolling. A delayed swipe indicator is a separate experimental child branch, excluded from this parent implementation.
+
 The source is the design discussion in this task. The mobile stacking and reversible gesture are established requirements. Desktop presentation, exact dimensions, form fields, and motion tuning remain exploratory. The defaults below make the prototype buildable without presenting those choices as final design approval.
 
 Deliverable: the proof of concept implemented in the existing GitHub repository and deployed to Cloudflare for preview, with a working preview URL, a short review guide, and browser verification evidence. Use the repository and Cloudflare deployment configuration already known to the implementing session and project. This document defines the acceptance criteria; implementation and deployed results are recorded in verification/VERIFICATION.md.
@@ -127,6 +129,8 @@ The enhanced mobile deck owns vertical browsing gestures only inside its non-int
 Place native scrolling overlays outside the deck's gesture-constrained ancestors. Setting pan-y on a child cannot recover scrolling when an ancestor already disallows it. Suspend deck listeners during overlays rather than trying to let the same gesture scroll the form and turn a card.
 
 Preserve native long-press text selection and mouse selection. Ordinary touch swipes work across text and open space; previous and next controls remain available. Do not prevent native gestures globally, capture wheel events across the page, or disable zoom.
+
+In card mode only, handle vertical wheel input over the card stage with a non-passive listener. Normalize pixel, line, and page deltas, and map positive vertical deltas to forward progress along the existing motion path. Accumulate a burst continuously, permit reversal, and limit it to one adjacent card; discard overshoot rather than carrying momentum into another card. Settle after a quiet interval and avoid queuing momentum events during settlement. A small deliberate wheel notch must be usable independently of the touch drag threshold. Horizontal input, modified zoom input, selected text, wheel-consuming controls, editable content, and nested scroll regions retain native behavior. Clear wheel timers and state on settlement, pointer acquisition, resize, overlay opening, mode change, and tab hiding. These thresholds are review defaults and need physical trackpad/device QA.
 
 ### Controls and rapid input
 
@@ -266,7 +270,8 @@ Suggested separation:
 | index.html | Semantic content, navigation, contact form, and normal-flow fallback |
 | styles.css | Design tokens, card depth, responsive modes, dialog, and focus styling |
 | main.js | Enhancement setup and coordination |
-| deck-controller.js | Index state, pointer input, velocity, controls, and settlement |
+| deck-controller.js | Index state, pointer and wheel arbitration, velocity, controls, and settlement |
+| wheel-input.js | Wheel-unit normalization, bounded travel, and wheel-specific settlement thresholds |
 | motion.js | Pure deterministic pose evaluation, release decisions, and preset data |
 | layout.js | Viewport geometry, responsive modes, and reading-view switches |
 | contact-dialog.js | Expansion, focus, form draft, validation, review, and demo completion |

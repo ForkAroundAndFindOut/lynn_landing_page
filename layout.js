@@ -109,7 +109,7 @@ export function setupLayout({ stage, cards, deck, settings, isBlocked, onMode })
       if (neededHeight > currentHeight) stage.style.setProperty('--card-height', `${neededHeight}px`);
       if (neededHeight <= stageHeight - 42) {
         mode = 'deck';
-        reason = 'Card view: swipe text or open space vertically, or use the arrows.';
+        reason = 'Card view: swipe or scroll vertically, or use the arrows.';
       } else {
         mode = 'flow';
         reason = 'Reading view keeps enlarged or compact-screen content fully visible.';

@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const dist = path.join(root, "dist");
-const files = ["index.html", "styles.css", "main.js", "deck-controller.js", "motion.js", "layout.js", "contact-dialog.js", "demo-settings.js", "favicon.svg"];
+const files = ["index.html", "styles.css", "main.js", "deck-controller.js", "wheel-input.js", "motion.js", "layout.js", "contact-dialog.js", "demo-settings.js", "favicon.svg"];
 
 await rm(dist, { recursive: true, force: true });
 await mkdir(dist, { recursive: true });

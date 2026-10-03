@@ -96,14 +96,14 @@ test('velocity uses only the final 80ms and supports irregular sampling', () => 
 });
 
 test('presets preserve direct tracking and bound travel and settlement duration', () => {
-  for (const [name, duration, minimum, maximum] of [['crisp', 240, 96, 144], ['balanced', 300, 96, 160], ['gentle', 380, 112, 176]]) {
+  for (const [name, duration, minimum, maximum] of [['crisp', 600, 192, 288], ['balanced', 900, 240, 400], ['gentle', 1300, 336, 528]]) {
     assert.equal(presetFor(name).duration, duration);
     assert.equal(travelDistance(100, name), minimum);
     assert.equal(travelDistance(2000, name), maximum);
   }
 });
 
-function controllerHarness(t) {
+function controllerHarness(t, preset = 'balanced') {
   const original = { document: globalThis.document, window: globalThis.window, requestAnimationFrame: globalThis.requestAnimationFrame, cancelAnimationFrame: globalThis.cancelAnimationFrame };
   const callbacks = new Map();
   let nextFrame = 0;
@@ -136,7 +136,7 @@ function controllerHarness(t) {
     releasePointerCapture: (pointer) => captures.delete(pointer),
   };
   const changes = [];
-  const deck = createDeck({ stage, cards, onChange: (index, options) => changes.push({ index, ...options }) });
+  const deck = createDeck({ stage, cards, getPreset: () => preset, onChange: (index, options) => changes.push({ index, ...options }) });
   deck.setEnabled(true);
   function tick(milliseconds = 16) {
     time += milliseconds;
@@ -145,7 +145,7 @@ function controllerHarness(t) {
     current.forEach((callback) => callback(time));
   }
   function drain() {
-    for (let count = 0; callbacks.size && count < 100; count += 1) tick();
+    for (let count = 0; callbacks.size && count < Math.ceil(2 * presetFor(preset).duration / 16) + 4; count += 1) tick();
     assert.equal(callbacks.size, 0, 'no idle animation loop should remain');
   }
   function pointer(type, overrides = {}) {
@@ -153,7 +153,7 @@ function controllerHarness(t) {
     listeners[type](event);
     return event;
   }
-  return { deck, cards, stage, changes, callbacks, captures, tick, drain, pointer, hide() { document.hidden = true; documentListeners.visibilitychange(); } };
+  return { deck, cards, stage, changes, callbacks, captures, tick, drain, pointer, setPreset(name) { preset = name; }, hide() { document.hidden = true; documentListeners.visibilitychange(); } };
 }
 
 test('controller retains one latest request during settlement, without skipping states', (t) => {
@@ -221,7 +221,7 @@ test('tab hiding settles motion, removes temporary hints, and mode exit restores
   document.activeElement = cards[0];
   deck.navigate(1);
   tick();
-  tick(120);
+  tick(presetFor('balanced').duration / 2);
   hide();
   assert.equal(deck.index, 1);
   assert.equal(deck.state, 'idle');
@@ -232,4 +232,37 @@ test('tab hiding settles motion, removes temporary hints, and mode exit restores
   assert.ok(cards.every((card) => !card.style.willChange));
   deck.setEnabled(false);
   assert.ok(cards.every((card) => !card.inert && !card.attributes.has('aria-hidden')));
+});
+
+test('every preset halves or further reduces equal finger travel at every responsive height', () => {
+  const previous = { crisp: [.16, 96, 144], balanced: [.18, 96, 160], gentle: [.2, 112, 176] };
+  for (const height of [100, 360, 503, 640, 844, 900, 2000]) {
+    const distances = ['crisp', 'balanced', 'gentle'].map(name => {
+      const [ratio, min, max] = previous[name];
+      const oldDistance = Math.min(max, Math.max(min, height * ratio));
+      const newDistance = travelDistance(height, name);
+      assert.ok(newDistance >= oldDistance * 2, name + ' at height ' + height);
+      assert.ok(positionFromTravel(2, 60, newDistance, 6) - 2 <= 60 / oldDistance / 2 + 1e-12);
+      return newDistance;
+    });
+    assert.ok(distances[0] < distances[1] && distances[1] < distances[2]);
+  }
+  assert.equal(presetFor('balanced').duration - presetFor('crisp').duration, 300);
+  assert.equal(presetFor('gentle').duration - presetFor('balanced').duration, 400);
+});
+
+test('controller preserves full preset settlement duration for navigation and partial release', (t) => {
+  const h = controllerHarness(t);
+  for (const [preset, duration] of [['crisp', 600], ['balanced', 900], ['gentle', 1300]]) {
+    h.setPreset(preset); h.deck.jump(0); h.drain();
+    h.deck.navigate(1); h.tick(); h.tick(duration - 1);
+    assert.equal(h.deck.state, 'settling'); assert.equal(h.deck.index, 0);
+    h.tick(1); assert.equal(h.deck.state, 'idle'); assert.equal(h.deck.index, 1);
+    h.pointer('pointerdown'); h.tick(100);
+    h.pointer('pointermove', { clientY: 370 }); h.tick(100);
+    h.pointer('pointerup', { clientY: 370 });
+    assert.equal(h.deck.state, 'settling'); h.tick(); h.tick(duration - 1);
+    assert.equal(h.deck.state, 'settling'); h.tick(1);
+    assert.equal(h.deck.state, 'idle'); assert.equal(h.deck.position, 1);
+  }
 });

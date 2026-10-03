@@ -1,9 +1,9 @@
 // Motion is evaluated from a single continuous deck position. No DOM reads,
 // frame-dependent randomness, or animation state belongs in this module.
 export const PRESETS = Object.freeze({
-  crisp: Object.freeze({ duration: 240, travelRatio: 0.16, minTravel: 96, maxTravel: 144, rotation: 0.82, curvature: 0.9 }),
-  balanced: Object.freeze({ duration: 300, travelRatio: 0.18, minTravel: 96, maxTravel: 160, rotation: 1, curvature: 1 }),
-  gentle: Object.freeze({ duration: 380, travelRatio: 0.2, minTravel: 112, maxTravel: 176, rotation: 1.08, curvature: 1.06 }),
+  crisp: Object.freeze({ duration: 600, travelRatio: 0.32, minTravel: 192, maxTravel: 288, rotation: 0.82, curvature: 0.9 }),
+  balanced: Object.freeze({ duration: 900, travelRatio: 0.45, minTravel: 240, maxTravel: 400, rotation: 1, curvature: 1 }),
+  gentle: Object.freeze({ duration: 1300, travelRatio: 0.6, minTravel: 336, maxTravel: 528, rotation: 1.08, curvature: 1.06 }),
 });
 
 export const MOTION = Object.freeze({

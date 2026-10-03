@@ -1,0 +1,158 @@
+{
+  "checkedAt": "2026-10-03T20:45:42.976Z",
+  "baseURL": "http://127.0.0.1:4188",
+  "revision": {
+    "revision": "fe62048bfa8f99e41dc03095ba80fb8d51cf413e",
+    "assets": {
+      "index.html": "19d1ab3fd088644b326c5dfdf9078c50370e55eca799f75095dc676031be0eb1",
+      "styles.css": "1656a3178471e6e26c1af5984eb9ed04332ef8fbc5ef92e8c5c2aef199eb4b65",
+      "main.js": "f868e8c6af79ad1cc0ecbd82f9c4baf2b98a83c3b4d27f0cd219e48bba5701cf",
+      "deck-controller.js": "558795d0ad5baa0cd7cc4e92e92a874dacb20adc45eadd254058c3ad56430682",
+      "wheel-input.js": "8f0ab0f01ed4cf959d3d15834a3fa7de85f8413bb4070d932e24dae1e7726b71",
+      "motion.js": "ec7e63730bebcab9b86ea99719609544a528c9acbefddfc4cfe31ed7dbf647e0",
+      "layout.js": "37d6e05b18a458e7b74fffc3af3da132c1d8a91d43cd872d2de8f3533fabfda0",
+      "contact-dialog.js": "deadb51618db4ca8d011d6aaf5781bc0eae2f01d80463c7096be83520148953b",
+      "demo-settings.js": "e89eeecedb88ca7b1428948be8f841eb54d71799af9a7a089c29af4d292196ae",
+      "favicon.svg": "7993edfb7fa472661ba552f25bbea5eecb841a65da7f04ace9956e1898248b94"
+    }
+  },
+  "results": [
+    {
+      "name": "trusted equal finger travel produces at least two-times less card progress in every preset",
+      "status": "PASS",
+      "detail": {
+        "measurements": [
+          {
+            "width": 390,
+            "height": 844,
+            "stageHeight": 643,
+            "preset": "crisp",
+            "measuredFingerPixels": 60,
+            "cardProgress": 0.292,
+            "priorProgress": 0.583203732503888,
+            "attenuation": 1.9972730565201646,
+            "expectedAttenuation": 2,
+            "progressResolution": 0.001,
+            "trusted": true
+          },
+          {
+            "width": 390,
+            "height": 844,
+            "stageHeight": 643,
+            "preset": "balanced",
+            "measuredFingerPixels": 60,
+            "cardProgress": 0.207,
+            "priorProgress": 0.5184033177812338,
+            "attenuation": 2.5043638540156223,
+            "expectedAttenuation": 2.5000000000000004,
+            "progressResolution": 0.001,
+            "trusted": true
+          },
+          {
+            "width": 390,
+            "height": 844,
+            "stageHeight": 643,
+            "preset": "gentle",
+            "measuredFingerPixels": 60,
+            "cardProgress": 0.156,
+            "priorProgress": 0.4665629860031104,
+            "attenuation": 2.9907883718148103,
+            "expectedAttenuation": 3,
+            "progressResolution": 0.001,
+            "trusted": true
+          },
+          {
+            "width": 390,
+            "height": 932,
+            "stageHeight": 731,
+            "preset": "crisp",
+            "measuredFingerPixels": 60,
+            "cardProgress": 0.256,
+            "priorProgress": 0.5129958960328317,
+            "attenuation": 2.0038902188782486,
+            "expectedAttenuation": 2,
+            "progressResolution": 0.001,
+            "trusted": true
+          },
+          {
+            "width": 390,
+            "height": 932,
+            "stageHeight": 731,
+            "preset": "balanced",
+            "measuredFingerPixels": 60,
+            "cardProgress": 0.182,
+            "priorProgress": 0.4559963520291838,
+            "attenuation": 2.505474461698812,
+            "expectedAttenuation": 2.5,
+            "progressResolution": 0.001,
+            "trusted": true
+          },
+          {
+            "width": 390,
+            "height": 932,
+            "stageHeight": 731,
+            "preset": "gentle",
+            "measuredFingerPixels": 60,
+            "cardProgress": 0.137,
+            "priorProgress": 0.41039671682626533,
+            "attenuation": 2.9955964731844182,
+            "expectedAttenuation": 2.9999999999999996,
+            "progressResolution": 0.001,
+            "trusted": true
+          },
+          {
+            "width": 800,
+            "height": 900,
+            "stageHeight": 699,
+            "preset": "crisp",
+            "measuredFingerPixels": 60,
+            "cardProgress": 0.268,
+            "priorProgress": 0.5364806866952789,
+            "attenuation": 2.001793607071936,
+            "expectedAttenuation": 2,
+            "progressResolution": 0.001,
+            "trusted": true
+          },
+          {
+            "width": 800,
+            "height": 900,
+            "stageHeight": 699,
+            "preset": "balanced",
+            "measuredFingerPixels": 60,
+            "cardProgress": 0.191,
+            "priorProgress": 0.47687172150691465,
+            "attenuation": 2.496710583805836,
+            "expectedAttenuation": 2.5000000000000004,
+            "progressResolution": 0.001,
+            "trusted": true
+          },
+          {
+            "width": 800,
+            "height": 900,
+            "stageHeight": 699,
+            "preset": "gentle",
+            "measuredFingerPixels": 60,
+            "cardProgress": 0.143,
+            "priorProgress": 0.42918454935622313,
+            "attenuation": 3.0012905549386235,
+            "expectedAttenuation": 2.9999999999999996,
+            "progressResolution": 0.001,
+            "trusted": true
+          }
+        ],
+        "method": "Chromium trusted CDP touch; baseline progress calculated from frozen prior travel ratios/min/max on the same measured stage height. Physical devices remain unverified."
+      }
+    },
+    {
+      "name": "WebKit desktop/mobile navigation and form smoke",
+      "status": "UNVERIFIED",
+      "message": "Skipped because local installed WebKit launch created a context but hung creating its first page and exceeded a 25-second process timeout."
+    }
+  ],
+  "faults": [],
+  "notes": [
+    "Chromium 149.0.7827.55; installed browser executable explicitly selected.",
+    "Firefox, native Safari, Android Chrome, and iPhone Safari are unavailable/unverified in this environment. No real-device performance, browser pinch behavior, or on-screen keyboard claim is made."
+  ],
+  "artifacts": "PNG captures; slow-reversible-drag.webm, short-flick.webm, contact-expansion.webm, touch-text-reversal.webm, touch-text-flick.webm when RECORD_DEMOS is enabled"
+}

@@ -133,7 +133,7 @@ test('passive links/buttons permit wheel but controls, editables, selection and 
 
 test('inertial tails with 180–350ms gaps never queue another card even after animation finishes', (t) => {
   const h = harness(t, false);
-  h.wheel(48); assert.equal(h.deck.state, 'settling'); h.tick(); h.tick(300);
+  h.wheel(48); assert.equal(h.deck.state, 'settling'); h.tick(); h.tick(700); h.wheel(48); h.tick(200);
   assert.equal(h.deck.index, 1); assert.equal(h.deck.state, 'idle');
   for (const gap of [180, 250, 350, 180, 350]) {
     // The first event continues the original burst, subsequent gaps remain
@@ -148,7 +148,7 @@ test('inertial tails with 180–350ms gaps never queue another card even after a
 test('wheel input arriving during keyboard settlement cannot replay through its navigation queue', (t) => {
   const h = harness(t, false); h.deck.navigate(1); h.tick();
   for (let n = 0; n < 25; n++) { h.wheel(40); h.tick(20); }
-  assert.equal(h.deck.index, 1); h.advance(WHEEL.quiet); h.clean();
+  h.drain(); assert.equal(h.deck.index, 1); h.advance(WHEEL.quiet); h.clean();
 });
 
 test('boundary command consumes its entire burst, including reversal, before a new command can retreat', (t) => {
@@ -207,7 +207,7 @@ test('wheel listener is attached only in deck mode and repeated mode refresh nev
 
 test('delta magnitude and stream speed never change the complete preset animation or leave partial cards', (t) => {
   const h = harness(t, false);
-  for (const [preset, duration] of [['crisp', 240], ['balanced', 300], ['gentle', 380]]) {
+  for (const [preset, duration] of [['crisp', 600], ['balanced', 900], ['gentle', 1300]]) {
     h.setPreset(preset);
     for (const magnitude of [16, 48, 8000]) {
       h.deck.jump(0); h.drain(); h.changes.length = 0;
@@ -228,8 +228,9 @@ test('delta magnitude and stream speed never change the complete preset animatio
 test('quiet during a paused animation does not unlock another command until that animation finishes', (t) => {
   const h = harness(t, false); h.wheel(16); h.advance(WHEEL.quiet);
   assert.equal(h.deck.state, 'settling'); h.wheel(500); h.drain(); assert.equal(h.deck.index, 1);
-  h.wheel(500); assert.equal(h.deck.position, 1); h.advance(WHEEL.quiet); h.clean();
-  h.wheel(16); h.drain(); assert.equal(h.deck.index, 2); h.advance(WHEEL.quiet); h.clean();
+  assert.equal(h.deck.state, 'idle');
+  h.wheel(500); assert.equal(h.deck.state, 'settling', 'quiet already elapsed while the slow animation ran');
+  h.drain(); assert.equal(h.deck.index, 2); h.advance(WHEEL.quiet); h.clean();
 });
 
 test('horizontal, zoom and native control fragments preserve committed animation and burst lock', (t) => {
@@ -238,7 +239,8 @@ test('horizontal, zoom and native control fragments preserve committed animation
   for (const overrides of [{ deltaX: 100 }, { ctrlKey: true }, { metaKey: true }, { target: input }]) {
     assert.equal(h.wheel(20, overrides).defaultPrevented, false); assert.equal(h.deck.state, 'settling');
   }
-  h.drain(); h.wheel(100); assert.equal(h.deck.position, 1);
+  h.tick(750); h.wheel(20, { target: input }); h.tick(150);
+  assert.equal(h.deck.index, 1); h.wheel(100); assert.equal(h.deck.state, 'idle', 'recent native fragment preserves burst lock');
   h.advance(WHEEL.quiet); h.clean();
 });
 

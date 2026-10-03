@@ -1,13 +1,13 @@
 {
-  "checkedAt": "2026-10-03T18:34:52.858Z",
+  "checkedAt": "2026-10-03T18:51:57.174Z",
   "baseURL": "https://codex-card-layout-lynn-landing-page.nrct6ycww6.workers.dev",
   "revision": {
-    "revision": "f315ff728698c0524093d6c0a9976cc9ceb6d3c8",
+    "revision": "c8162e94d6398de1ebcdce4c3e4036bb6cfddeec",
     "assets": {
       "index.html": "8716f65aebf2b4ad426dedb6b1ac1497d0a85655cb91d0f4b108db91033f94e1",
       "styles.css": "1656a3178471e6e26c1af5984eb9ed04332ef8fbc5ef92e8c5c2aef199eb4b65",
       "main.js": "f868e8c6af79ad1cc0ecbd82f9c4baf2b98a83c3b4d27f0cd219e48bba5701cf",
-      "deck-controller.js": "8b24635cd7bd70de47d9de4bb753e5005e357ebb4c5926fbe7b40d69ed0dd3fb",
+      "deck-controller.js": "0f6a5e56178cb2ce6d095da3923e5fc891b0e23aa5a9b50e76df78b0943ff0d2",
       "motion.js": "43b0850a3388b378fc4d003f40bddd6375ebf3f07318be555e50d9f4dafb5041",
       "layout.js": "068da7e28ce0a3ecc79d90a17fe1ac163e71e81396c4a07c56b1519cb0cc83e3",
       "contact-dialog.js": "deadb51618db4ca8d011d6aaf5781bc0eae2f01d80463c7096be83520148953b",
@@ -41,7 +41,7 @@
             "preset": "balanced",
             "area": "text",
             "flickPixels": 36,
-            "settlementMilliseconds": 323
+            "settlementMilliseconds": 316
           },
           {
             "preset": "balanced",
@@ -59,7 +59,7 @@
             "preset": "balanced",
             "area": "background",
             "flickPixels": 36,
-            "settlementMilliseconds": 323
+            "settlementMilliseconds": 318
           },
           {
             "preset": "crisp",
@@ -131,7 +131,7 @@
             "preset": "gentle",
             "area": "background",
             "flickPixels": 36,
-            "settlementMilliseconds": 397
+            "settlementMilliseconds": 394
           }
         ],
         "method": "Chromium CDP touch input; hardware touch and native Safari/Android remain unverified"
@@ -164,6 +164,26 @@
           }
         ],
         "method": "Native Chromium touch dispatch and releasePointerCapture, not synthetic lostpointercapture"
+      }
+    },
+    {
+      "name": "early touch selection attempt allows swipe while a held touch yields to selection",
+      "status": "PASS",
+      "detail": {
+        "early": {
+          "defaultPrevented": true,
+          "collapsed": true
+        },
+        "held": {
+          "defaultPrevented": false,
+          "collapsed": true
+        },
+        "mouse": {
+          "defaultPrevented": false,
+          "collapsed": true
+        },
+        "dragProgress": 0.346,
+        "method": "selectstart events explicitly synthetic; movement uses Chromium CDP touch input. Native device selection and long-press UI remain unverified."
       }
     },
     {
@@ -326,7 +346,7 @@
           "id": "example",
           "ratio": 0,
           "intersecting": true,
-          "time": 847.2999999523163
+          "time": 843.1000001430511
         },
         "method": "Chromium exact boundary with test-only subpixel compensation for integer scroll offsets"
       }
@@ -369,27 +389,27 @@
         "samples": [
           {
             "type": "pointermove",
-            "time": 3171.7000000476837,
+            "time": 3369.9000000953674,
             "y": 497.29998779296875
           },
           {
             "type": "pointerdown",
-            "time": 3173.2999999523163,
+            "time": 3371.4000000953674,
             "y": 497.29998779296875
           },
           {
             "type": "pointermove",
-            "time": 3175.2000000476837,
+            "time": 3372.9000000953674,
             "y": 485.29998779296875
           },
           {
             "type": "pointermove",
-            "time": 3204.7000000476837,
+            "time": 3402.9000000953674,
             "y": 461.29998779296875
           },
           {
             "type": "pointerup",
-            "time": 3208.5999999046326,
+            "time": 3406.5,
             "y": 461.29998779296875
           }
         ]
@@ -569,7 +589,7 @@
       "name": "no browser/asset errors or unexpected contact network",
       "status": "PASS",
       "detail": {
-        "requestsObserved": 591,
+        "requestsObserved": 600,
         "errors": 0
       }
     }

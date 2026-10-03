@@ -2,11 +2,12 @@
 
 Preview: https://codex-card-layout-lynn-landing-page.nrct6ycww6.workers.dev
 
-Checked: 2026-10-03T18:34:52.858Z
+Checked: 2026-10-03T18:51:57.174Z
 
 - PASS: cold direct section links preserve destination
 - PASS: native-dispatched touch text and background paths reverse, release, and respect bounds in every preset
 - PASS: touch implicit capture transfers to stage and genuine capture loss cancels
+- PASS: early touch selection attempt allows swipe while a held touch yields to selection
 - PASS: touch hold, context menu, horizontal intent, and additional touch cancel cleanly
 - PASS: two-touch pinch preserves browser zoom and cancels deck gesture
 - PASS: all review controls and panel persist, reload starts at top, fresh links survive

@@ -1,12 +1,12 @@
 {
   "capture": "Playwright Chromium149 at390x844; Cloudflare preview",
-  "revision": "f315ff728698c0524093d6c0a9976cc9ceb6d3c8",
+  "revision": "c8162e94d6398de1ebcdce4c3e4036bb6cfddeec",
   "verifiedWith": "Existing Playwright FFmpeg1011 input metadata inspection",
   "recordings": [
     {
       "file": "slow-reversible-drag.webm",
-      "seconds": 4,
-      "bytes": 382938,
+      "seconds": 4.08,
+      "bytes": 392770,
       "codec": "VP8",
       "dimensions": "390x844",
       "fps": 25,
@@ -14,8 +14,8 @@
     },
     {
       "file": "short-flick.webm",
-      "seconds": 2.48,
-      "bytes": 223278,
+      "seconds": 2.52,
+      "bytes": 226038,
       "codec": "VP8",
       "dimensions": "390x844",
       "fps": 25,
@@ -23,8 +23,8 @@
     },
     {
       "file": "contact-expansion.webm",
-      "seconds": 3.4,
-      "bytes": 248879,
+      "seconds": 3.36,
+      "bytes": 242617,
       "codec": "VP8",
       "dimensions": "390x844",
       "fps": 25,
@@ -32,8 +32,8 @@
     },
     {
       "file": "touch-text-reversal.webm",
-      "seconds": 4.36,
-      "bytes": 435868,
+      "seconds": 4.24,
+      "bytes": 424226,
       "codec": "VP8",
       "dimensions": "390x844",
       "fps": 25,
@@ -42,7 +42,7 @@
     {
       "file": "touch-text-flick.webm",
       "seconds": 2.52,
-      "bytes": 219889,
+      "bytes": 220760,
       "codec": "VP8",
       "dimensions": "390x844",
       "fps": 25,

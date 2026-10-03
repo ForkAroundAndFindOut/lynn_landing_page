@@ -1,7 +1,7 @@
 {
-  "checkedAt": "2026-10-03T18:32:32.179Z",
+  "checkedAt": "2026-10-03T18:49:35.098Z",
   "preview": "https://codex-card-layout-lynn-landing-page.nrct6ycww6.workers.dev",
-  "revision": "f315ff728698c0524093d6c0a9976cc9ceb6d3c8",
+  "revision": "c8162e94d6398de1ebcdce4c3e4036bb6cfddeec",
   "assets": [
     {
       "file": "index.html",
@@ -24,7 +24,7 @@
     {
       "file": "deck-controller.js",
       "status": 200,
-      "sha256": "8b24635cd7bd70de47d9de4bb753e5005e357ebb4c5926fbe7b40d69ed0dd3fb",
+      "sha256": "0f6a5e56178cb2ce6d095da3923e5fc891b0e23aa5a9b50e76df78b0943ff0d2",
       "matchesManifestAndCommit": true
     },
     {
@@ -74,7 +74,7 @@
       "theme-2-pallette-2": "de9cc08ed6feacc080ed3844bc925ce2aa1e8458"
     },
     "remoteHeads": {
-      "codex/card-layout": "f315ff728698c0524093d6c0a9976cc9ceb6d3c8",
+      "codex/card-layout": "c8162e94d6398de1ebcdce4c3e4036bb6cfddeec",
       "floating-card": "f5311c548a57cc409ef20773b6e45b17fdacf43e",
       "main": "0b10b41b59e717da2cc6f83f9e950250541eac3d",
       "scrolling-reveal": "1733fa7bb7a5c53233da83df93b334ab78441611"

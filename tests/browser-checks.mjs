@@ -6,6 +6,8 @@ import { promisify } from 'node:util';
 import assert from 'node:assert/strict';
 
 // This checks browser behavior, not real-device touch/keyboard performance.
+const presetDurations = { crisp: 600, balanced: 900, gentle: 1300 };
+const priorTravel = { crisp: [.16, 96, 144], balanced: [.18, 96, 160], gentle: [.2, 112, 176] };
 const baseURL = process.env.BASE_URL || 'http://127.0.0.1:4188';
 const output = path.resolve(process.env.EVIDENCE_DIR || 'verification/local');
 const modulePath = process.env.PW_MODULE || 'C:/Users/pgche/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright/index.mjs';
@@ -106,6 +108,11 @@ async function touchTravel(page, session, start, travel, hold = 0) {
   await touch(session, 'touchMove', [{ x: start.x, y: start.y - travel }]);
   await page.waitForTimeout(hold || 35);
 }
+async function deckTravel(page, preset = 'balanced') {
+  const height = await page.locator('#deck-stage').evaluate(el => el.clientHeight);
+  const settings = { crisp: [.32, 192, 288], balanced: [.45, 240, 400], gentle: [.6, 336, 528] }[preset];
+  return Math.min(settings[2], Math.max(settings[1], height * settings[0]));
+}
 async function settingsValues(page) {
   return page.evaluate(() => ({ preset: document.querySelector('#motion-preset').value, desktop: document.querySelector('#desktop-layout').value, reduce: document.querySelector('#reduce-motion').checked, debug: document.querySelector('#show-debug').checked, panel: document.querySelector('#review-settings').open }));
 }
@@ -144,6 +151,44 @@ await check('cold direct section links preserve destination', async () => {
   }
 });
 
+await check('trusted equal finger travel produces at least two-times less card progress in every preset', async () => {
+  const measurements = [];
+  for (const [width, height] of [[390, 844], [390, 932], [800, 900]]) {
+    const progress = [];
+    for (const preset of ['crisp', 'balanced', 'gentle']) await isolated({ viewport: { width, height } }, async (page, context) => {
+      assert.equal((await state(page)).mode, 'deck');
+      await page.evaluate(() => {
+        window.__touchMeasurements = [];
+        for (const type of ['pointerdown', 'pointermove']) document.addEventListener(type, event => {
+          if (event.pointerType === 'touch') window.__touchMeasurements.push({ type, y: event.clientY, trusted: event.isTrusted });
+        });
+      });
+      const stageHeight = await page.locator('#deck-stage').evaluate(el => el.clientHeight);
+      const session = await context.newCDPSession(page), start = await blankPoint(page);
+      await touch(session, 'touchStart', [start]); await touchTravel(page, session, start, 60, 100);
+      const current = await state(page), input = await page.evaluate(() => window.__touchMeasurements);
+      assert.equal(current.state, 'dragging');
+      assert.ok(input.length >= 2 && input.every(event => event.trusted), 'touch events must be browser-trusted');
+      const measuredFingerPixels = input[0].y - input.at(-1).y;
+      assert.ok(Math.abs(measuredFingerPixels - 60) < .01);
+      const [ratio, minimum, maximum] = priorTravel[preset];
+      const priorDistance = Math.min(maximum, Math.max(minimum, stageHeight * ratio));
+      const priorProgress = measuredFingerPixels / priorDistance;
+      const attenuation = priorProgress / current.position;
+      // The public deck state rounds position to three decimals; allow only
+      // its half-unit quantization error around the exact two-times bound.
+      assert.ok(current.position <= priorProgress / 2 + .0005, preset + ' touch attenuation ' + attenuation);
+      assert.ok(Math.abs(current.position - measuredFingerPixels / await deckTravel(page, preset)) < .002);
+      progress.push(current.position);
+      measurements.push({ width, height, stageHeight, preset, measuredFingerPixels, cardProgress: current.position,
+        priorProgress, attenuation, expectedAttenuation: await deckTravel(page, preset) / priorDistance, progressResolution: .001, trusted: true });
+      await touch(session, 'touchCancel'); await settled(page, 0); await session.detach();
+    }, '?preset=' + preset);
+    assert.ok(progress[0] > progress[1] && progress[1] > progress[2], 'equal finger travel orders Crisp, Balanced, Gentle sensitivity');
+  }
+  return { measurements, method: 'Chromium trusted CDP touch; baseline progress calculated from frozen prior travel ratios/min/max on the same measured stage height. Physical devices remain unverified.' };
+});
+
 await check('native-dispatched touch text and background paths reverse, release, and respect bounds in every preset', async () => {
   const measurements = [];
   for (const preset of ['balanced', 'crisp', 'gentle']) for (const area of ['text', 'background']) {
@@ -151,34 +196,41 @@ await check('native-dispatched touch text and background paths reverse, release,
       const session = await context.newCDPSession(page);
       await page.locator('#next-card').click(); await settled(page, 1);
       const point = area === 'text' ? textPoint : blankPoint;
+      const distance = await deckTravel(page, preset);
       for (const direction of [1, -1]) {
         const start = await point(page);
         await touch(session, 'touchStart', [start]);
         await touchTravel(page, session, start, direction * 30, 100);
         const first = await state(page);
         assert.equal(first.state, 'dragging');
-        assert.ok(direction * (first.position - 1) > .1);
+        assert.ok(Math.abs(direction * (first.position - 1) - 30 / distance) < .002);
         const poses = await page.locator('.card').evaluateAll(cards => cards.map(card => card.style.transform));
         await touchTravel(page, session, start, direction * 52, 100);
-        assert.ok(direction * ((await state(page)).position - first.position) > .1);
+        assert.ok(Math.abs(direction * ((await state(page)).position - first.position) - 22 / distance) < .002);
         await touchTravel(page, session, start, direction * 30, 120);
         assert.deepEqual(await page.locator('.card').evaluateAll(cards => cards.map(card => card.style.transform)), poses);
+        const reversalReleased = Date.now();
         await touch(session, 'touchEnd'); await settled(page, 1);
+        const reversalMilliseconds = Date.now() - reversalReleased;
+        assert.ok(reversalMilliseconds >= presetDurations[preset] - 45 && reversalMilliseconds <= presetDurations[preset] + 180, preset + ' slow reversal settlement ' + reversalMilliseconds);
         const commit = await point(page);
         await touch(session, 'touchStart', [commit]);
-        await touchTravel(page, session, commit, direction * 92, 140);
+        await touchTravel(page, session, commit, direction * distance * .6, 140);
+        const commitReleased = Date.now();
         await touch(session, 'touchEnd'); await settled(page, 1 + direction);
+        const commitMilliseconds = Date.now() - commitReleased;
+        assert.ok(commitMilliseconds >= presetDurations[preset] - 45 && commitMilliseconds <= presetDurations[preset] + 180, preset + ' slow drag settlement ' + commitMilliseconds);
         if (!(await page.locator('#go-top').isDisabled())) await page.locator('#go-top').click();
         await settled(page, 0);
         await page.locator('#next-card').click(); await settled(page, 1);
-        measurements.push({ preset, area, direction, reversibleProgress: first.position });
+        measurements.push({ preset, area, direction, reversibleProgress: first.position, reversalMilliseconds, commitMilliseconds });
       }
       const flick = await point(page); await touch(session, 'touchStart', [flick]);
-      await touchTravel(page, session, flick, 12, 10); await touchTravel(page, session, flick, 36, 1);
+      await touchTravel(page, session, flick, 12, 10); await touchTravel(page, session, flick, 72, 1);
       const released = Date.now(); await touch(session, 'touchEnd'); await settled(page, 2);
       const duration = Date.now() - released;
-      assert.ok(duration >= 200 && duration <= 500, `native-dispatched ${preset} flick settlement ${duration}ms`);
-      measurements.push({ preset, area, flickPixels: 36, settlementMilliseconds: duration });
+      assert.ok(duration >= presetDurations[preset] - 45 && duration <= presetDurations[preset] + 180, `native-dispatched ${preset} flick settlement ${duration}ms`);
+      measurements.push({ preset, area, flickPixels: 72, settlementMilliseconds: duration });
       await page.locator('#go-top').click(); await settled(page, 0);
       const start = await point(page); await touch(session, 'touchStart', [start]);
       await touchTravel(page, session, start, -80, 130); assert.equal((await state(page)).position, 0);
@@ -231,7 +283,7 @@ await check('early touch selection attempt allows swipe while a held touch yield
   assert.equal(early.collapsed, true);
   await touchTravel(page, session, start, 40);
   const drag = await state(page);
-  assert.equal(drag.state, 'dragging'); assert.ok(drag.position > .2);
+  assert.equal(drag.state, 'dragging'); assert.ok(Math.abs(drag.position - 40 / await deckTravel(page)) < .002);
   assert.equal(await page.evaluate(() => window.getSelection().isCollapsed), true);
   await touch(session, 'touchCancel'); await settled(page, 0);
   start = await textPoint(page); await touch(session, 'touchStart', [start]);
@@ -318,7 +370,7 @@ async function wheelPoint(page) {
 await check('wheel browser input keeps tiny intent idle and uses fixed preset transitions in touch and PC decks', async () => {
   const measurements = [];
   for (const [width, height, hasTouch] of [[390, 844, true], [800, 900, false]]) {
-    for (const [preset, duration] of [['crisp', 240], ['balanced', 300], ['gentle', 380]]) {
+    for (const [preset, duration] of Object.entries(presetDurations)) {
       for (const delta of [16, 2000]) await isolated({ viewport: { width, height }, hasTouch }, async page => {
         assert.equal((await state(page)).mode, 'deck'); await wheelProbe(page); await wheelPoint(page);
         await wheelStep(page, 12); assert.equal((await state(page)).state, 'idle'); assert.equal((await state(page)).position, 0);
@@ -335,6 +387,10 @@ await check('wheel browser input keeps tiny intent idle and uses fixed preset tr
         measurements.push({ width, height, hasTouch, preset, delta, initialProgress: initial.position, duration: Math.round(elapsed) });
       }, '?preset=' + preset);
     }
+  }
+  for (const width of [390, 800]) for (const delta of [16, 2000]) {
+    const durations = ['crisp', 'balanced', 'gentle'].map(preset => measurements.find(row => row.width === width && row.delta === delta && row.preset === preset).duration);
+    assert.ok(durations[1] - durations[0] >= 230 && durations[2] - durations[1] >= 330, 'preset timing gaps must remain visibly wider');
   }
   return { measurements, method: 'Playwright browser wheel input: below-threshold intent leaves geometry idle; normalized 16px and 2000px produce the same preset animation. Physical trackpads remain unverified.' };
 });
@@ -463,12 +519,12 @@ await check('PC touchscreen and mouse pointer paths work alongside wheel navigat
   const measurements = [];
   for (const [width, height, hasTouch] of [[390, 844, true], [800, 900, false]]) await isolated({ viewport: { width, height }, hasTouch }, async (page, context) => {
     const session = await context.newCDPSession(page); const start = await textPoint(page);
-    await touch(session, 'touchStart', [start]); await touchTravel(page, session, start, 90, 130);
+    await touch(session, 'touchStart', [start]); await touchTravel(page, session, start, await deckTravel(page) * .6, 130);
     assert.equal((await state(page)).state, 'dragging'); await touch(session, 'touchEnd'); await settled(page, 1);
     await page.waitForTimeout(650); await wheelPoint(page); await wheelStep(page, 90); await settled(page, 2);
     await page.locator('#go-top').click(); await settled(page, 0);
     const blank = await blankPoint(page); await page.mouse.move(blank.x, blank.y); await page.mouse.down();
-    await page.mouse.move(blank.x, blank.y - 100, { steps: 8 }); await page.waitForTimeout(100);
+    await page.mouse.move(blank.x, blank.y - await deckTravel(page) * .6, { steps: 8 }); await page.waitForTimeout(100);
     assert.equal((await state(page)).state, 'dragging'); await page.mouse.up(); await settled(page, 1);
     await session.detach(); measurements.push({ width, height, hasTouch, touch: 'CDP', mouse: 'Playwright' });
   });
@@ -730,7 +786,7 @@ await check('slow reversible pointer path with partial release', async () => {
   await page.mouse.move(start.x, start.y - 30, { steps: 8 }); await page.waitForTimeout(100);
   const forward = await page.locator('#services').evaluate(el => el.style.transform);
   const first = await state(page);
-  assert.equal(first.state, 'dragging'); assert.ok(first.position > .15 && first.position < .4);
+  assert.equal(first.state, 'dragging'); assert.ok(Math.abs(first.position - 30 / await deckTravel(page)) < .002);
   await page.mouse.move(start.x, start.y - 55, { steps: 8 }); await page.waitForTimeout(150);
   const further = await state(page); assert.ok(further.position > first.position);
   await shot(page, 'gesture-mid-drag');
@@ -742,7 +798,7 @@ await check('slow reversible pointer path with partial release', async () => {
   return { start, forwardProgress: first.position, peakProgress: further.position, identicalReversalTransform: true };
 });
 
-await check('short flick commits and settles within 200–400 ms', async () => {
+await check('short flick commits and uses the full Balanced 900ms settlement', async () => {
   const start = await blankPoint(page);
   await page.evaluate(() => {
     window.__flickSamples = [];
@@ -751,18 +807,18 @@ await check('short flick commits and settles within 200–400 ms', async () => {
   });
   await page.mouse.move(start.x, start.y); await page.mouse.down();
   await page.mouse.move(start.x, start.y - 12); await page.waitForTimeout(10);
-  await page.mouse.move(start.x, start.y - 36);
+  await page.mouse.move(start.x, start.y - 72);
   const started = Date.now(); await page.mouse.up();
-  await page.waitForFunction(() => document.querySelector('#deck-stage').dataset.deckState === 'idle', null, { polling: 'raf', timeout: 1000 });
+  await page.waitForFunction(() => document.querySelector('#deck-stage').dataset.deckState === 'idle', null, { polling: 'raf', timeout: 2000 });
   const elapsed = Date.now() - started;
   const samples = await page.evaluate(() => {
     for (const type of ['pointerdown', 'pointermove', 'pointerup']) document.removeEventListener(type, window.__recordFlick);
     return window.__flickSamples;
   });
   await settled(page, 1);
-  assert.ok(elapsed >= 190 && elapsed <= 430, `observed browser settlement ${elapsed}ms includes automation overhead`);
+  assert.ok(elapsed >= 855 && elapsed <= 1080, `observed browser settlement ${elapsed}ms includes automation overhead`);
   assert.equal(await page.evaluate(() => window.getSelection().isCollapsed), true);
-  return { travelPixels: 36, measuredMilliseconds: elapsed, samples };
+  return { travelPixels: 72, measuredMilliseconds: elapsed, samples };
 });
 
 await check('full traversal keeps settled geometry stable', async () => {
@@ -995,7 +1051,7 @@ if (process.env.RECORD_DEMOS !== '0') {
           await page.waitForTimeout(150); await touch(session, 'touchEnd'); await settled(page, 0);
         } else {
           await touchTravel(page, session, start, 12, 10);
-          await touchTravel(page, session, start, 36, 1);
+          await touchTravel(page, session, start, 72, 1);
           await touch(session, 'touchEnd'); await settled(page, 1);
         }
         await session.detach(); await page.waitForTimeout(700);
@@ -1009,7 +1065,7 @@ if (process.env.RECORD_DEMOS !== '0') {
           await page.waitForTimeout(150); await page.mouse.up(); await settled(page, 0);
         } else {
           await page.mouse.move(start.x, start.y - 12); await page.waitForTimeout(10);
-          await page.mouse.move(start.x, start.y - 36); await page.mouse.up(); await settled(page, 1);
+          await page.mouse.move(start.x, start.y - 72); await page.mouse.up(); await settled(page, 1);
         }
         await page.waitForTimeout(700);
       }

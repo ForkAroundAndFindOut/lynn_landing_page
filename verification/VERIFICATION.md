@@ -2,7 +2,7 @@
 
 Date: 2026-10-03 (America/Los_Angeles).
 
-The discrete wheel-request follow-up below records the latest input-support work. The proportional-wheel prototype and earlier selection, settings, layout, and recording evidence are retained as historical acceptance baselines.
+The slower-touch follow-up below records the latest tuning. The discrete wheel-request implementation remains current, with revised preset durations. Its original timing evidence, the proportional-wheel prototype, and earlier selection, settings, layout, and recordings are retained as historical acceptance baselines.
 
 ## Isolation
 
@@ -23,7 +23,17 @@ Existing remote branches are `main`, `floating-card`, and `scrolling-reveal`, wi
 
 Production baseline: https://lynn-landing-page.nrct6ycww6.workers.dev/ returned HTTP 200. Its HTML SHA-256 (UTF-8 response content) before this work was `4e48750db67c9167ae8cde0d95bc5eaf4f326e9613143f39b976474e50c8cae3`. Active production version in the dashboard: `b19c9862` (100%).
 
-## Discrete wheel-request follow-up
+## Slower-touch follow-up
+
+Physical touchscreen feedback found every preset too fast even after the discrete wheel correction. The prior 96–176px travel mapped a short finger movement to most of a card; merely changing wheel settlement did not change that mapping. The revised presets reduce direct-touch sensitivity by at least half across all stage heights: Crisp uses 32% / 192–288px, Balanced 45% / 240–400px, and Gentle 60% / 336–528px. Continuous finger tracking, reversal, the 6px acquisition threshold, native long holds, and one-neighbor release bounds remain intact.
+
+Settlement and wheel/arrow animations now use fixed 600/900/1300ms durations, compared with the original 240/300/380ms. Both durations and sensitivity have wider separation between presets. Scroll delta and flick velocity still choose intent/target rather than animation duration; desktop document entrances and contact transitions remain separate.
+
+The focused suite passes 58/58 tests. [Local verification](slower-motion/local-verification.md) records 53 passing combined Chromium checks, zero browser/asset errors, five refreshed recordings, and one corrected test-fixture failure: 390×650 appropriately selected native flow rather than cards. The corrected [equal-travel check](slower-motion/local-corrected-attenuation/browser-results.json) passes all nine trusted 60px touch measurements at 390×844, 390×932, and 800×900, confirming 2×/2.5×/3× attenuation. Observed flick settlements are approximately 620/920/1320ms. The known unavailable WebKit engine is explicitly unverified.
+
+Current hosted evidence is saved under `slower-motion/hosted/` after upload. The child reminder experiment incorporates this same tuning and records its separate visibility investigation. Emulated Chromium touch checks measure input delivery and geometry; they do not replace the owner's Android Chrome device review.
+
+## Discrete wheel-request follow-up (original timing evidence)
 
 After device review of the proportional-wheel preview, the owner reported excessive speed, partial cards, and occasional multiple-card advances. The revised contract separates scroll detection from animation: a deliberate wheel/trackpad burst requests exactly one adjacent card and starts the selected preset's fixed-duration animation. Pixel/line/page input is used only to recognize direction and commitment, never to position the card. Continuous reversible touch dragging remains unchanged.
 

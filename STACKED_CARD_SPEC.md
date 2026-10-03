@@ -98,7 +98,7 @@ Let upward travel be positive:
 
 - Travel equals pointer start Y minus current pointer Y.
 
-- Full travel distance D defaults to 18 percent of the stage height, clamped between 96 and 160 CSS pixels.
+- Full travel distance D defaults to 45 percent of the stage height, clamped between 240 and 400 CSS pixels. This reduces Balanced direct-touch sensitivity by at least half versus the original 18 percent / 96–160 pixel tuning.
 
 - Signed progress r equals travel divided by D, clamped to the available adjacent interval.
 
@@ -168,11 +168,11 @@ The incoming card remains above the cards it is covering; removing a card reveal
 
 | Preset | Button and flick settlement target | Full drag travel | Character |
 | - | - | - | - |
-| Crisp | 240 milliseconds | 16 percent of stage height, clamped 96–144 pixels | Fast glide, restrained rotation, firm final settlement |
-| Balanced | 300 milliseconds | 18 percent of stage height, clamped 96–160 pixels | Clear arc, smooth glide, magnetic arrival |
-| Gentle | 380 milliseconds | 20 percent of stage height, clamped 112–176 pixels | Slightly fuller arc and slower settlement |
+| Crisp | 600 milliseconds | 32 percent of stage height, clamped 192–288 pixels | Restrained rotation, firmer settlement |
+| Balanced | 900 milliseconds | 45 percent of stage height, clamped 240–400 pixels | Clear arc, smooth glide, magnetic arrival |
+| Gentle | 1300 milliseconds | 60 percent of stage height, clamped 336–528 pixels | Fuller arc, least sensitive drag, slower settlement |
 
-Keep direct finger tracking immediate in every preset. A preset changes settlement and path tuning, not whether the finger controls progress. Reduced motion overrides all presets.
+Keep direct finger tracking immediate and reversible in every preset. Presets change drag sensitivity, settlement duration, and path tuning; they never delay acquisition or detach the card from finger-controlled progress. These revised durations are at least twice the original 240/300/380 milliseconds, with wider separation. Wheel requests and arrow navigation use the same revised fixed durations; desktop document entrances retain their separate timing. Reduced motion overrides all presets.
 
 Expose these choices through a small POC review panel or documented demo URLs. Keep tuning numbers and implementation terminology out of ordinary website content. Optional debug indicators belong to the review panel and are off by default.
 

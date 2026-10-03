@@ -1,0 +1,221 @@
+{
+  "checkedAt": "2026-10-03T19:55:27.861Z",
+  "baseURL": "http://127.0.0.1:4189",
+  "revision": {
+    "revision": "10aa8407bc7713654f3d1d4d4999e74b2150b3b0",
+    "assets": {
+      "index.html": "aef4bf97088b8b4fbf245b4132511c0526e15717c2bcdfc35c969c32e56a8bc5",
+      "styles.css": "47eebb4cc0a53ef3e2419e087a6b9cf608bbe0b5d9a24ae72189516b503e8023",
+      "main.js": "c1417b685f40ce84d363ee6cac9df0bdfc8d55f1aa9837d248f78b079e83b535",
+      "deck-controller.js": "788518416c4d3090a6351849da91ba9283e783f2a9cfdb24a97a4aa216000a2a",
+      "wheel-input.js": "ee0e37c9e6e0e06600b60c134f119ad8fe03447ff2a66fab21aa7668b81ed31f",
+      "swipe-hint.js": "07a7edefde13b2ff01808f572f865027660fe95f4185b10d24348deeb4b6a314",
+      "motion.js": "43b0850a3388b378fc4d003f40bddd6375ebf3f07318be555e50d9f4dafb5041",
+      "layout.js": "37d6e05b18a458e7b74fffc3af3da132c1d8a91d43cd872d2de8f3533fabfda0",
+      "contact-dialog.js": "deadb51618db4ca8d011d6aaf5781bc0eae2f01d80463c7096be83520148953b",
+      "demo-settings.js": "e89eeecedb88ca7b1428948be8f841eb54d71799af9a7a089c29af4d292196ae",
+      "favicon.svg": "7993edfb7fa472661ba552f25bbea5eecb841a65da7f04ace9956e1898248b94"
+    }
+  },
+  "engine": "Chromium 149.0.7827.55",
+  "results": [
+    {
+      "name": "idle first card waits five seconds, stays decorative and does not shift geometry 390",
+      "status": "PASS",
+      "detail": {
+        "width": 390,
+        "height": 844,
+        "hasTouch": true,
+        "timer": {
+          "scheduled": 143,
+          "fired": 5143.899999856949
+        },
+        "shown": {
+          "visible": "true",
+          "opacity": 0.45,
+          "visibility": "visible",
+          "display": "inline-flex",
+          "pointerEvents": "none",
+          "ariaHidden": "true",
+          "tabIndex": -1,
+          "focus": "BODY"
+        },
+        "animation": {
+          "duration": "1.2s",
+          "iterations": "2",
+          "timing": {
+            "delay": 0,
+            "direction": "normal",
+            "duration": 1200,
+            "easing": "linear",
+            "endDelay": 0,
+            "fill": "none",
+            "iterationStart": 0,
+            "iterations": 2
+          }
+        },
+        "geometryUnchanged": true,
+        "method": "Actual browser timer and CSS animation; physical/native browser coverage remains unverified"
+      }
+    },
+    {
+      "name": "idle first card waits five seconds, stays decorative and does not shift geometry 800",
+      "status": "PASS",
+      "detail": {
+        "width": 800,
+        "height": 900,
+        "hasTouch": false,
+        "timer": {
+          "scheduled": 160.39999985694885,
+          "fired": 5161.599999904633
+        },
+        "shown": {
+          "visible": "true",
+          "opacity": 0.45,
+          "visibility": "visible",
+          "display": "inline-flex",
+          "pointerEvents": "none",
+          "ariaHidden": "true",
+          "tabIndex": -1,
+          "focus": "BODY"
+        },
+        "animation": {
+          "duration": "1.2s",
+          "iterations": "2",
+          "timing": {
+            "delay": 0,
+            "direction": "normal",
+            "duration": 1200,
+            "easing": "linear",
+            "endDelay": 0,
+            "fill": "none",
+            "iterationStart": 0,
+            "iterations": 2
+          }
+        },
+        "geometryUnchanged": true,
+        "method": "Actual browser timer and CSS animation; physical/native browser coverage remains unverified"
+      }
+    },
+    {
+      "name": "any wheel dismisses cue until reload",
+      "status": "PASS",
+      "detail": {
+        "input": "wheel",
+        "events": [
+          {
+            "type": "wheel",
+            "trusted": true
+          }
+        ],
+        "method": "Playwright browser input, actual elapsed wait, then reload"
+      }
+    },
+    {
+      "name": "any pointer dismisses cue until reload",
+      "status": "PASS",
+      "detail": {
+        "input": "pointer",
+        "events": [
+          {
+            "type": "pointerdown",
+            "trusted": true
+          }
+        ],
+        "method": "Playwright browser input, actual elapsed wait, then reload"
+      }
+    },
+    {
+      "name": "any keyboard dismisses cue until reload",
+      "status": "PASS",
+      "detail": {
+        "input": "keyboard",
+        "events": [
+          {
+            "type": "keydown",
+            "trusted": true
+          }
+        ],
+        "method": "Playwright browser input, actual elapsed wait, then reload"
+      }
+    },
+    {
+      "name": "hidden tab resets the countdown before cue can reappear",
+      "status": "PASS",
+      "detail": {
+        "timers": [
+          {
+            "scheduled": 68.60000014305115
+          },
+          {
+            "scheduled": 6097.400000095367,
+            "fired": 11097.600000143051
+          }
+        ],
+        "method": "Synthetic document.hidden accessor and visibilitychange notifications; actual five-second timers. OS tab/background throttling remains unverified."
+      }
+    },
+    {
+      "name": "cue stays suppressed for desktop",
+      "status": "PASS",
+      "detail": {
+        "variant": "desktop",
+        "mode": "flow",
+        "dialogOpen": false,
+        "method": "Browser viewport/media/input/hash state and actual wait"
+      }
+    },
+    {
+      "name": "cue stays suppressed for reading",
+      "status": "PASS",
+      "detail": {
+        "variant": "reading",
+        "mode": "flow",
+        "dialogOpen": false,
+        "method": "Browser viewport/media/input/hash state and actual wait"
+      }
+    },
+    {
+      "name": "cue stays suppressed for reduced",
+      "status": "PASS",
+      "detail": {
+        "variant": "reduced",
+        "mode": "flow",
+        "dialogOpen": false,
+        "method": "Browser viewport/media/input/hash state and actual wait"
+      }
+    },
+    {
+      "name": "cue stays suppressed for dialog",
+      "status": "PASS",
+      "detail": {
+        "variant": "dialog",
+        "mode": "deck",
+        "dialogOpen": true,
+        "method": "Programmatic native dialog.showModal verifies the open-dialog guard independently of input dismissal"
+      }
+    },
+    {
+      "name": "cue stays suppressed for later-hash",
+      "status": "PASS",
+      "detail": {
+        "variant": "later-hash",
+        "mode": "deck",
+        "dialogOpen": false,
+        "method": "Browser viewport/media/input/hash state and actual wait"
+      }
+    },
+    {
+      "name": "no browser or asset errors",
+      "status": "PASS",
+      "detail": {
+        "faults": 0
+      }
+    }
+  ],
+  "faults": [],
+  "notes": [
+    "Chromium browser input and CSS/timer checks only. Native Safari, Firefox, Edge, physical trackpads/touchscreens, and real hidden-tab throttling remain unverified by this suite.",
+    "Existing browser regressions are reported separately in browser-results.json."
+  ]
+}

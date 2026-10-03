@@ -2,7 +2,7 @@
 
 Date: 2026-10-03 (America/Los_Angeles).
 
-Branch: `codex/card-layout-swipe-hint`, incorporating slower-touch parent `402ee6a6e1fd1b9b299fc3ac159ce33b74aa2848`. Core motion/input modules match that parent; the reminder remains child-only. Production and original branches are preserved.
+Branch: `codex/card-layout-swipe-hint`, incorporating verified slower-touch parent `5192f3bcb6317384e8579b9e03aa829ad8ddcb0f`. Core motion/input modules match that parent; the reminder remains child-only. Production and original branches are preserved.
 
 ## Android reminder follow-up
 
@@ -10,7 +10,11 @@ The earlier cue permanently dismissed itself on any pointerdown, wheel, or keydo
 
 Input now hides the cue and restarts a five-second idle interval. Held pointers, native selection, the expanded review panel, dialogs, hidden tabs, and unfocused windows pause the countdown. Returning to the first card, closing the panel, clearing selection, or restoring focus/visibility rearms it. Lost contacts are cleared during blur/tab hiding. The cue retains its first-card-only, decorative, non-interactive behavior, reserved space, opacity 0.45, 300ms fade, and two 4px nudges; reduced motion and native document flow still suppress it.
 
-Focused source checks passed in Chromium, including Android Chrome emulation at 360×740 and 412×915. Merged-build and hosted checks are recorded under `slower-motion/hint/`; emulation is explicitly distinct from physical Android QA. The original results below are historical and do not validate the new rearming policy.
+The merged application passes 58/58 unit tests. [Local reminder checks](slower-motion/hint/local/hint-results.md) and the [hosted reminder checks](slower-motion/hint/hosted/hint-results.md) each pass 19/19 cases with zero browser/asset faults. The hosted reminder run completed at `2026-10-03T21:03:27.827Z` on source `5718ffe564dc6ad4ae959d3d369c92d39e7d2a1b`, uploaded by Cloudflare build `9443a4af-2bf8-450a-82e2-f0728665d331`. [Integrity evidence](slower-motion/hint/hosted/integrity.json) matches all eleven public assets to the commit and manifest and confirms production and original branches unchanged.
+
+Additional [rendered Android emulation checks](slower-motion/hint/hosted-android-visible/hint-results.md) pass at 360×740 and 412×915, with the reminder entirely inside the visible viewport, no clipping or browser/asset faults, and screenshots saved beside the report. Root visual review confirms the subtle arrow and text remain visible above the navigation. The timer fires after approximately five seconds; taps, pointer holds, selection, review-panel closure, focus/visibility restoration, and return-to-first-card paths all pass. Focus/visibility/held-pointer scenarios that use synthetic state/events are labelled in the detailed report. Emulation is explicitly distinct from physical Android QA. The original results below are historical and do not validate the new rearming policy.
+
+The [combined hosted regression report](slower-motion/hint/hosted/browser-results.md) completed at `2026-10-03T21:06:35.098Z`: 53 PASS, 0 FAIL, 1 UNVERIFIED (known unavailable WebKit), zero browser/asset errors, 1084 GET requests, and no contact submissions. It verifies the inherited slower-touch presets, text/background reversal, release/flick timing, fixed-speed wheel navigation, cookie restoration, native flow, stack depth, and dialog behavior on source `5718ffe564dc6ad4ae959d3d369c92d39e7d2a1b`. Updated recordings are inherited from the identical parent motion modules. The final evidence-only commit has unchanged public assets and is checked again after upload; its merge base is the final verified parent `5192f3bcb6317384e8579b9e03aa829ad8ddcb0f`.
 
 ## Original reminder evidence (superseded dismissal policy)
 

@@ -2,7 +2,7 @@
 
 ## Experimental delayed swipe cue
 
-This child branch, `codex/card-layout-swipe-hint`, incorporates slower-touch parent `codex/card-layout` at `402ee6a6e1fd1b9b299fc3ac159ce33b74aa2848`. It includes the same reduced touch sensitivity and fixed 600/900/1300ms card durations. The experiment is not integrated into the parent preview.
+This child branch, `codex/card-layout-swipe-hint`, incorporates verified slower-touch parent `codex/card-layout` at `5192f3bcb6317384e8579b9e03aa829ad8ddcb0f`. It includes the same reduced touch sensitivity and fixed 600/900/1300ms card durations. The experiment is not integrated into the parent preview.
 
 After five foreground seconds without interaction on the first card, a faint upward arrow and “Swipe up · scroll down” appear near the bottom navigation. The arrow nudges twice, then rests. Input hides the cue and restarts the countdown; it no longer disables the reminder for the whole visit. Held pointers, selected text, the expanded POC review panel, dialogs, background tabs, and unfocused windows pause it. Returning to the first card, closing the panel, or returning to the tab starts a fresh interval. Reading/desktop/reduced-motion modes suppress the cue. The existing arrows and screen-reader instructions remain available. The cue is decorative, cannot receive input or focus, and saves no state.
 

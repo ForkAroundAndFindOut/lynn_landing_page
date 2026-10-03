@@ -1,0 +1,377 @@
+{
+  "checkedAt": "2026-10-03T20:54:31.309Z",
+  "baseURL": "http://127.0.0.1:4189",
+  "revision": {
+    "revision": "5745f8841e78a84b7b737820db5324135cdc2a9e",
+    "assets": {
+      "index.html": "aef4bf97088b8b4fbf245b4132511c0526e15717c2bcdfc35c969c32e56a8bc5",
+      "styles.css": "47eebb4cc0a53ef3e2419e087a6b9cf608bbe0b5d9a24ae72189516b503e8023",
+      "main.js": "c1417b685f40ce84d363ee6cac9df0bdfc8d55f1aa9837d248f78b079e83b535",
+      "deck-controller.js": "558795d0ad5baa0cd7cc4e92e92a874dacb20adc45eadd254058c3ad56430682",
+      "wheel-input.js": "8f0ab0f01ed4cf959d3d15834a3fa7de85f8413bb4070d932e24dae1e7726b71",
+      "swipe-hint.js": "7d15e422a0cdca2bd4c624f0c17fd263ccb637bd369ec71d14d37284959c2ea0",
+      "motion.js": "ec7e63730bebcab9b86ea99719609544a528c9acbefddfc4cfe31ed7dbf647e0",
+      "layout.js": "37d6e05b18a458e7b74fffc3af3da132c1d8a91d43cd872d2de8f3533fabfda0",
+      "contact-dialog.js": "deadb51618db4ca8d011d6aaf5781bc0eae2f01d80463c7096be83520148953b",
+      "demo-settings.js": "e89eeecedb88ca7b1428948be8f841eb54d71799af9a7a089c29af4d292196ae",
+      "favicon.svg": "7993edfb7fa472661ba552f25bbea5eecb841a65da7f04ace9956e1898248b94"
+    }
+  },
+  "engine": "Chromium 149.0.7827.55",
+  "results": [
+    {
+      "name": "Android Chrome emulation shows the reminder at 360x740",
+      "status": "PASS",
+      "detail": {
+        "width": 360,
+        "height": 740,
+        "mode": "deck",
+        "shown": {
+          "visible": "true",
+          "opacity": 0.45,
+          "visibility": "visible",
+          "display": "inline-flex",
+          "pointerEvents": "none",
+          "ariaHidden": "true",
+          "tabIndex": -1,
+          "focus": "BODY"
+        },
+        "method": "Chromium Android user-agent/mobile viewport emulation; not a physical Android device"
+      }
+    },
+    {
+      "name": "idle first card waits five seconds, stays decorative and does not shift geometry 390",
+      "status": "PASS",
+      "detail": {
+        "width": 390,
+        "height": 844,
+        "hasTouch": true,
+        "timer": {
+          "scheduled": 269.2000000476837,
+          "fired": 5269.299999952316
+        },
+        "shown": {
+          "visible": "true",
+          "opacity": 0.45,
+          "visibility": "visible",
+          "display": "inline-flex",
+          "pointerEvents": "none",
+          "ariaHidden": "true",
+          "tabIndex": -1,
+          "focus": "BODY"
+        },
+        "animation": {
+          "duration": "1.2s",
+          "iterations": "2",
+          "timing": {
+            "delay": 0,
+            "direction": "normal",
+            "duration": 1200,
+            "easing": "linear",
+            "endDelay": 0,
+            "fill": "none",
+            "iterationStart": 0,
+            "iterations": 2
+          }
+        },
+        "geometryUnchanged": true,
+        "method": "Actual browser timer and CSS animation; physical/native browser coverage remains unverified"
+      }
+    },
+    {
+      "name": "idle first card waits five seconds, stays decorative and does not shift geometry 800",
+      "status": "PASS",
+      "detail": {
+        "width": 800,
+        "height": 900,
+        "hasTouch": false,
+        "timer": {
+          "scheduled": 675.5,
+          "fired": 5678.299999952316
+        },
+        "shown": {
+          "visible": "true",
+          "opacity": 0.45,
+          "visibility": "visible",
+          "display": "inline-flex",
+          "pointerEvents": "none",
+          "ariaHidden": "true",
+          "tabIndex": -1,
+          "focus": "BODY"
+        },
+        "animation": {
+          "duration": "1.2s",
+          "iterations": "2",
+          "timing": {
+            "delay": 0,
+            "direction": "normal",
+            "duration": 1200,
+            "easing": "linear",
+            "endDelay": 0,
+            "fill": "none",
+            "iterationStart": 0,
+            "iterations": 2
+          }
+        },
+        "geometryUnchanged": true,
+        "method": "Actual browser timer and CSS animation; physical/native browser coverage remains unverified"
+      }
+    },
+    {
+      "name": "Android Chrome emulation shows the reminder at 412x915",
+      "status": "PASS",
+      "detail": {
+        "width": 412,
+        "height": 915,
+        "mode": "deck",
+        "shown": {
+          "visible": "true",
+          "opacity": 0.45,
+          "visibility": "visible",
+          "display": "inline-flex",
+          "pointerEvents": "none",
+          "ariaHidden": "true",
+          "tabIndex": -1,
+          "focus": "BODY"
+        },
+        "method": "Chromium Android user-agent/mobile viewport emulation; not a physical Android device"
+      }
+    },
+    {
+      "name": "wheel activity restarts the idle reminder",
+      "status": "PASS",
+      "detail": {
+        "input": "wheel",
+        "events": [
+          {
+            "type": "wheel",
+            "trusted": true
+          }
+        ],
+        "timers": [
+          {
+            "scheduled": 89.70000004768372
+          },
+          {
+            "scheduled": 2115.2000000476837,
+            "fired": 7116.299999952316
+          }
+        ],
+        "method": "Playwright browser input before first cue, actual five-second quiet wait"
+      }
+    },
+    {
+      "name": "pointer activity restarts the idle reminder",
+      "status": "PASS",
+      "detail": {
+        "input": "pointer",
+        "events": [
+          {
+            "type": "pointerdown",
+            "trusted": true
+          }
+        ],
+        "timers": [
+          {
+            "scheduled": 105.70000004768372
+          },
+          {
+            "scheduled": 2113.9000000953674
+          },
+          {
+            "scheduled": 2114.5,
+            "fired": 7119.5
+          }
+        ],
+        "method": "Playwright browser input before first cue, actual five-second quiet wait"
+      }
+    },
+    {
+      "name": "keyboard activity restarts the idle reminder",
+      "status": "PASS",
+      "detail": {
+        "input": "keyboard",
+        "events": [
+          {
+            "type": "keydown",
+            "trusted": true
+          }
+        ],
+        "timers": [
+          {
+            "scheduled": 108.19999980926514
+          },
+          {
+            "scheduled": 2117.2999999523163,
+            "fired": 7118.399999856949
+          }
+        ],
+        "method": "Playwright browser input before first cue, actual five-second quiet wait"
+      }
+    },
+    {
+      "name": "returning to the first card starts a fresh idle reminder",
+      "status": "PASS",
+      "detail": {
+        "position": "0.000",
+        "timers": [
+          {
+            "scheduled": 86.5
+          },
+          {
+            "scheduled": 277.2999999523163
+          },
+          {
+            "scheduled": 1396.5999999046326,
+            "fired": 6396.899999856949
+          }
+        ],
+        "method": "Card navigation in Chromium, followed by actual five-second idle wait"
+      }
+    },
+    {
+      "name": "an open review panel pauses the reminder and closing it restarts the interval",
+      "status": "PASS",
+      "detail": {
+        "panelOpen": false,
+        "timers": [
+          {
+            "scheduled": 107.90000009536743
+          },
+          {
+            "scheduled": 5534.400000095367,
+            "fired": 10535.299999952316
+          }
+        ],
+        "method": "Open and close the saved review panel state in Chromium"
+      }
+    },
+    {
+      "name": "a held pointer suppresses the reminder until release",
+      "status": "PASS",
+      "detail": {
+        "timers": [
+          {
+            "scheduled": 111.70000004768372
+          },
+          {
+            "scheduled": 6503.100000143051,
+            "fired": 11504.400000095367
+          }
+        ],
+        "method": "Synthetic held pointer with real timers; release starts the idle interval"
+      }
+    },
+    {
+      "name": "selected text pauses the reminder until selection clears",
+      "status": "PASS",
+      "detail": {
+        "selectedText": "",
+        "timers": [
+          {
+            "scheduled": 106.79999995231628
+          },
+          {
+            "scheduled": 6498,
+            "fired": 11498.799999952316
+          }
+        ],
+        "method": "Browser text selection change with real timers"
+      }
+    },
+    {
+      "name": "window blur clears a lost pointer and focus starts a new interval",
+      "status": "PASS",
+      "detail": {
+        "timers": [
+          {
+            "scheduled": 102.20000004768372
+          },
+          {
+            "scheduled": 6493.5,
+            "fired": 11493.800000190735
+          }
+        ],
+        "method": "Synthetic hasFocus state and blur/focus events, with actual timers"
+      }
+    },
+    {
+      "name": "cue stays suppressed for desktop",
+      "status": "PASS",
+      "detail": {
+        "variant": "desktop",
+        "mode": "flow",
+        "dialogOpen": false,
+        "method": "Browser viewport/media/input/hash state and actual wait"
+      }
+    },
+    {
+      "name": "hidden tab resets the countdown before cue can reappear",
+      "status": "PASS",
+      "detail": {
+        "timers": [
+          {
+            "scheduled": 122.10000014305115
+          },
+          {
+            "scheduled": 6161.400000095367,
+            "fired": 11162.100000143051
+          }
+        ],
+        "method": "Synthetic document.hidden accessor and visibilitychange notifications; actual five-second timers. OS tab/background throttling remains unverified."
+      }
+    },
+    {
+      "name": "cue stays suppressed for reading",
+      "status": "PASS",
+      "detail": {
+        "variant": "reading",
+        "mode": "flow",
+        "dialogOpen": false,
+        "method": "Browser viewport/media/input/hash state and actual wait"
+      }
+    },
+    {
+      "name": "cue stays suppressed for reduced",
+      "status": "PASS",
+      "detail": {
+        "variant": "reduced",
+        "mode": "flow",
+        "dialogOpen": false,
+        "method": "Browser viewport/media/input/hash state and actual wait"
+      }
+    },
+    {
+      "name": "cue stays suppressed for dialog",
+      "status": "PASS",
+      "detail": {
+        "variant": "dialog",
+        "mode": "deck",
+        "dialogOpen": true,
+        "method": "Programmatic native dialog.showModal verifies the open-dialog guard independently of input dismissal"
+      }
+    },
+    {
+      "name": "deep link stays suppressed until first card is revisited",
+      "status": "PASS",
+      "detail": {
+        "variant": "later-hash",
+        "mode": "deck",
+        "dialogOpen": false,
+        "method": "Browser viewport/media/input/hash state and actual wait"
+      }
+    },
+    {
+      "name": "no browser or asset errors",
+      "status": "PASS",
+      "detail": {
+        "faults": 0
+      }
+    }
+  ],
+  "faults": [],
+  "notes": [
+    "Chromium browser input and CSS/timer checks only. Native Safari, Firefox, Edge, physical trackpads/touchscreens, and real hidden-tab throttling remain unverified by this suite.",
+    "Existing browser regressions are reported separately in browser-results.json."
+  ]
+}

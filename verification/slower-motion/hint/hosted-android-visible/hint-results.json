@@ -1,0 +1,109 @@
+{
+  "checkedAt": "2026-10-03T21:06:06.263Z",
+  "baseURL": "https://codex-card-layout-swipe-hint-lynn-landing-page.nrct6ycww6.workers.dev/",
+  "revision": {
+    "revision": "5718ffe564dc6ad4ae959d3d369c92d39e7d2a1b",
+    "assets": {
+      "index.html": "aef4bf97088b8b4fbf245b4132511c0526e15717c2bcdfc35c969c32e56a8bc5",
+      "styles.css": "47eebb4cc0a53ef3e2419e087a6b9cf608bbe0b5d9a24ae72189516b503e8023",
+      "main.js": "c1417b685f40ce84d363ee6cac9df0bdfc8d55f1aa9837d248f78b079e83b535",
+      "deck-controller.js": "558795d0ad5baa0cd7cc4e92e92a874dacb20adc45eadd254058c3ad56430682",
+      "wheel-input.js": "8f0ab0f01ed4cf959d3d15834a3fa7de85f8413bb4070d932e24dae1e7726b71",
+      "swipe-hint.js": "7d15e422a0cdca2bd4c624f0c17fd263ccb637bd369ec71d14d37284959c2ea0",
+      "motion.js": "ec7e63730bebcab9b86ea99719609544a528c9acbefddfc4cfe31ed7dbf647e0",
+      "layout.js": "37d6e05b18a458e7b74fffc3af3da132c1d8a91d43cd872d2de8f3533fabfda0",
+      "contact-dialog.js": "deadb51618db4ca8d011d6aaf5781bc0eae2f01d80463c7096be83520148953b",
+      "demo-settings.js": "e89eeecedb88ca7b1428948be8f841eb54d71799af9a7a089c29af4d292196ae",
+      "favicon.svg": "7993edfb7fa472661ba552f25bbea5eecb841a65da7f04ace9956e1898248b94"
+    }
+  },
+  "engine": "Chromium 149.0.7827.55",
+  "results": [
+    {
+      "name": "Android Chrome emulation shows the reminder at 360x740",
+      "status": "PASS",
+      "detail": {
+        "width": 360,
+        "height": 740,
+        "mode": "deck",
+        "shown": {
+          "visible": "true",
+          "opacity": 0.45,
+          "visibility": "visible",
+          "display": "inline-flex",
+          "pointerEvents": "none",
+          "ariaHidden": "true",
+          "tabIndex": -1,
+          "focus": "BODY"
+        },
+        "bounds": {
+          "cue": {
+            "x": 116.125,
+            "y": 614,
+            "width": 127.75,
+            "height": 18.140625,
+            "top": 614,
+            "right": 243.875,
+            "bottom": 632.140625,
+            "left": 116.125
+          },
+          "viewport": {
+            "top": 0,
+            "height": 740,
+            "width": 360
+          }
+        },
+        "method": "Chromium Android user-agent/mobile viewport emulation and rendered viewport bounds; not a physical Android device"
+      }
+    },
+    {
+      "name": "Android Chrome emulation shows the reminder at 412x915",
+      "status": "PASS",
+      "detail": {
+        "width": 412,
+        "height": 915,
+        "mode": "deck",
+        "shown": {
+          "visible": "true",
+          "opacity": 0.45,
+          "visibility": "visible",
+          "display": "inline-flex",
+          "pointerEvents": "none",
+          "ariaHidden": "true",
+          "tabIndex": -1,
+          "focus": "BODY"
+        },
+        "bounds": {
+          "cue": {
+            "x": 142.125,
+            "y": 789,
+            "width": 127.75,
+            "height": 18.140625,
+            "top": 789,
+            "right": 269.875,
+            "bottom": 807.140625,
+            "left": 142.125
+          },
+          "viewport": {
+            "top": 0,
+            "height": 915,
+            "width": 412
+          }
+        },
+        "method": "Chromium Android user-agent/mobile viewport emulation and rendered viewport bounds; not a physical Android device"
+      }
+    },
+    {
+      "name": "no browser or asset errors",
+      "status": "PASS",
+      "detail": {
+        "faults": 0
+      }
+    }
+  ],
+  "faults": [],
+  "notes": [
+    "Chromium browser input and CSS/timer checks only. Native Safari, Firefox, Edge, physical trackpads/touchscreens, and real hidden-tab throttling remain unverified by this suite.",
+    "Existing browser regressions are reported separately in browser-results.json."
+  ]
+}

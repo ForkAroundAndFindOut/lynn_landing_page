@@ -42,7 +42,11 @@ for(const[width,height,hasTouch]of[[390,844,true],[800,900,false]])jobs.push(()=
 for(const[width,height]of[[360,740],[412,915]])jobs.push(()=>check('Android Chrome emulation shows the reminder at '+width+'x'+height,()=>isolated({viewport:{width,height},hasTouch:true,isMobile:true,userAgent:'Mozilla/5.0 (Linux; Android 15; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Mobile Safari/537.36'},async page=>{
  await elapsed(page,5350);const shown=await visible(page);
  assert.equal(await page.locator('body').getAttribute('data-mode'),'deck');
- return{width,height,mode:'deck',shown,method:'Chromium Android user-agent/mobile viewport emulation; not a physical Android device'};
+ const bounds=await page.locator('#experimental-swipe-cue').evaluate(el=>({cue:el.getBoundingClientRect().toJSON(),viewport:{top:visualViewport.offsetTop,height:visualViewport.height,width:visualViewport.width}}));
+ assert.ok(bounds.cue.top>=bounds.viewport.top&&bounds.cue.bottom+2<=bounds.viewport.top+bounds.viewport.height,'cue and arrow nudge fit in the visible mobile viewport');
+ assert.ok(bounds.cue.left>=0&&bounds.cue.right<=bounds.viewport.width,'cue fits horizontally');
+ await page.screenshot({path:path.join(output,'hint-android-'+width+'.png')});
+ return{width,height,mode:'deck',shown,bounds,method:'Chromium Android user-agent/mobile viewport emulation and rendered viewport bounds; not a physical Android device'};
 })));
 for(const input of ['wheel','pointer','keyboard'])jobs.push(()=>check(input+' activity restarts the idle reminder',()=>isolated({hasTouch:false},async page=>{
  await elapsed(page,2000);

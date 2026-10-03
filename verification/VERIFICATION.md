@@ -31,7 +31,9 @@ Committed wheel bursts consume their momentum tails without queued navigation an
 
 The focused unit suite passes 56 tests, including 18 wheel cases that verify fixed 240/300/380ms preset durations across small, large, and slowly accumulated input; no manual partial positioning; single-card gates across 180–350ms tail gaps; the 399/400ms quiet boundary; delayed animation completion; and native/listener/lifecycle handling. The [focused local browser report](wheel/fixed-speed/local/browser-results.md) passes all nine input checks with zero failures; known unavailable WebKit is explicitly unverified. Trusted Chromium input measured similar durations for 16px and 2000px deltas in phone and PC-sized decks. [Browser compatibility research](BROWSER_COMPATIBILITY.md) records the Chrome/Edge/Firefox/Safari target, standards basis, accepted listener-lifecycle change, and hardware limits.
 
-Hosted evidence will be recorded after the corrected version upload. The delayed swipe reminder remains a child-branch experiment and will be rebased on this verified fix before upload.
+The [combined hosted report](wheel/fixed-speed/hosted/browser-results.md) completed at `2026-10-03T20:00:49.362Z`: 52 PASS, 0 FAIL, 1 UNVERIFIED (known unavailable WebKit engine), 907 GET requests, and zero browser/asset errors or submissions. Tested application source is `c53eaf1175da9dd0ed15f055836f3fb51a47fde0`, uploaded by Cloudflare build `e1e6a7fb-d1bb-4b49-bbf7-f549f5ec2ac4`. [Integrity evidence](wheel/fixed-speed/hosted/integrity.json) matches all ten public assets to the commit and manifest and verifies original branches and production unchanged. The final evidence-only commit retains identical public assets and is checked again after upload.
+
+The corrected parent preview is https://codex-card-layout-lynn-landing-page.nrct6ycww6.workers.dev/. The delayed swipe reminder remains a child-branch experiment, rebased on this verified fixed-speed input version before upload; its branch records and URL are separate.
 
 ## Proportional wheel prototype (superseded)
 

@@ -2,11 +2,11 @@
 
 ## Experimental delayed swipe cue
 
-This child branch, `codex/card-layout-swipe-hint`, starts from verified fixed-speed input-support parent `codex/card-layout` at `fe62048bfa8f99e41dc03095ba80fb8d51cf413e`. It includes the one-card wheel/trackpad request correction. The experiment is not integrated into the parent preview.
+This child branch, `codex/card-layout-swipe-hint`, incorporates slower-touch parent `codex/card-layout` at `402ee6a6e1fd1b9b299fc3ac159ce33b74aa2848`. It includes the same reduced touch sensitivity and fixed 600/900/1300ms card durations. The experiment is not integrated into the parent preview.
 
-After five visible-tab seconds without interaction on the first card, a faint upward arrow and “Swipe up · scroll down” appear near the bottom navigation. The arrow nudges twice, then rests. Any pointer press, wheel input, keyboard input, or navigation dismisses it until reload. Hidden tabs restart the countdown; reading/desktop/reduced-motion modes and dialogs suppress the cue. The existing arrows and screen-reader instructions remain available. The cue is decorative, cannot receive input or focus, and saves no state.
+After five foreground seconds without interaction on the first card, a faint upward arrow and “Swipe up · scroll down” appear near the bottom navigation. The arrow nudges twice, then rests. Input hides the cue and restarts the countdown; it no longer disables the reminder for the whole visit. Held pointers, selected text, the expanded POC review panel, dialogs, background tabs, and unfocused windows pause it. Returning to the first card, closing the panel, or returning to the tab starts a fresh interval. Reading/desktop/reduced-motion modes suppress the cue. The existing arrows and screen-reader instructions remain available. The cue is decorative, cannot receive input or focus, and saves no state.
 
-Experimental preview: https://codex-card-layout-swipe-hint-lynn-landing-page.nrct6ycww6.workers.dev/. Input-support parent: https://codex-card-layout-lynn-landing-page.nrct6ycww6.workers.dev/. To review the experiment, open its URL at a card-mode width, leave the first card idle for five seconds, then swipe or scroll. Refresh to repeat.
+Experimental preview: https://codex-card-layout-swipe-hint-lynn-landing-page.nrct6ycww6.workers.dev/. Input-support parent: https://codex-card-layout-lynn-landing-page.nrct6ycww6.workers.dev/. To review the experiment, open its URL in card mode, close POC review, leave the first card idle for five seconds, then swipe or scroll. Return to the first card to repeat; refresh is no longer required.
 
 An isolated exploration for Lynn Renezeder’s static Fractional HR Consulting site. The parent branch is `codex/card-layout`, based on `main` at `0b10b41b59e717da2cc6f83f9e950250541eac3d`. Existing branches and production are retained. Future card-layout experiments can branch from this parent.
 

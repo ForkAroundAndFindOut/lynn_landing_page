@@ -2,7 +2,17 @@
 
 Date: 2026-10-03 (America/Los_Angeles).
 
-Branch: `codex/card-layout-swipe-hint`, rebased on fixed-speed input-support parent `fe62048bfa8f99e41dc03095ba80fb8d51cf413e`. It includes the one-card request correction; the child adds only the reminder and its evidence. No parent or production changes are included in this experiment.
+Branch: `codex/card-layout-swipe-hint`, incorporating slower-touch parent `402ee6a6e1fd1b9b299fc3ac159ce33b74aa2848`. Core motion/input modules match that parent; the reminder remains child-only. Production and original branches are preserved.
+
+## Android reminder follow-up
+
+The earlier cue permanently dismissed itself on any pointerdown, wheel, or keydown, including ordinary taps and review-control use before its first appearance. A saved expanded review panel could obscure the bottom cue. These source-confirmed conditions explain plausible failure paths for the owner's report; physical Android Chrome is not available to establish the exact device cause.
+
+Input now hides the cue and restarts a five-second idle interval. Held pointers, native selection, the expanded review panel, dialogs, hidden tabs, and unfocused windows pause the countdown. Returning to the first card, closing the panel, clearing selection, or restoring focus/visibility rearms it. Lost contacts are cleared during blur/tab hiding. The cue retains its first-card-only, decorative, non-interactive behavior, reserved space, opacity 0.45, 300ms fade, and two 4px nudges; reduced motion and native document flow still suppress it.
+
+Focused source checks passed in Chromium, including Android Chrome emulation at 360×740 and 412×915. Merged-build and hosted checks are recorded under `slower-motion/hint/`; emulation is explicitly distinct from physical Android QA. The original results below are historical and do not validate the new rearming policy.
+
+## Original reminder evidence (superseded dismissal policy)
 
 The cue uses the reserved bottom instruction row, opacity 0.45, a 300ms fade, and two restrained 4px arrow nudges. It appears after five visible-tab seconds on the idle first card. Pointer press, wheel, keyboard, or navigation dismisses it until reload. Reading/desktop/reduced-motion modes, dialogs, and hidden tabs suppress it. Text instructions remain semantic and available through the stage description; decorative cue elements are aria-hidden and have pointer-events:none. No preference or contact data is stored by this feature.
 

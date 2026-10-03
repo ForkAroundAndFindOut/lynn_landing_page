@@ -2,7 +2,7 @@
 
 ## Experimental delayed swipe cue
 
-This child branch, `codex/card-layout-swipe-hint`, starts from verified input-support parent `codex/card-layout` at `10aa8407bc7713654f3d1d4d4999e74b2150b3b0`. The experiment is not integrated into the parent preview.
+This child branch, `codex/card-layout-swipe-hint`, starts from verified fixed-speed input-support parent `codex/card-layout` at `fe62048bfa8f99e41dc03095ba80fb8d51cf413e`. It includes the one-card wheel/trackpad request correction. The experiment is not integrated into the parent preview.
 
 After five visible-tab seconds without interaction on the first card, a faint upward arrow and “Swipe up · scroll down” appear near the bottom navigation. The arrow nudges twice, then rests. Any pointer press, wheel input, keyboard input, or navigation dismisses it until reload. Hidden tabs restart the countdown; reading/desktop/reduced-motion modes and dialogs suppress the cue. The existing arrows and screen-reader instructions remain available. The cue is decorative, cannot receive input or focus, and saves no state.
 

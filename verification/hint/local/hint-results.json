@@ -1,14 +1,14 @@
 {
-  "checkedAt": "2026-10-03T19:55:27.861Z",
+  "checkedAt": "2026-10-03T20:04:25.552Z",
   "baseURL": "http://127.0.0.1:4189",
   "revision": {
-    "revision": "10aa8407bc7713654f3d1d4d4999e74b2150b3b0",
+    "revision": "21a4bf620aeb3ebaf7edf3d9c7141fb13c1b348c",
     "assets": {
       "index.html": "aef4bf97088b8b4fbf245b4132511c0526e15717c2bcdfc35c969c32e56a8bc5",
       "styles.css": "47eebb4cc0a53ef3e2419e087a6b9cf608bbe0b5d9a24ae72189516b503e8023",
       "main.js": "c1417b685f40ce84d363ee6cac9df0bdfc8d55f1aa9837d248f78b079e83b535",
-      "deck-controller.js": "788518416c4d3090a6351849da91ba9283e783f2a9cfdb24a97a4aa216000a2a",
-      "wheel-input.js": "ee0e37c9e6e0e06600b60c134f119ad8fe03447ff2a66fab21aa7668b81ed31f",
+      "deck-controller.js": "558795d0ad5baa0cd7cc4e92e92a874dacb20adc45eadd254058c3ad56430682",
+      "wheel-input.js": "8f0ab0f01ed4cf959d3d15834a3fa7de85f8413bb4070d932e24dae1e7726b71",
       "swipe-hint.js": "07a7edefde13b2ff01808f572f865027660fe95f4185b10d24348deeb4b6a314",
       "motion.js": "43b0850a3388b378fc4d003f40bddd6375ebf3f07318be555e50d9f4dafb5041",
       "layout.js": "37d6e05b18a458e7b74fffc3af3da132c1d8a91d43cd872d2de8f3533fabfda0",
@@ -27,8 +27,8 @@
         "height": 844,
         "hasTouch": true,
         "timer": {
-          "scheduled": 143,
-          "fired": 5143.899999856949
+          "scheduled": 187.79999995231628,
+          "fired": 5188.200000047684
         },
         "shown": {
           "visible": "true",
@@ -66,8 +66,8 @@
         "height": 900,
         "hasTouch": false,
         "timer": {
-          "scheduled": 160.39999985694885,
-          "fired": 5161.599999904633
+          "scheduled": 167.59999990463257,
+          "fired": 5168.700000047684
         },
         "shown": {
           "visible": "true",
@@ -145,11 +145,11 @@
       "detail": {
         "timers": [
           {
-            "scheduled": 68.60000014305115
+            "scheduled": 83.5
           },
           {
-            "scheduled": 6097.400000095367,
-            "fired": 11097.600000143051
+            "scheduled": 6120.5,
+            "fired": 11126.5
           }
         ],
         "method": "Synthetic document.hidden accessor and visibilitychange notifications; actual five-second timers. OS tab/background throttling remains unverified."

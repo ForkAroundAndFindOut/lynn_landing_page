@@ -1,0 +1,266 @@
+{
+  "checkedAt": "2026-10-03T19:52:47.495Z",
+  "baseURL": "http://127.0.0.1:4188",
+  "revision": {
+    "revision": "10aa8407bc7713654f3d1d4d4999e74b2150b3b0",
+    "assets": {
+      "index.html": "19d1ab3fd088644b326c5dfdf9078c50370e55eca799f75095dc676031be0eb1",
+      "styles.css": "1656a3178471e6e26c1af5984eb9ed04332ef8fbc5ef92e8c5c2aef199eb4b65",
+      "main.js": "f868e8c6af79ad1cc0ecbd82f9c4baf2b98a83c3b4d27f0cd219e48bba5701cf",
+      "deck-controller.js": "558795d0ad5baa0cd7cc4e92e92a874dacb20adc45eadd254058c3ad56430682",
+      "wheel-input.js": "8f0ab0f01ed4cf959d3d15834a3fa7de85f8413bb4070d932e24dae1e7726b71",
+      "motion.js": "43b0850a3388b378fc4d003f40bddd6375ebf3f07318be555e50d9f4dafb5041",
+      "layout.js": "37d6e05b18a458e7b74fffc3af3da132c1d8a91d43cd872d2de8f3533fabfda0",
+      "contact-dialog.js": "deadb51618db4ca8d011d6aaf5781bc0eae2f01d80463c7096be83520148953b",
+      "demo-settings.js": "e89eeecedb88ca7b1428948be8f841eb54d71799af9a7a089c29af4d292196ae",
+      "favicon.svg": "7993edfb7fa472661ba552f25bbea5eecb841a65da7f04ace9956e1898248b94"
+    }
+  },
+  "results": [
+    {
+      "name": "wheel browser input keeps tiny intent idle and uses fixed preset transitions in touch and PC decks",
+      "status": "PASS",
+      "detail": {
+        "measurements": [
+          {
+            "width": 390,
+            "height": 844,
+            "hasTouch": true,
+            "preset": "crisp",
+            "delta": 16,
+            "initialProgress": 0.49,
+            "duration": 253
+          },
+          {
+            "width": 390,
+            "height": 844,
+            "hasTouch": true,
+            "preset": "crisp",
+            "delta": 2000,
+            "initialProgress": 0.54,
+            "duration": 248
+          },
+          {
+            "width": 390,
+            "height": 844,
+            "hasTouch": true,
+            "preset": "balanced",
+            "delta": 16,
+            "initialProgress": 0.412,
+            "duration": 318
+          },
+          {
+            "width": 390,
+            "height": 844,
+            "hasTouch": true,
+            "preset": "balanced",
+            "delta": 2000,
+            "initialProgress": 0.408,
+            "duration": 319
+          },
+          {
+            "width": 390,
+            "height": 844,
+            "hasTouch": true,
+            "preset": "gentle",
+            "delta": 16,
+            "initialProgress": 0.337,
+            "duration": 393
+          },
+          {
+            "width": 390,
+            "height": 844,
+            "hasTouch": true,
+            "preset": "gentle",
+            "delta": 2000,
+            "initialProgress": 0.337,
+            "duration": 393
+          },
+          {
+            "width": 800,
+            "height": 900,
+            "hasTouch": false,
+            "preset": "crisp",
+            "delta": 16,
+            "initialProgress": 0.49,
+            "duration": 256
+          },
+          {
+            "width": 800,
+            "height": 900,
+            "hasTouch": false,
+            "preset": "crisp",
+            "delta": 2000,
+            "initialProgress": 0.493,
+            "duration": 254
+          },
+          {
+            "width": 800,
+            "height": 900,
+            "hasTouch": false,
+            "preset": "balanced",
+            "delta": 16,
+            "initialProgress": 0.411,
+            "duration": 317
+          },
+          {
+            "width": 800,
+            "height": 900,
+            "hasTouch": false,
+            "preset": "balanced",
+            "delta": 2000,
+            "initialProgress": 0.413,
+            "duration": 314
+          },
+          {
+            "width": 800,
+            "height": 900,
+            "hasTouch": false,
+            "preset": "gentle",
+            "delta": 16,
+            "initialProgress": 0.332,
+            "duration": 394
+          },
+          {
+            "width": 800,
+            "height": 900,
+            "hasTouch": false,
+            "preset": "gentle",
+            "delta": 2000,
+            "initialProgress": 0.336,
+            "duration": 391
+          }
+        ],
+        "method": "Playwright browser wheel input: below-threshold intent leaves geometry idle; normalized 16px and 2000px produce the same preset animation. Physical trackpads remain unverified."
+      }
+    },
+    {
+      "name": "wheel long inertia tails and 180–350 ms gaps cannot skip cards; fresh reverse bursts navigate",
+      "status": "PASS",
+      "detail": {
+        "method": "Browser wheel input with sustained tails, interrupted tails at 180/250/350ms, deliberate 650ms quiet gaps, reverse commands, and both deck bounds"
+      }
+    },
+    {
+      "name": "wheel line and page delta modes normalize and retain cancellable listener policy",
+      "status": "PASS",
+      "detail": {
+        "measurements": [
+          {
+            "deltaMode": 1,
+            "prevented": true,
+            "trusted": false
+          },
+          {
+            "deltaMode": 2,
+            "prevented": true,
+            "trusted": false
+          }
+        ],
+        "method": "Synthetic WheelEvent deltaMode=1/2; actual browser input above covers pixel-mode wheel dispatch"
+      }
+    },
+    {
+      "name": "wheel horizontal intent and control-modified browser zoom input bypass the deck",
+      "status": "PASS",
+      "detail": {
+        "horizontal": {
+          "x": 180,
+          "y": 12,
+          "mode": 0,
+          "ctrl": false,
+          "prevented": false,
+          "trusted": true,
+          "target": "hero-title"
+        },
+        "zoom": {
+          "x": 0,
+          "y": -60,
+          "mode": 0,
+          "ctrl": true,
+          "prevented": false,
+          "trusted": true,
+          "target": "hero-title"
+        },
+        "method": "Browser-dispatched horizontal and Control+wheel; browser zoom policy is uncancelled, actual physical pinch scaling remains unverified"
+      }
+    },
+    {
+      "name": "wheel nested scrolling and input controls retain their native paths",
+      "status": "PASS",
+      "detail": {
+        "method": "Browser wheel scrolls a bounded nested overflow fixture; editable input and existing navigation controls remain usable"
+      }
+    },
+    {
+      "name": "wheel contact textarea scrolls while dialog locks deck position",
+      "status": "PASS",
+      "detail": {
+        "textareaScrollTop": 180,
+        "method": "Native browser wheel input inside contact textarea; no background card navigation"
+      }
+    },
+    {
+      "name": "wheel desktop, reduced motion, and Read as page keep native document scrolling",
+      "status": "PASS",
+      "detail": {
+        "measurements": [
+          {
+            "variant": "desktop",
+            "scrollY": 500
+          },
+          {
+            "variant": "reduced",
+            "scrollY": 500
+          },
+          {
+            "variant": "reading",
+            "scrollY": 500
+          }
+        ],
+        "method": "Browser-dispatched wheel in each normal document flow mode"
+      }
+    },
+    {
+      "name": "wheel lifecycle cancellation clears release timers across blur, resize, reading and reduced motion",
+      "status": "PASS",
+      "detail": {
+        "method": "Native viewport/media/control changes; window blur is explicitly synthetic. Subsequent wheel input verifies no stale gesture/timer interference."
+      }
+    },
+    {
+      "name": "PC touchscreen and mouse pointer paths work alongside wheel navigation",
+      "status": "PASS",
+      "detail": {
+        "measurements": [
+          {
+            "width": 390,
+            "height": 844,
+            "hasTouch": true,
+            "touch": "CDP",
+            "mouse": "Playwright"
+          },
+          {
+            "width": 800,
+            "height": 900,
+            "hasTouch": false,
+            "touch": "CDP",
+            "mouse": "Playwright"
+          }
+        ],
+        "method": "CDP touchscreen input in touch-capable mobile and narrow non-touch PC contexts; physical Windows touchscreen remains unverified"
+      }
+    },
+    {
+      "name": "WebKit desktop/mobile navigation and form smoke",
+      "status": "UNVERIFIED",
+      "message": "Skipped because local installed WebKit launch created a context but hung creating its first page and exceeded a 25-second process timeout."
+    }
+  ],
+  "faults": [],
+  "notes": [
+    "Chromium 149.0.7827.55; installed browser executable explicitly selected.",
+    "Firefox, native Safari, Android Chrome, and iPhone Safari are unavailable/unverified in this environment. No real-device performance, browser pinch behavior, or on-screen keyboard claim is made."
+  ],
+  "artifacts": "PNG captures; slow-reversible-drag.webm, short-flick.webm, contact-expansion.webm, touch-text-reversal.webm, touch-text-flick.webm when RECORD_DEMOS is enabled"
+}

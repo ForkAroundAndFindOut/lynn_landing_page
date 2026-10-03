@@ -3,7 +3,7 @@ import test from 'node:test';
 import { createDeck } from '../deck-controller.js';
 import { WHEEL, normalizeWheel } from '../wheel-input.js';
 
-function harness(t, reduced = true) {
+function harness(t, reduced = true, preset = 'balanced') {
   const names = ['document', 'window', 'requestAnimationFrame', 'cancelAnimationFrame', 'setTimeout', 'clearTimeout'];
   const original = Object.fromEntries(names.map((name) => [name, globalThis[name]]));
   t.after(() => Object.assign(globalThis, original));
@@ -36,6 +36,7 @@ function harness(t, reduced = true) {
         return null;
       },
       addEventListener(name, fn, options) { const list = this.listeners.get(name) || []; list.push({ fn, options }); this.listeners.set(name, list); },
+      removeEventListener(name, fn) { this.listeners.set(name, (this.listeners.get(name) || []).filter((listener) => listener.fn !== fn)); },
       setAttribute(name, value) { attrs[name] = value; }, removeAttribute(name) { delete attrs[name]; },
       toggleAttribute(name, value) { if (value) attrs[name] = ''; else delete attrs[name]; },
     };
@@ -44,7 +45,7 @@ function harness(t, reduced = true) {
     hasPointerCapture: (key) => captures.has(key), setPointerCapture: (key) => captures.add(key), releasePointerCapture: (key) => captures.delete(key) });
   const cards = Array.from({ length: 6 }, (_, index) => Object.assign(element('article', { class: 'card' }, stage), { id: `card-${index}`, offsetWidth: 358, offsetHeight: 570 }));
   const changes = [];
-  const deck = createDeck({ stage, cards, isReduced: () => reduced, isBlocked: () => blocked, onChange: (index, options) => changes.push({ index, ...options }) });
+  const deck = createDeck({ stage, cards, getPreset: () => preset, isReduced: () => reduced, isBlocked: () => blocked, onChange: (index, options) => changes.push({ index, ...options }) });
   deck.setEnabled(true);
   function dispatch(name, overrides = {}) {
     const event = { target: cards[deck.index], deltaX: 0, deltaY: 0, deltaMode: 0, timeStamp: now,
@@ -64,7 +65,8 @@ function harness(t, reduced = true) {
   function drain() { for (let n = 0; frames.size && n < 100; n++) tick(); assert.equal(frames.size, 0); }
   function clean() { assert.equal(timers.size, 0); assert.equal(frames.size, 0); assert.equal(captures.size, 0); assert.equal(deck.state, 'idle'); }
   return { deck, stage, cards, changes, selection, timers, frames, element, dispatch, advance, tick, drain, clean,
-    wheel: (deltaY, overrides) => dispatch('wheel', { deltaY, ...overrides }), block: (value) => { blocked = value; }, blur: () => windowListeners.get('blur')() };
+    wheel: (deltaY, overrides) => dispatch('wheel', { deltaY, ...overrides }), block: (value) => { blocked = value; },
+    setPreset: (value) => { preset = value; }, blur: () => windowListeners.get('blur')() };
 }
 
 test('pixel, line and page wheel units normalize in CSS pixels and malformed deltas yield', () => {
@@ -79,31 +81,29 @@ test('a one-line notch and equivalent pixel/page intent advance, then negative i
   assert.equal(h.stage.listeners.get('wheel')[0].options.passive, false);
   for (const [deltaY, deltaMode] of [[1, 1], [16, 0], [1, 2]]) {
     assert.equal(h.wheel(deltaY, { deltaMode }).defaultPrevented, true);
+    assert.equal(h.deck.index, 1, 'commit starts navigation immediately');
     h.advance(WHEEL.quiet);
-    assert.equal(h.deck.index, 1);
     assert.equal(h.changes.at(-1).focus, false);
     h.wheel(-16); h.advance(WHEEL.quiet); assert.equal(h.deck.index, 0);
     h.clean();
   }
 });
 
-test('small jitter returns to origin while a fine pixel stream accumulates deliberate intent', (t) => {
+test('small jitter never moves cards while a fine pixel stream accumulates one command', (t) => {
   const h = harness(t);
   h.wheel(3); h.advance(WHEEL.quiet); assert.equal(h.deck.index, 0);
-  for (let n = 0; n < 8; n++) { h.wheel(2); h.advance(20); }
-  assert.equal(h.deck.position, 0.2);
+  for (let n = 0; n < 7; n++) { h.wheel(2); h.advance(20); assert.equal(h.deck.position, 0); assert.equal(h.frames.size, 0); }
+  h.wheel(2); assert.equal(h.deck.index, 1);
   h.advance(WHEEL.quiet); assert.equal(h.deck.index, 1); h.clean();
 });
 
-test('one burst stays within adjacent cards, discards excess inertia and reverses immediately', (t) => {
+test('reversal cancels uncommitted intent and cannot alter or repeat a committed command', (t) => {
   const h = harness(t); h.deck.jump(2);
-  for (let n = 0; n < 12; n++) { h.wheel(90); h.advance(30); }
-  assert.equal(h.deck.position, 3); assert.equal(h.deck.index, 2);
-  h.wheel(-40); assert.equal(h.deck.position, 2.5);
-  h.wheel(-40); assert.equal(h.deck.position, 2);
+  h.wheel(12); h.wheel(-12); assert.equal(h.deck.position, 2);
   h.advance(WHEEL.quiet); assert.equal(h.deck.index, 2);
-  h.wheel(80); h.wheel(-160); assert.equal(h.deck.position, 1);
-  h.advance(WHEEL.quiet); assert.equal(h.deck.index, 1); h.clean();
+  h.wheel(6); h.wheel(-22); assert.equal(h.deck.index, 1);
+  for (let n = 0; n < 12; n++) { h.wheel(n % 2 ? 500 : -500); h.advance(30); }
+  assert.equal(h.deck.index, 1); h.advance(WHEEL.quiet); h.clean();
 });
 
 test('scrolling outside the stage, flow mode, horizontal intent, shifted wheel and zoom stay native', (t) => {
@@ -131,15 +131,18 @@ test('passive links/buttons permit wheel but controls, editables, selection and 
   h.selection.isCollapsed = false; assert.equal(h.wheel(100).defaultPrevented, false); h.clean();
 });
 
-test('inertial tail during settlement never queues another card and must go quiet before reacquiring', (t) => {
+test('inertial tails with 180–350ms gaps never queue another card even after animation finishes', (t) => {
   const h = harness(t, false);
-  h.wheel(48); h.advance(WHEEL.quiet); assert.equal(h.deck.state, 'settling');
-  h.tick();
-  for (let n = 0; n < 25; n++) { h.wheel(10); h.tick(20); }
+  h.wheel(48); assert.equal(h.deck.state, 'settling'); h.tick(); h.tick(300);
   assert.equal(h.deck.index, 1); assert.equal(h.deck.state, 'idle');
-  h.wheel(80); assert.equal(h.deck.position, 1, 'a continuing tail is consumed even after animation finishes');
+  for (const gap of [180, 250, 350, 180, 350]) {
+    // The first event continues the original burst, subsequent gaps remain
+    // longer than the former 180 ms timeout but shorter than true quiet.
+    h.wheel(300); h.advance(gap); h.wheel(-300); assert.equal(h.deck.position, 1);
+  }
+  assert.deepEqual(h.changes.map(({ index }) => index), [1]);
   h.advance(WHEEL.quiet); h.clean();
-  h.wheel(16); h.advance(WHEEL.quiet); h.drain(); assert.equal(h.deck.index, 2); h.clean();
+  h.wheel(16); h.drain(); assert.equal(h.deck.index, 2); h.advance(WHEEL.quiet); h.clean();
 });
 
 test('wheel input arriving during keyboard settlement cannot replay through its navigation queue', (t) => {
@@ -148,12 +151,13 @@ test('wheel input arriving during keyboard settlement cannot replay through its 
   assert.equal(h.deck.index, 1); h.advance(WHEEL.quiet); h.clean();
 });
 
-test('boundary inertia stays bounded and reversal retreats without invisible overflow', (t) => {
+test('boundary command consumes its entire burst, including reversal, before a new command can retreat', (t) => {
   const h = harness(t); h.deck.jump(5);
   for (let n = 0; n < 15; n++) h.wheel(300);
   assert.equal(h.deck.position, 5);
-  h.wheel(-16); assert.equal(h.deck.position, 4.8);
-  h.advance(WHEEL.quiet); assert.equal(h.deck.index, 4); h.clean();
+  h.wheel(-16); assert.equal(h.deck.position, 5);
+  h.advance(WHEEL.quiet); h.wheel(-16); assert.equal(h.deck.index, 4);
+  h.advance(WHEEL.quiet); h.clean();
   h.deck.jump(0); h.wheel(-500); h.advance(WHEEL.quiet); assert.equal(h.deck.index, 0); h.clean();
 });
 
@@ -163,16 +167,16 @@ test('mode, resize, overlay, visibility, selection and explicit lifecycle interr
     () => h.deck.jump(0), () => { h.block(true); h.wheel(10); h.block(false); },
     () => { document.hidden = true; h.dispatch('visibilitychange'); document.hidden = false; },
     () => { h.selection.isCollapsed = false; h.dispatch('selectionchange'); h.selection.isCollapsed = true; },
-    () => h.dispatch('contextmenu'), () => h.wheel(20, { ctrlKey: true }), () => h.blur()];
+    () => h.dispatch('contextmenu'), () => h.blur()];
   for (const interrupt of interruptions) {
-    h.deck.jump(0); h.wheel(20); interrupt(); h.clean();
+    h.deck.jump(0); h.wheel(10); interrupt(); h.clean();
     h.advance(1000); assert.equal(h.deck.index, 0, 'canceled timers cannot navigate later');
     h.deck.setEnabled(true);
   }
 });
 
 test('pointer acquisition cancels wheel timer and wheel cannot steal a pending or acquired drag', (t) => {
-  const h = harness(t); h.wheel(20);
+  const h = harness(t); h.wheel(10);
   h.dispatch('pointerdown', { pointerType: 'touch' });
   assert.equal(h.wheel(50).defaultPrevented, false);
   h.dispatch('pointermove', { pointerType: 'touch', clientY: 350 });
@@ -185,8 +189,77 @@ test('pointer acquisition cancels wheel timer and wheel cannot steal a pending o
 test('explicit navigation interrupts owned wheel input while settlement and guards reset on blur', (t) => {
   const h = harness(t, false);
   h.wheel(20); h.deck.navigate(1); h.drain(); assert.equal(h.deck.index, 1); h.clean();
-  h.wheel(20); h.advance(WHEEL.quiet); assert.equal(h.deck.state, 'settling');
+  h.wheel(20); assert.equal(h.deck.state, 'settling');
   h.wheel(20); h.blur(); h.clean();
   const index = h.deck.index; h.advance(1000); assert.equal(h.deck.index, index);
-  h.wheel(20); assert.equal(h.deck.state, 'wheeling'); h.deck.settle(); h.clean();
+  h.wheel(20); assert.equal(h.deck.state, 'settling'); h.deck.settle(); h.clean();
+});
+
+test('wheel listener is attached only in deck mode and repeated mode refresh never duplicates it', (t) => {
+  const h = harness(t);
+  assert.equal(h.stage.listeners.get('wheel').length, 1);
+  h.deck.setEnabled(true); assert.equal(h.stage.listeners.get('wheel').length, 1);
+  h.wheel(10); h.deck.setEnabled(false); assert.equal(h.stage.listeners.get('wheel').length, 0); h.clean();
+  assert.equal(h.wheel(100).defaultPrevented, false);
+  h.deck.setEnabled(true); assert.equal(h.stage.listeners.get('wheel').length, 1);
+  h.deck.setEnabled(false); h.deck.setEnabled(true); assert.equal(h.stage.listeners.get('wheel').length, 1); h.clean();
+});
+
+test('delta magnitude and stream speed never change the complete preset animation or leave partial cards', (t) => {
+  const h = harness(t, false);
+  for (const [preset, duration] of [['crisp', 240], ['balanced', 300], ['gentle', 380]]) {
+    h.setPreset(preset);
+    for (const magnitude of [16, 48, 8000]) {
+      h.deck.jump(0); h.drain(); h.changes.length = 0;
+      h.wheel(magnitude); assert.equal(h.deck.position, 0, 'wheel handler never manually assigns fractional progress');
+      assert.equal(h.deck.state, 'settling'); h.tick(); h.tick(duration / 2);
+      assert.equal(h.deck.position, 0.875, 'progress is the preset easeOut at half duration');
+      h.wheel(-8000); h.tick(duration / 2 - 1); assert.equal(h.deck.index, 0);
+      h.tick(1); assert.equal(h.deck.position, 1); assert.equal(h.deck.index, 1);
+      assert.deepEqual(h.changes.map(({ index }) => index), [1]); h.advance(WHEEL.quiet); h.clean();
+    }
+    h.deck.jump(0); h.drain(); h.changes.length = 0;
+    for (let n = 0; n < 7; n++) { h.wheel(2); h.advance(40); assert.equal(h.deck.position, 0); }
+    h.wheel(2); h.tick(); h.tick(duration); assert.equal(h.deck.index, 1);
+    assert.deepEqual(h.changes.map(({ index }) => index), [1]); h.advance(WHEEL.quiet); h.clean();
+  }
+});
+
+test('quiet during a paused animation does not unlock another command until that animation finishes', (t) => {
+  const h = harness(t, false); h.wheel(16); h.advance(WHEEL.quiet);
+  assert.equal(h.deck.state, 'settling'); h.wheel(500); h.drain(); assert.equal(h.deck.index, 1);
+  h.wheel(500); assert.equal(h.deck.position, 1); h.advance(WHEEL.quiet); h.clean();
+  h.wheel(16); h.drain(); assert.equal(h.deck.index, 2); h.advance(WHEEL.quiet); h.clean();
+});
+
+test('horizontal, zoom and native control fragments preserve committed animation and burst lock', (t) => {
+  const h = harness(t, false); h.wheel(16); h.tick();
+  const input = h.element('input', {}, h.cards[0]);
+  for (const overrides of [{ deltaX: 100 }, { ctrlKey: true }, { metaKey: true }, { target: input }]) {
+    assert.equal(h.wheel(20, overrides).defaultPrevented, false); assert.equal(h.deck.state, 'settling');
+  }
+  h.drain(); h.wheel(100); assert.equal(h.deck.position, 1);
+  h.advance(WHEEL.quiet); h.clean();
+});
+
+test('399 ms of quiet remains locked, while a full 400 ms permits exactly one new command', (t) => {
+  const h = harness(t); h.wheel(16); assert.equal(h.deck.index, 1);
+  h.advance(399); h.wheel(100); assert.equal(h.deck.index, 1);
+  h.advance(399); assert.equal(h.deck.index, 1); h.advance(1);
+  h.wheel(16); assert.equal(h.deck.index, 2); h.advance(WHEEL.quiet); h.clean();
+});
+
+test('committed animation and its burst lock are canceled cleanly on lifecycle interruption', (t) => {
+  const h = harness(t, false);
+  const interruptions = [() => h.deck.measure(), () => h.deck.setEnabled(false), () => h.deck.settle(),
+    () => { h.block(true); h.wheel(20); h.block(false); },
+    () => { document.hidden = true; h.dispatch('visibilitychange'); document.hidden = false; },
+    () => h.blur(), () => h.dispatch('pointerdown', { target: h.element('button') })];
+  for (const interrupt of interruptions) {
+    h.deck.jump(0); h.drain(); h.wheel(16); h.tick(); h.tick(25); interrupt(); h.clean();
+    const index = h.deck.index; assert.ok(Number.isInteger(h.deck.position));
+    h.advance(1000); assert.equal(h.deck.index, index); h.deck.setEnabled(true);
+    h.wheel(16); assert.equal(h.deck.state, 'settling', 'new input can start after explicit cancellation');
+    h.deck.settle(); h.clean();
+  }
 });

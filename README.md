@@ -20,7 +20,7 @@ python -m http.server 4188 --bind 127.0.0.1 --directory dist
 
 Open [the local preview](http://127.0.0.1:4188). `npm test` and `npm run build` are equivalent conveniences. The build copies public assets only; documentation, tests, verification evidence, and Git metadata are excluded. `dist/revision.json` reports the source commit and SHA-256 hashes of all website assets.
 
-Card mode supports touch swipes, trackpad scrolling, and mouse wheels. Swipe a finger upward or scroll downward to advance; reverse to go back. Wheel bursts follow the same card paths, settle after a brief pause, and advance at most one card so a trackpad momentum tail cannot skip content. Wide desktop and reading layouts use ordinary page scrolling. Browser checks emulate input delivery; physical Mac/PC trackpads and touchscreens still need device QA.
+Card mode supports touch swipes, trackpad scrolling, and mouse wheels. Swipe a finger upward or scroll downward to advance; reverse to go back. A deliberate wheel or trackpad burst requests one adjacent card, animated at the selected preset's fixed speed. Raw scroll speed does not drive card position, and momentum tails cannot queue further cards. Touch drags remain continuously reversible. Wide desktop and reading layouts use ordinary page scrolling. Browser checks emulate input delivery; physical Mac/PC trackpads and touchscreens still need device QA.
 
 ## Review route
 

@@ -2,7 +2,7 @@
 
 Date: 2026-10-03 (America/Los_Angeles).
 
-The trackpad/wheel follow-up below records the latest input-support work. The earlier selection, settings, layout, and recording evidence is retained as the preceding acceptance baseline.
+The discrete wheel-request follow-up below records the latest input-support work. The proportional-wheel prototype and earlier selection, settings, layout, and recording evidence are retained as historical acceptance baselines.
 
 ## Isolation
 
@@ -23,7 +23,17 @@ Existing remote branches are `main`, `floating-card`, and `scrolling-reveal`, wi
 
 Production baseline: https://lynn-landing-page.nrct6ycww6.workers.dev/ returned HTTP 200. Its HTML SHA-256 (UTF-8 response content) before this work was `4e48750db67c9167ae8cde0d95bc5eaf4f326e9613143f39b976474e50c8cae3`. Active production version in the dashboard: `b19c9862` (100%).
 
-## Trackpad and wheel follow-up
+## Discrete wheel-request follow-up
+
+After device review of the proportional-wheel preview, the owner reported excessive speed, partial cards, and occasional multiple-card advances. The revised contract separates scroll detection from animation: a deliberate wheel/trackpad burst requests exactly one adjacent card and starts the selected preset's fixed-duration animation. Pixel/line/page input is used only to recognize direction and commitment, never to position the card. Continuous reversible touch dragging remains unchanged.
+
+Committed wheel bursts consume their momentum tails without queued navigation and release only after both animation completion and 400ms of quiet input. Small opposite deltas can cancel an uncommitted candidate; after commitment, reversal belongs to the next distinct burst. The wheel listener is installed only while card mode is enabled, retaining native desktop/reading scroll performance. Zoom, horizontal gestures, native controls and nested scroll regions retain browser behavior. The quiet threshold is provisional application tuning, not a standardized OS gesture boundary.
+
+The focused unit suite passes 56 tests, including 18 wheel cases that verify fixed 240/300/380ms preset durations across small, large, and slowly accumulated input; no manual partial positioning; single-card gates across 180–350ms tail gaps; the 399/400ms quiet boundary; delayed animation completion; and native/listener/lifecycle handling. The [focused local browser report](wheel/fixed-speed/local/browser-results.md) passes all nine input checks with zero failures; known unavailable WebKit is explicitly unverified. Trusted Chromium input measured similar durations for 16px and 2000px deltas in phone and PC-sized decks. [Browser compatibility research](BROWSER_COMPATIBILITY.md) records the Chrome/Edge/Firefox/Safari target, standards basis, accepted listener-lifecycle change, and hardware limits.
+
+Hosted evidence will be recorded after the corrected version upload. The delayed swipe reminder remains a child-branch experiment and will be rebased on this verified fix before upload.
+
+## Proportional wheel prototype (superseded)
 
 The owner reported that two-finger PC trackpad scrolling did not advance cards on the hosted preview. Chromium wheel input reproduced that failure on revision `8b368c6` at both 390 × 844 and 800 × 900; the 1280 × 900 desktop flow scrolled normally. [Wheel baseline](wheel/baseline.json) records the separate delivery paths.
 

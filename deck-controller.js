@@ -1,5 +1,5 @@
 import { MOTION, clamp, easeOut, evaluateStack, positionFromTravel, presetFor, releaseTarget, releaseVelocity, travelDistance } from './motion.js';
-import { WHEEL, normalizeWheel, wheelTravel, wheelTarget } from './wheel-input.js';
+import { WHEEL, normalizeWheel, wheelTarget } from './wheel-input.js';
 
 const INTERACTIVE_START = 'a, button, input, textarea, select, option, label, summary, [contenteditable], [data-no-drag], [role="button"], [role="link"], [role="checkbox"], [role="combobox"], [role="listbox"], [role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"], [role="option"], [role="radio"], [role="slider"], [role="spinbutton"], [role="switch"], [role="tab"], [role="textbox"], [role="treeitem"]';
 const MOUSE_EXCLUDED_START = `${INTERACTIVE_START}, p, h1, h2, h3, h4, h5, h6, li, span, strong, em, small, blockquote, code, pre, dt, dd`;
@@ -154,10 +154,12 @@ export function createDeck({ stage, cards, onChange = () => {}, isBlocked = () =
     settle();
     enabled = next;
     if (enabled) {
+      stage.addEventListener('wheel', onWheel, { passive: false });
       measure();
       syncSemantics();
       render();
     } else {
+      stage.removeEventListener?.('wheel', onWheel);
       cards.forEach((card) => {
         for (const property of OWNED_STYLES) card.style.removeProperty(property);
         card.inert = false;
@@ -240,19 +242,18 @@ export function createDeck({ stage, cards, onChange = () => {}, isBlocked = () =
       wheelTimer = 0;
       if (!wheel) return;
       if (!enabled || isBlocked() || document.hidden) { settle(); return; }
-      if (wheel.phase === 'tracking') {
-        const target = wheelTarget(wheel.origin, wheel.travel, cards.length);
-        wheel.phase = 'settling';
-        animateTo(target, { focus: false });
-      } else if (state === 'idle') wheel = null;
+      if (wheel.phase === 'tracking' || state === 'idle') wheel = null;
     }, WHEEL.quiet);
   }
 
-  stage.addEventListener('wheel', (event) => {
+  function onWheel(event) {
     if (!enabled || isBlocked() || document.hidden) { cancelWheel(); return; }
     const delta = normalizeWheel(event, height);
     if (!delta || !delta.y || Math.abs(delta.y) < Math.abs(delta.x) * MOTION.verticalRatio || event.ctrlKey || event.metaKey || event.shiftKey || hasSelection() || event.target.closest(WHEEL_EXCLUDED) || nestedScroller(event.target)) {
-      cancelWheel();
+      // A native horizontal/zoom/control fragment cannot unlock a committed
+      // burst or alter its animation. Only uncommitted intent is discarded.
+      if (wheel?.phase === 'settling') wheelQuiet();
+      else resetWheel();
       return;
     }
     if (gesture || multiTouch || state === 'dragging') return;
@@ -266,13 +267,16 @@ export function createDeck({ stage, cards, onChange = () => {}, isBlocked = () =
       wheelQuiet();
       return;
     }
-    wheel ||= { origin: index, travel: 0, phase: 'tracking' };
-    wheel.travel = wheelTravel(wheel.origin, wheel.travel, delta.y, cards.length);
-    position = wheel.origin + wheel.travel / WHEEL.distance;
-    state = 'wheeling';
-    queueRender();
+    wheel ||= { intent: 0, phase: 'tracking' };
+    wheel.intent += delta.y;
     wheelQuiet();
-  }, { passive: false });
+    if (Math.abs(wheel.intent) < WHEEL.commit) return;
+    const target = wheelTarget(index, wheel.intent, cards.length);
+    wheel.phase = 'settling';
+    // Exactly one command per burst. Delta size and input speed never affect
+    // the preset animation, and later momentum never enters the pending queue.
+    if (target !== index) animateTo(target, { focus: false });
+  }
 
   function trackTouchDown(event) {
     cancelWheel();

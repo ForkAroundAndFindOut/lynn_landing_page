@@ -1,5 +1,13 @@
 # Stacked card layout proof of concept
 
+## Experimental delayed swipe cue
+
+This child branch, `codex/card-layout-swipe-hint`, starts from verified input-support parent `codex/card-layout` at `10aa8407bc7713654f3d1d4d4999e74b2150b3b0`. The experiment is not integrated into the parent preview.
+
+After five visible-tab seconds without interaction on the first card, a faint upward arrow and “Swipe up · scroll down” appear near the bottom navigation. The arrow nudges twice, then rests. Any pointer press, wheel input, keyboard input, or navigation dismisses it until reload. Hidden tabs restart the countdown; reading/desktop/reduced-motion modes and dialogs suppress the cue. The existing arrows and screen-reader instructions remain available. The cue is decorative, cannot receive input or focus, and saves no state.
+
+Experimental preview: https://codex-card-layout-swipe-hint-lynn-landing-page.nrct6ycww6.workers.dev/. Input-support parent: https://codex-card-layout-lynn-landing-page.nrct6ycww6.workers.dev/. To review the experiment, open its URL at a card-mode width, leave the first card idle for five seconds, then swipe or scroll. Refresh to repeat.
+
 An isolated exploration for Lynn Renezeder’s static Fractional HR Consulting site. The parent branch is `codex/card-layout`, based on `main` at `0b10b41b59e717da2cc6f83f9e950250541eac3d`. Existing branches and production are retained. Future card-layout experiments can branch from this parent.
 
 **[Open the Cloudflare preview](https://codex-card-layout-lynn-landing-page.nrct6ycww6.workers.dev)** · [GitHub branch](https://github.com/ForkAroundAndFindOut/lynn_landing_page/tree/codex/card-layout) · [Verification log](verification/VERIFICATION.md)

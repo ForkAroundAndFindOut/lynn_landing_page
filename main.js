@@ -2,6 +2,7 @@ import { createDeck } from './deck-controller.js';
 import { setupContact } from './contact-dialog.js';
 import { setupSettings } from './demo-settings.js';
 import { setupLayout } from './layout.js';
+import { setupSwipeHint } from './swipe-hint.js';
 
 const restartingReview = performance.getEntriesByType('navigation')[0]?.type === 'reload';
 if (restartingReview) {
@@ -119,3 +120,4 @@ if (!restartingReview && initialIndex >= 0) layout.revealCard(cards[initialIndex
 if (initialIndex >= 0 && layout.mode === 'flow') cards[initialIndex].scrollIntoView({ block: 'start' });
 if (restartingReview) window.scrollTo(0, 0);
 updateControls();
+setupSwipeHint({ stage, cue: document.querySelector('#experimental-swipe-cue'), dialog: document.querySelector('#contact-dialog'), isBlocked: () => contact.isOpen, isReduced: () => settings.reduced });

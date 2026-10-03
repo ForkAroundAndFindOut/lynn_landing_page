@@ -20,3 +20,12 @@ body[data-mode=deck] .deck-stage.is-deck-dragging,body[data-mode=deck] .deck-sta
 /* Added only by the desktop observer; no-script content remains readable. */
 @media(min-width:900px){body[data-mode=flow][data-desktop=staggered][data-reduced=false] .card[data-entrance=pending]{opacity:0}}
 #reset-review-settings{margin-top:10px;text-decoration:underline;text-underline-offset:3px}
+
+/* Child-branch experiment: reserved instruction space prevents layout shift. */
+.experimental-gesture-hint{height:19px;position:relative;pointer-events:none}
+.swipe-cue{display:inline-flex;align-items:center;gap:7px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity 300ms ease-out}
+.swipe-cue[data-visible=true]{visibility:visible;opacity:.45}
+.swipe-cue[data-visible=true] svg{animation:swipe-cue-nudge 1200ms ease-in-out 2}
+body[data-mode=flow] .swipe-cue{display:none}
+@keyframes swipe-cue-nudge{0%,100%{transform:translateY(2px)}50%{transform:translateY(-2px)}}
+@media(prefers-reduced-motion:reduce){.swipe-cue{transition:none}.swipe-cue svg{animation:none!important}}

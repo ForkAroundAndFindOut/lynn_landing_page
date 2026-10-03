@@ -25,7 +25,7 @@ const assets = await Promise.all(Object.entries(metadata.assets).map(async ([fil
   assert.equal(deployedHash, sourceHash, `${file} must match committed source`);
   return { file, status: response.status, sha256: deployedHash, matchesManifestAndCommit: true };
 }));
-const expectedAssetCount = process.env.EXPECTED_ASSET_COUNT ? Number(process.env.EXPECTED_ASSET_COUNT) : 10;
+const expectedAssetCount = process.env.EXPECTED_ASSET_COUNT ? Number(process.env.EXPECTED_ASSET_COUNT) : 11;
 assert.equal(assets.length, expectedAssetCount);
 const productionResponse = await fetch(production);
 assert.equal(productionResponse.status, 200);

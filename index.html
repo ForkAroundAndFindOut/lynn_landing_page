@@ -53,7 +53,7 @@
         </section>
       </div>
       <nav class="deck-navigation" aria-label="Card navigation" hidden>
-        <p id="gesture-hint">Swipe up or scroll down for next; reverse for previous, or use the arrows.</p>
+        <p id="gesture-hint" class="experimental-gesture-hint"><span class="sr-only">Swipe up or scroll down for next; reverse for previous, or use the arrows.</span><span id="experimental-swipe-cue" class="swipe-cue" aria-hidden="true"><svg viewBox="0 0 12 18" width="12" height="18" fill="none" aria-hidden="true"><path d="M6 16V3M2 7l4-4 4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Swipe up · scroll down</span></span></p>
         <div class="deck-controls"><button id="go-top" class="quiet-button" type="button" aria-label="Return to first card">Back to top</button><div class="step-controls"><button id="previous-card" class="icon-button" type="button" aria-label="Previous card">↑</button><span id="position" aria-hidden="true">01 <i>/</i> 06</span><button id="next-card" class="icon-button" type="button" aria-label="Next card">↓</button></div><button id="read-mode" class="quiet-button" type="button">Read as page</button></div>
       </nav>
       <div id="card-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>

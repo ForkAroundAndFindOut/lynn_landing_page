@@ -1,0 +1,91 @@
+{
+  "checkedAt": "2026-10-03T19:19:42.668Z",
+  "preview": "https://codex-card-layout-lynn-landing-page.nrct6ycww6.workers.dev",
+  "revision": "b6bc3f85e9f1d1374451c1578077f024fe263b15",
+  "assets": [
+    {
+      "file": "index.html",
+      "status": 200,
+      "sha256": "19d1ab3fd088644b326c5dfdf9078c50370e55eca799f75095dc676031be0eb1",
+      "matchesManifestAndCommit": true
+    },
+    {
+      "file": "styles.css",
+      "status": 200,
+      "sha256": "1656a3178471e6e26c1af5984eb9ed04332ef8fbc5ef92e8c5c2aef199eb4b65",
+      "matchesManifestAndCommit": true
+    },
+    {
+      "file": "main.js",
+      "status": 200,
+      "sha256": "f868e8c6af79ad1cc0ecbd82f9c4baf2b98a83c3b4d27f0cd219e48bba5701cf",
+      "matchesManifestAndCommit": true
+    },
+    {
+      "file": "deck-controller.js",
+      "status": 200,
+      "sha256": "788518416c4d3090a6351849da91ba9283e783f2a9cfdb24a97a4aa216000a2a",
+      "matchesManifestAndCommit": true
+    },
+    {
+      "file": "wheel-input.js",
+      "status": 200,
+      "sha256": "ee0e37c9e6e0e06600b60c134f119ad8fe03447ff2a66fab21aa7668b81ed31f",
+      "matchesManifestAndCommit": true
+    },
+    {
+      "file": "motion.js",
+      "status": 200,
+      "sha256": "43b0850a3388b378fc4d003f40bddd6375ebf3f07318be555e50d9f4dafb5041",
+      "matchesManifestAndCommit": true
+    },
+    {
+      "file": "layout.js",
+      "status": 200,
+      "sha256": "37d6e05b18a458e7b74fffc3af3da132c1d8a91d43cd872d2de8f3533fabfda0",
+      "matchesManifestAndCommit": true
+    },
+    {
+      "file": "contact-dialog.js",
+      "status": 200,
+      "sha256": "deadb51618db4ca8d011d6aaf5781bc0eae2f01d80463c7096be83520148953b",
+      "matchesManifestAndCommit": true
+    },
+    {
+      "file": "demo-settings.js",
+      "status": 200,
+      "sha256": "e89eeecedb88ca7b1428948be8f841eb54d71799af9a7a089c29af4d292196ae",
+      "matchesManifestAndCommit": true
+    },
+    {
+      "file": "favicon.svg",
+      "status": 200,
+      "sha256": "7993edfb7fa472661ba552f25bbea5eecb841a65da7f04ace9956e1898248b94",
+      "matchesManifestAndCommit": true
+    }
+  ],
+  "production": {
+    "url": "https://lynn-landing-page.nrct6ycww6.workers.dev",
+    "status": 200,
+    "sha256": "4e48750db67c9167ae8cde0d95bc5eaf4f326e9613143f39b976474e50c8cae3",
+    "unchanged": true
+  },
+  "isolation": {
+    "localHeads": {
+      "main": "0b10b41b59e717da2cc6f83f9e950250541eac3d",
+      "floating-card": "f5311c548a57cc409ef20773b6e45b17fdacf43e",
+      "scrolling-reveal": "1733fa7bb7a5c53233da83df93b334ab78441611",
+      "theme-2-pallette-1": "e0b332ca07172745692d3e3060656ab0501acb64",
+      "theme-2-pallette-1-heavy": "15c96a3d15e07d7f3505d3b51d1fac729e784fb1",
+      "theme-2-pallette-2": "de9cc08ed6feacc080ed3844bc925ce2aa1e8458"
+    },
+    "remoteHeads": {
+      "codex/card-layout": "b6bc3f85e9f1d1374451c1578077f024fe263b15",
+      "floating-card": "f5311c548a57cc409ef20773b6e45b17fdacf43e",
+      "main": "0b10b41b59e717da2cc6f83f9e950250541eac3d",
+      "scrolling-reveal": "1733fa7bb7a5c53233da83df93b334ab78441611"
+    },
+    "originalCheckoutBranch": "main",
+    "unchanged": true
+  }
+}

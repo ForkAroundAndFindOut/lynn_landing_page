@@ -42,7 +42,7 @@ export function harness(t, configuration = {}, reduced = false) {
   const deck = createDeck({ stage, cards, getTuning: () => tuning, isReduced: () => reduced, isBlocked: () => blocked, onRequest: index => requests.push(index), onChange: (index, options) => changes.push({ index, ...options }) });
   deck.setEnabled(true);
   function dispatch(name, overrides = {}) {
-    const event = { target: stage, deltaX: 0, deltaY: 0, deltaMode: 0, timeStamp: now, pointerId: 1, pointerType: 'touch', isPrimary: true, button: 0, buttons: 1, clientX: 50, clientY: 400, defaultPrevented: false, preventDefault() { this.defaultPrevented = true; }, ...overrides };
+    const event = { target: stage, deltaX: 0, deltaY: 0, deltaMode: 0, timeStamp: now, pointerId: 1, pointerType: 'touch', isPrimary: true, button: 0, buttons: 1, clientX: 50, clientY: 400, defaultPrevented: false, preventDefault() { this.defaultPrevented = true; }, stopImmediatePropagation() { this.propagationStopped = true; }, ...overrides };
     const list = documentListeners.get(name) || [];
     list.filter(item => item.capture).forEach(item => item.fn(event));
     if (stage.contains(event.target)) (stage.listeners.get(name) || []).forEach(fn => fn(event));

@@ -1,5 +1,7 @@
 # Movement lab verification
 
+Current link-origin swipe correction is recorded in [LINK_SWIPES.md](LINK_SWIPES.md). The movement-lab rollout below remains its historical baseline; the follow-up allows card links/buttons to participate in full-distance swipes while preserving taps.
+
 Date: October 4, 2026. Current scope supersedes historical finger-pinned dragging and queued navigation in earlier verification records.
 
 The owner approved the reminder on the existing Cloudflare preview and its promotion into the card prototype parent. Development proceeds on `codex/card-layout-tuning`, based on approved reminder `b14176fdec35e2460d0aa33abcdc64025d4c5a14`. The parent `codex/card-layout` incorporated that reminder with a fast-forward. Production `main`, all original branches, and the reminder baseline branch are preserved.

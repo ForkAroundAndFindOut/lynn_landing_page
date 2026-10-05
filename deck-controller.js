@@ -2,7 +2,8 @@ import { MOTION, clamp, easeOut, evaluateStack, presetFor, releaseVelocity, smoo
 import { normalizeWheel } from './wheel-input.js';
 import { DEFAULT_TUNING } from './tuning-config.js';
 
-const INTERACTIVE_START = 'a, button, input, textarea, select, option, label, summary, [contenteditable], [data-no-drag], [role="button"], [role="link"], [role="checkbox"], [role="combobox"], [role="listbox"], [role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"], [role="option"], [role="radio"], [role="slider"], [role="spinbutton"], [role="switch"], [role="tab"], [role="textbox"], [role="treeitem"]';
+const ACTIVATION_START = 'a, button, [role="button"], [role="link"]';
+const INTERACTIVE_START = 'input, textarea, select, option, label, summary, [contenteditable], [data-no-drag], [role="checkbox"], [role="combobox"], [role="listbox"], [role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"], [role="option"], [role="radio"], [role="slider"], [role="spinbutton"], [role="switch"], [role="tab"], [role="textbox"], [role="treeitem"]';
 const MOUSE_EXCLUDED_START = `${INTERACTIVE_START}, p, h1, h2, h3, h4, h5, h6, li, span, strong, em, small, blockquote, code, pre, dt, dd`;
 const WHEEL_EXCLUDED = 'input, textarea, select, option, [contenteditable], [data-no-drag], [data-no-wheel], [role="combobox"], [role="listbox"], [role="slider"], [role="spinbutton"], [role="textbox"], [role="tree"]';
 const OWNED_STYLES = ['transform', 'opacity', 'visibility', 'z-index', 'will-change', '--card-shadow-strength'];
@@ -14,6 +15,7 @@ export function createDeck({ stage, cards, onChange = () => {}, onRequest = () =
   let width = 320, height = 540, cardHeight = 0, fade = 1;
   let wheel = null, wheelTimer = 0, multiTouch = false;
   let lastAcceptedAt = -Infinity, lastRejection = null;
+  let suppressedClick = null;
   const touchContacts = new Set(), ids = cards.map(card => card.id);
   const readTuning = () => {
     const preset = presetFor(getPreset());
@@ -204,6 +206,9 @@ export function createDeck({ stage, cards, onChange = () => {}, onRequest = () =
     wheel.consumed = true; navigate(Math.sign(wheel.intent), { focus: false, source: 'wheel' });
   }
   function trackTouchDown(event) {
+    // A new primary press begins a new activation, rather than inheriting a
+    // previous drag's click suppression. Keyboard/programmatic clicks bypass it.
+    if (event.isPrimary) suppressedClick = null;
     if (event.pointerType !== 'touch') return;
     touchContacts.add(event.pointerId);
     if (touchContacts.size > 1) { multiTouch = true; releaseCapture(); }
@@ -218,13 +223,14 @@ export function createDeck({ stage, cards, onChange = () => {}, onRequest = () =
   stage.addEventListener('pointerdown', event => {
     trackTouchDown(event);
     if (!enabled || isBlocked() || document.hidden || multiTouch || gesture || !event.isPrimary || event.button !== 0) return;
-    const excluded = event.pointerType === 'mouse' ? MOUSE_EXCLUDED_START : INTERACTIVE_START;
-    if (event.target.closest(excluded) || hasSelection()) return;
+    const activation = event.target.closest(ACTIVATION_START);
+    const excluded = event.pointerType === 'mouse' && !activation ? MOUSE_EXCLUDED_START : INTERACTIVE_START;
+    if (event.target.closest(excluded) || hasSelection() || nestedScroller(event.target)) return;
     const targetCard = event.target.closest('.card');
     if (state === 'idle' && targetCard && targetCard !== cards[index]) return;
-    if (event.pointerType === 'mouse') event.preventDefault();
+    if (event.pointerType === 'mouse' && !activation) event.preventDefault();
     const configuration = readTuning();
-    gesture = { pointerId: event.pointerId, pointerType: event.pointerType, acquired: false, consumed: false, deadline: event.timeStamp + configuration.holdDelay * 1000, startX: event.clientX, startY: event.clientY, samples: [{ time: event.timeStamp, position: 0 }] };
+    gesture = { pointerId: event.pointerId, pointerType: event.pointerType, activation, startTarget: event.target, acquired: false, consumed: false, deadline: event.timeStamp + configuration.holdDelay * 1000, startX: event.clientX, startY: event.clientY, samples: [{ time: event.timeStamp, position: 0 }] };
     if (event.pointerType === 'touch') {
       const candidate = gesture;
       holdTimer = setTimeout(() => { holdTimer = 0; if (gesture === candidate && !gesture.acquired) releaseCapture(); }, configuration.holdDelay * 1000);
@@ -243,16 +249,34 @@ export function createDeck({ stage, cards, onChange = () => {}, onRequest = () =
       gesture.acquired = true;
       if (holdTimer) clearTimeout(holdTimer); holdTimer = 0;
       stage.classList?.add('is-deck-dragging'); stage.setPointerCapture(event.pointerId);
+      suppressedClick = { pointerId: event.pointerId, origin: gesture.startTarget, startX: gesture.startX, startY: gesture.startY, x: event.clientX, y: event.clientY, time: clock() };
     }
+    if (suppressedClick?.pointerId === event.pointerId) Object.assign(suppressedClick, { x: event.clientX, y: event.clientY, time: clock() });
     event.preventDefault();
     if (gesture.consumed) return;
     const velocity = releaseVelocity(gesture.samples, configuration.velocityWindow * 1000);
-    const flick = configuration.flickEnabled && Math.abs(travel) >= configuration.flickDistance && Math.abs(velocity) >= configuration.flickVelocity && Math.sign(velocity) === Math.sign(travel);
+    // Actionable starts use the full distance: a quick small tap drift must not
+    // become a flick that navigates away or opens the contact form.
+    const flick = !gesture.activation && configuration.flickEnabled && Math.abs(travel) >= configuration.flickDistance && Math.abs(velocity) >= configuration.flickVelocity && Math.sign(velocity) === Math.sign(travel);
     if (Math.abs(travel) < configuration.swipeDistance && !flick) return;
     gesture.consumed = true; navigate(Math.sign(travel), { focus: false, source: 'gesture' });
   }
   stage.addEventListener('pointermove', event => { if (event.pointerType === 'mouse' && event.buttons === 0) { cancelGesture(event); return; } recognize(event); }, { passive: false });
   stage.addEventListener('pointerup', event => { recognize(event); trackTouchEnd(event); if (gesture?.pointerId === event.pointerId) releaseCapture(); });
+  stage.addEventListener('dragstart', event => { if (gesture) event.preventDefault(); });
+  stage.addEventListener('click', event => {
+    const pending = suppressedClick;
+    if (!pending || event.detail === 0) return;
+    if (clock() - pending.time > 750) { suppressedClick = null; return; }
+    const matchesPointer = typeof event.pointerId === 'number' && event.pointerId >= 0 ? event.pointerId === pending.pointerId
+      : (Math.abs(event.clientX - pending.x) <= 6 && Math.abs(event.clientY - pending.y) <= 6
+          || Math.abs(event.clientX - pending.startX) <= 6 && Math.abs(event.clientY - pending.startY) <= 6)
+        && (event.target === stage || pending.origin === event.target || pending.origin.contains?.(event.target) || event.target.contains?.(pending.origin));
+    if (!matchesPointer) return;
+    suppressedClick = null;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  }, true);
   function cancelGesture(event) { if (gesture && (!event || event.pointerId === gesture.pointerId)) releaseCapture(); }
   stage.addEventListener('pointercancel', event => { trackTouchEnd(event); cancelGesture(event); });
   stage.addEventListener('lostpointercapture', event => { if (event.target === stage && !stage.hasPointerCapture(event.pointerId)) cancelGesture(event); });

@@ -119,6 +119,148 @@ async function noOverflow(page) {
   assert.ok(widths.scroll <= widths.client + 1, 'Horizontal overflow ' + JSON.stringify(widths));
 }
 
+// Hit real rendered children and record the browser's final click disposition.
+// No synthetic DOM input is used to demonstrate gesture or activation behavior.
+async function controlPoint(page, selector) {
+  return page.locator(selector).evaluate(el => {
+    const rect = el.getBoundingClientRect(), point = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    const hit = document.elementFromPoint(point.x, point.y);
+    if (!el.contains(hit)) throw new Error('Gesture control is obscured: ' + el.outerHTML);
+    return point;
+  });
+}
+async function observeControlClicks(page) {
+  await page.evaluate(() => {
+    window.__controlClicks = []; window.__controlDrags = [];
+    document.addEventListener('click', event => {
+      const target = event.target, activation = target.closest('a,button');
+      const record = { trusted: event.isTrusted, detail: event.detail, pointerType: event.pointerType, target: target.id || target.tagName, activation: activation?.id || activation?.getAttribute('href') || null, prevented: false };
+      window.__controlClicks.push(record);
+      setTimeout(() => { record.prevented = event.defaultPrevented; }, 0);
+    }, true);
+    document.addEventListener('dragstart', event => {
+      const record = { trusted: event.isTrusted, prevented: false }; window.__controlDrags.push(record);
+      setTimeout(() => { record.prevented = event.defaultPrevented; }, 0);
+    }, true);
+  });
+}
+async function controlClicks(page) { await page.waitForTimeout(30); return page.evaluate(() => window.__controlClicks); }
+async function mouseReturnSwipe(page, start, distance) {
+  await page.mouse.move(start.x, start.y); await page.mouse.down();
+  await page.mouse.move(start.x, start.y - distance, { steps: 4 });
+  await page.mouse.move(start.x, start.y, { steps: 4 }); await page.mouse.up();
+}
+
+test('link swipe: trusted touch on nested arrow waits for full distance and reverse card-child swipe returns', () => isolated({}, async (page, context) => {
+  const session = await context.newCDPSession(page), start = await controlPoint(page, '#top .text-link span');
+  await observeControlClicks(page); await touch(session, 'touchStart', [start]);
+  await touch(session, 'touchMove', [{ x: start.x, y: start.y - 47 }]);
+  assert.equal((await state(page)).target, 0, 'A link start cannot take the configured 16px flick shortcut');
+  await touch(session, 'touchMove', [{ x: start.x, y: start.y - 48 }]); await requested(page, 1);
+  await touch(session, 'touchEnd'); await settled(page, 1);
+  const reverse = await controlPoint(page, '#services .card-foot .small-mark');
+  await swipe(page, session, reverse, -64); await requested(page, 0); await settled(page, 0);
+  const near = await page.locator('#top .text-link').evaluate(el => {
+    const rect = el.getBoundingClientRect(), point = { x: rect.left + rect.width / 2, y: rect.top - 6 };
+    if (!el.closest('.card').contains(document.elementFromPoint(point.x, point.y))) throw new Error('Near-link point is outside the active card');
+    return point;
+  });
+  await swipe(page, session, near, 64); await requested(page, 1); await settled(page, 1);
+  await swipe(page, session, await controlPoint(page, '#services .card-foot .small-mark'), -64); await settled(page, 0);
+  await trusted(page, 'pointerdown', 'touch'); await trusted(page, 'pointermove', 'touch');
+  return { linkChildThreshold: 48, belowThreshold: 47, nearLinkAccepted: true, reverseActualCardChild: '#services .small-mark', finalTarget: 0, clicks: await controlClicks(page) };
+}));
+
+test('link swipe: trusted reverse from link and contact-button child advances exactly one card', () => isolated({}, async (page, context) => {
+  const session = await context.newCDPSession(page); await observeControlClicks(page);
+  await settled(page, 4); await swipe(page, session, await controlPoint(page, '#working-together .text-link span'), -64);
+  await requested(page, 3); await settled(page, 3);
+  await page.locator('.header-contact').click(); await settled(page, 5);
+  await swipe(page, session, await controlPoint(page, '#open-contact span'), -64); await requested(page, 4); await settled(page, 4);
+  assert.equal(await page.locator('#contact-dialog').evaluate(el => el.open), false, 'Button swipe must not open the form');
+  await trusted(page, 'pointerdown', 'touch');
+  return { linkReverse: [4, 3], buttonReverse: [5, 4], dialogOpen: false, clicks: await controlClicks(page) };
+}, '#working-together'));
+
+test('link swipe: stationary trusted taps activate the intended section and contact form once', () => isolated({}, async (page, context) => {
+  const session = await context.newCDPSession(page); await observeControlClicks(page);
+  const link = await controlPoint(page, '#top .text-link span'); await touch(session, 'touchStart', [link]); await touch(session, 'touchEnd');
+  await settled(page, 1); assert.equal(await page.evaluate(() => document.activeElement.id), 'services-title');
+  let clicks = await controlClicks(page); assert.equal(clicks.filter(e => e.activation === '#services' && e.trusted && !e.prevented).length, 0, 'Section handler owns the native link default');
+  assert.equal(clicks.filter(e => e.activation === '#services' && e.trusted).length, 1);
+  await page.locator('.header-contact').click(); await settled(page, 5);
+  const button = await controlPoint(page, '#open-contact span'); await touch(session, 'touchStart', [button]); await touch(session, 'touchEnd');
+  await page.waitForFunction(() => document.querySelector('#contact-dialog').open);
+  clicks = await controlClicks(page); assert.equal(clicks.filter(e => e.activation === 'open-contact' && e.trusted && !e.prevented).length, 1);
+  assert.equal((await state(page)).target, 5);
+  return { linkActivations: 1, focusedSection: 'services-title', contactActivations: 1, clicks };
+}));
+
+test('link swipe: 20px acquired gestures do not shuffle or activate; 5px mouse jitter retains native activation', () => isolated({}, async (page, context) => {
+  const session = await context.newCDPSession(page); await observeControlClicks(page);
+  const start = await controlPoint(page, '#top .text-link');
+  await swipe(page, session, start, 20, 10, 1);
+  assert.equal((await state(page)).target, 0, 'Rapid link motion below 48px must not shuffle');
+  await touch(session, 'touchStart', [start]); await page.waitForTimeout(420);
+  await touch(session, 'touchMove', [{ x: start.x, y: start.y - 64 }]); await touch(session, 'touchEnd');
+  assert.equal((await state(page)).target, 0, 'A held link remains native beyond the configured 350ms hold window');
+  await page.evaluate(() => { const range = document.createRange(); range.selectNodeContents(document.querySelector('#hero-title')); const selection = getSelection(); selection.removeAllRanges(); selection.addRange(range); });
+  await swipe(page, session, start, 64);
+  assert.equal((await state(page)).target, 0, 'An existing text selection excludes a link swipe');
+  await page.evaluate(() => getSelection().removeAllRanges());
+  await page.mouse.move(start.x, start.y); await page.mouse.down(); await page.mouse.move(start.x, start.y - 20);
+  assert.equal((await state(page)).target, 0, 'Mouse link motion below 48px must not shuffle before release');
+  await page.mouse.move(start.x, start.y); await page.mouse.up();
+  let clicks = await controlClicks(page);
+  assert.equal((await state(page)).target, 0, '20px acquires a gesture at 6px but cannot issue a card command below 48px');
+  assert.ok(clicks.some(e => e.trusted && e.pointerType === 'mouse' && e.prevented), 'An acquired return gesture consumes its pointer click');
+  assert.equal(clicks.filter(e => e.activation === '#services').length, 0, 'Aborted acquired gesture must not activate the link');
+  await page.mouse.move(start.x, start.y); await page.mouse.down(); await page.mouse.move(start.x, start.y - 5); await page.mouse.move(start.x, start.y); await page.mouse.up();
+  await settled(page, 1); clicks = await controlClicks(page);
+  assert.equal(clicks.filter(e => e.trusted && e.activation === '#services').length, 1, 'A fresh 5px mouse jitter stays below acquisition and retains native activation');
+  assert.equal(await page.evaluate(() => document.activeElement.id), 'services-title');
+  const drags = await page.evaluate(() => window.__controlDrags); assert.ok(drags.every(e => e.prevented), 'Native anchor dragging is prevented while a swipe candidate exists');
+  return { rapidTouchDistance: 20, mouseDistance: 20, acquisitionDistance: 6, commandDistance: 48, nativeJitterDistance: 5, heldMilliseconds: 420, selectionPreservedTarget: 0, targetAfterAcquiredRelease: 0, targetAfterNativeJitterActivation: 1, clicks, nativeDrags: drags };
+}));
+
+test('link swipe: mouse threshold consumes its returned pointer click and leaves immediate unrelated activation usable', () => isolated({ hasTouch: false }, async page => {
+  await observeControlClicks(page); await mouseReturnSwipe(page, await controlPoint(page, '#top .text-link span'), 64);
+  await requested(page, 1);
+  let clicks = await controlClicks(page); assert.ok(clicks.some(e => e.trusted && e.pointerType === 'mouse' && e.prevented), 'A real pointer click following the consumed swipe must be prevented');
+  assert.notEqual(await page.evaluate(() => document.activeElement.id), 'services-title', 'Swipe must not execute the link section-focus activation');
+  await page.locator('.header-contact').click(); await settled(page, 5);
+  clicks = await controlClicks(page); assert.equal(clicks.filter(e => e.activation === '#contact' && e.trusted).length, 1, 'Unrelated subsequent trusted click remains usable');
+  assert.equal(await page.evaluate(() => document.activeElement.id), 'open-contact');
+  const drags = await page.evaluate(() => window.__controlDrags); assert.ok(drags.every(e => e.prevented));
+  return { swipeTarget: 1, unrelatedClickTarget: 5, clicks, nativeDrags: drags };
+}));
+
+test('link swipe: gate and endpoint rejected button swipes consume click but preserve keyboard and later pointer activation', async () => {
+  const endpoint = await isolated({}, async (page, context) => {
+    await settled(page, 5); await observeControlClicks(page);
+    const session = await context.newCDPSession(page);
+    await swipe(page, session, await controlPoint(page, '#open-contact span'), 64);
+    assert.equal((await state(page)).target, 5); assert.equal(await page.locator('#contact-dialog').evaluate(el => el.open), false, 'Trusted touch endpoint swipe must not open the form');
+    await mouseReturnSwipe(page, await controlPoint(page, '#open-contact span'), 64);
+    assert.equal((await state(page)).target, 5); assert.equal(await page.locator('#contact-dialog').evaluate(el => el.open), false);
+    const clicks = await controlClicks(page); assert.ok(clicks.some(e => e.trusted && e.pointerType === 'mouse' && e.prevented), 'Endpoint rejection still consumes the following pointer click');
+    await page.locator('#open-contact').focus(); await page.keyboard.press('Enter'); await page.waitForFunction(() => document.querySelector('#contact-dialog').open);
+    const activated = await controlClicks(page); assert.ok(activated.some(e => e.activation === 'open-contact' && e.trusted && e.detail === 0 && !e.prevented), 'Keyboard activation remains available after a consumed swipe');
+    await trusted(page, 'pointerdown', 'touch');
+    return { target: 5, touchEndpointDialogOpen: false, keyboardActivated: true, clicks: activated };
+  }, '#contact');
+  const gate = await isolated({ hasTouch: false }, async page => {
+    await settled(page, 4); await panel(page); await number(page, 'duration', .2); await number(page, 'gate', 2); await panel(page, false);
+    await page.locator('#next-card').click(); await settled(page, 5); await observeControlClicks(page);
+    await mouseReturnSwipe(page, await controlPoint(page, '#open-contact'), -64);
+    assert.equal((await state(page)).target, 5); assert.equal((await state(page)).rejection, 'gate'); assert.equal(await page.locator('#contact-dialog').evaluate(el => el.open), false);
+    const clicks = await controlClicks(page); assert.ok(clicks.some(e => e.trusted && e.pointerType === 'mouse' && e.prevented), 'Gate rejection consumes the following pointer click');
+    await page.locator('#open-contact').click(); await page.waitForFunction(() => document.querySelector('#contact-dialog').open);
+    return { rejectedTarget: 5, rejection: 'gate', freshPointerActivated: true, clicks: await controlClicks(page) };
+  }, '#working-together');
+  return { endpoint, gate };
+});
+
 test('all 25 tuning controls expose metadata, synchronize numeric/range pairs and save edits', () => isolated({}, async (page, context) => {
   await panel(page); const { fields, defaults } = await metadata(page);
   assert.equal(fields.length, 25); assert.deepEqual(await tuning(page), defaults);

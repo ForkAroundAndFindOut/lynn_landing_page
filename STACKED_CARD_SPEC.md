@@ -2,6 +2,8 @@ This specification defines a buildable proof of concept for a website whose cont
 
 ## Current amendment: movement lab, October 4, 2026
 
+Link-start follow-up: active-card links, buttons, and nested content participate in swipe recognition. These actionable starts require the configured full swipe distance, ignoring the optional short flick shortcut. Preserve stationary taps, keyboard/programmatic activation, native long holds/context menus, and editable or nested scrolling surfaces. Suppress only the pointer-generated click associated with an acquired vertical gesture, including gate/endpoint rejection, so a swipe never also follows a link or opens contact. New primary presses begin fresh activation. Prevent native anchor dragging while deck recognition owns that pointer.
+
 The owner approved the reminder as part of the card prototype parent, without changing production `main`. The current interaction supersedes the original continuous-drag, preset sensitivity, queued-navigation, and animation-completion wheel gates below. Those sections remain historical context. The current review guide is README.md and acceptance evidence is verification/TUNING.md.
 
 Touch, mouse drag, trackpad, and wheel input recognize one adjacent-card command. Below-threshold movement leaves position unchanged; recognition starts a configured animation. One contact or wheel burst attempts once, including gated/boundary rejections. Native long holds, controls, selection, horizontal input, pinch/modified zoom, and reading flow retain browser paths. Legacy direct-drag math remains internal for future exploration, not the exposed default.

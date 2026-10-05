@@ -2,7 +2,9 @@
 export function setupLayout({ stage, cards, deck, settings, isBlocked, onMode }) {
   let mode = 'flow';
   let frame = 0;
-  let readAsPage = new URLSearchParams(location.search).get('view') === 'page';
+  let readingOverride;
+  let localView;
+  const legacyReadAsPage = new URLSearchParams(location.search).get('view') === 'page';
   let initialized = false;
   const entered = new Set();
   const entrances = new Map();
@@ -90,16 +92,22 @@ export function setupLayout({ stage, cards, deck, settings, isBlocked, onMode })
     const previous = mode;
     const viewportHeight = window.visualViewport?.height ?? innerHeight;
     const viewportWidth = window.visualViewport?.width ?? innerWidth;
-    const narrow = innerWidth < 900;
-    const eligible = narrow && viewportHeight >= 540 && !settings.reduced && !readAsPage;
+    const narrow = viewportWidth < 900;
+    const configuredView = settings.view ?? (legacyReadAsPage ? 'page' : 'auto');
+    const selectedView = ['auto', 'deck', 'page'].includes(configuredView) ? configuredView : 'auto';
+    const preferredView = localView ?? selectedView;
+    const requestedView = readingOverride ?? preferredView;
+    const eligible = viewportHeight >= 540 && !settings.reduced && requestedView !== 'page' && (narrow || requestedView === 'deck');
     document.body.dataset.reduced = String(settings.reduced);
     document.body.dataset.desktop = settings.desktop;
-    let reason = settings.reduced ? 'Reduced motion: all content in document flow.' : readAsPage ? 'Reading view: native page scrolling.' : 'Desktop: native page scrolling.';
+    let reason = settings.reduced ? 'Reduced motion: all content in document flow.' : requestedView === 'page' ? 'Reading view: native page scrolling.' : 'Desktop: native page scrolling.';
+    document.body.dataset.deckWide = String(!narrow && eligible);
     if (eligible) {
       document.body.dataset.mode = 'deck';
       const headerHeight = document.querySelector('.site-header').offsetHeight;
       const stageHeight = Math.max(240, viewportHeight - headerHeight - 126);
-      const cardWidth = Math.min(viewportWidth - 32, 590);
+      const availableWidth = viewportWidth - (!narrow ? 360 : 0);
+      const cardWidth = Math.min(availableWidth - 32, 590);
       stage.style.setProperty('--stage-height', `${stageHeight}px`);
       stage.style.setProperty('--card-width', `${cardWidth}px`);
       stage.style.setProperty('--card-height', `${Math.min(stageHeight - 46, Math.max(cardWidth, 450))}px`);
@@ -119,16 +127,18 @@ export function setupLayout({ stage, cards, deck, settings, isBlocked, onMode })
       if (narrow && viewportHeight < 540) reason = 'Short screen: native page scrolling.';
     }
     document.body.dataset.mode = mode;
+    document.body.dataset.deckWide = String(!narrow && mode === 'deck');
     deck.setEnabled(mode === 'deck');
     refreshEntrances(viewportHeight);
     const navigation = document.querySelector('.deck-navigation');
-    if (!narrow && navigation.contains(document.activeElement)) cards[deck.index].querySelector('h1,h2').focus({ preventScroll: true });
-    navigation.hidden = !narrow;
+    const deckWide = !narrow && mode === 'deck';
+    if (!narrow && !deckWide && navigation.contains(document.activeElement)) cards[deck.index].querySelector('h1,h2').focus({ preventScroll: true });
+    navigation.hidden = !narrow && !deckWide;
     const focused = document.activeElement;
     if (focused && focused !== document.body && !focused.getClientRects().length) cards[deck.index].querySelector('h1,h2').focus({ preventScroll: true });
     const readButton = document.querySelector('#read-mode');
     readButton.textContent = mode === 'deck' ? 'Read as page' : 'Use card view';
-    readButton.disabled = settings.reduced || viewportHeight < 540 || (!readAsPage && mode !== 'deck');
+    readButton.disabled = settings.reduced || viewportHeight < 540;
     document.querySelector('#mode-note').textContent = reason;
     if (previous !== mode && initialized) {
       if (mode === 'flow') cards[deck.index].scrollIntoView({ block: 'start' });
@@ -148,5 +158,18 @@ export function setupLayout({ stage, cards, deck, settings, isBlocked, onMode })
   Object.assign(fontProbe.style, { position: 'absolute', visibility: 'hidden', width: '1em', height: '1em', pointerEvents: 'none' });
   document.body.append(fontProbe);
   new ResizeObserver(schedule).observe(fontProbe);
-  return { refresh, revealCard, get mode() { return mode; }, toggleReading() { readAsPage = !readAsPage; refresh(); } };
+  function setView(view) {
+    if (!['auto', 'deck', 'page'].includes(view)) return;
+    readingOverride = undefined;
+    if (typeof settings.setView === 'function') settings.setView(view);
+    else localView = view;
+    refresh();
+  }
+  function toggleReading() {
+    // Keep the saved selector preference intact. The button temporarily switches
+    // presentation, and the selected preference resumes after the next toggle.
+    readingOverride = mode === 'deck' ? 'page' : 'deck';
+    refresh();
+  }
+  return { refresh, revealCard, setView, get mode() { return mode; }, toggleReading };
 }

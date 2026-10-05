@@ -1,0 +1,21 @@
+# Experimental hint checks
+
+- PASS: Android Chrome emulation shows the reminder at 360x740
+- PASS: idle first card waits five seconds, stays decorative and does not shift geometry 390
+- PASS: idle first card waits five seconds, stays decorative and does not shift geometry 800
+- PASS: Android Chrome emulation shows the reminder at 412x915
+- PASS: pointer activity restarts the idle reminder
+- PASS: wheel activity restarts the idle reminder
+- PASS: keyboard activity restarts the idle reminder
+- PASS: returning to the first card starts a fresh idle reminder
+- PASS: an open review panel pauses the reminder and closing it restarts the interval
+- PASS: a held pointer suppresses the reminder until release
+- PASS: selected text pauses the reminder until selection clears
+- PASS: window blur clears a lost pointer and focus starts a new interval
+- PASS: cue stays suppressed for desktop
+- PASS: hidden tab resets the countdown before cue can reappear
+- PASS: cue stays suppressed for reading
+- PASS: cue stays suppressed for reduced
+- PASS: cue stays suppressed for dialog
+- PASS: deep link stays suppressed until first card is revisited
+- PASS: no browser or asset errors

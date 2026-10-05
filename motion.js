@@ -40,9 +40,9 @@ function bezier(a, b, c, d, progress) {
 }
 
 /** A card's stored arrival path, relative to its settled center. */
-export function evaluatePose({ index, id = index, progress, width, height, preset = 'balanced' }) {
+export function evaluatePose({ index, id = index, progress, width, height, preset = 'balanced', tuning: configuration }) {
   const p = clamp(progress, 0, 1);
-  const tuning = presetFor(preset);
+  const tuning = configuration || presetFor(preset);
   const seed = variation(id);
   const direction = arrivalDirection(index);
   const side = direction === 'right' ? 1 : -1;
@@ -58,9 +58,9 @@ export function evaluatePose({ index, id = index, progress, width, height, prese
     x,
     y,
     angle: p === 1 ? 0 : startAngle * tuning.rotation * (1 - p) ** 1.35,
-    scale: 0.965 + 0.035 * p,
-    opacity: clamp(p * 8, 0, 1),
-    shadow: 0.45 + 0.55 * p,
+    scale: (tuning.arrivalScale ?? 0.965) + (1 - (tuning.arrivalScale ?? 0.965)) * p,
+    opacity: clamp(p / Math.max(0.000001, tuning.opacityRamp ?? 0.125), 0, 1),
+    shadow: (0.45 + 0.55 * p) * (tuning.shadowStrength ?? 1),
   };
 }
 
@@ -68,7 +68,7 @@ export function evaluatePose({ index, id = index, progress, width, height, prese
  * A continuous u gives identical poses whether approached forwards or backwards.
  * At most three resting layers and one adjacent arrival are returned.
  */
-export function evaluateStack({ position, count, width, height, cardHeight = 0, ids = [], preset = 'balanced' }) {
+export function evaluateStack({ position, count, width, height, cardHeight = 0, ids = [], preset = 'balanced', tuning }) {
   if (count < 1) return [];
   const u = clamp(position, 0, count - 1);
   const base = Math.floor(u);
@@ -79,25 +79,70 @@ export function evaluateStack({ position, count, width, height, cardHeight = 0, 
     // Fade the oldest exposed edge away as the fourth painted card arrives.
     const edgeOpacity = depth > 2 ? 3 - depth : 1;
     const visibleDepth = Math.min(depth, 2);
-    const scale = 1 - MOTION.layerScale * visibleDepth;
+    const scale = 1 - (tuning?.layerScale ?? MOTION.layerScale) * visibleDepth;
     layers.push({
       index,
       x: 0,
       // Centered scaling otherwise pulls the top edge back toward the active
       // card. Compensate using card height, independently of path/stage height.
-      y: depth === 0 ? 0 : -MOTION.layerOffset * visibleDepth - cardHeight * (1 - scale) / 2,
+      y: depth === 0 ? 0 : -(tuning?.layerOffset ?? MOTION.layerOffset) * visibleDepth - cardHeight * (1 - scale) / 2,
       angle: 0,
       scale,
       opacity: (1 - Math.min(depth, 2) * 0.06) * edgeOpacity,
-      shadow: 1 - Math.min(depth, 2) * 0.2,
+      shadow: (1 - Math.min(depth, 2) * 0.2) * (tuning?.shadowStrength ?? 1),
       zIndex: index + 1,
     });
   }
   if (progress > 0 && base + 1 < count) {
     const index = base + 1;
-    layers.push({ index, ...evaluatePose({ index, id: ids[index] ?? index, progress, width, height, preset }), zIndex: index + 1 });
+    layers.push({ index, ...evaluatePose({ index, id: ids[index] ?? index, progress, width, height, preset, tuning }), zIndex: index + 1 });
   }
   return layers;
+}
+
+export const smoothstep = (value) => { const x = clamp(value, 0, 1); return x * x * (3 - 2 * x); };
+
+// A deterministic normalized integral, rather than a frame-by-frame simulation.
+// Fixed quadrature bounds work and gives exact endpoints for every duration.
+const curveCache = new Map();
+const CURVE_STEPS = 2048;
+export function velocityCurve(configuration = {}) {
+  const a = clamp(configuration.acceleration ?? 0.15, 0, 0.45);
+  const d = clamp(configuration.deceleration ?? 0.35, 0, 0.45);
+  const strength = Math.max(0, configuration.magneticStrength ?? 0.25);
+  const onset = clamp(configuration.magneticOnset ?? 0.65, 0, 1);
+  const key = [a, d, strength, onset].join(':');
+  if (curveCache.has(key)) return curveCache.get(key);
+  const weight = (s) => {
+    const base = a && s < a ? smoothstep(s / a) : d && s > 1 - d ? smoothstep((1 - s) / d) : 1;
+    const z = onset < 1 ? clamp((s - onset) / (1 - onset), 0, 1) : 0;
+    return base * (1 + strength * 16 * z * z * (1 - z) * (1 - z));
+  };
+  const cumulative = new Float64Array(CURVE_STEPS + 1);
+  let previous = weight(0);
+  for (let i = 1; i <= CURVE_STEPS; i += 1) {
+    const next = weight(i / CURVE_STEPS);
+    cumulative[i] = cumulative[i - 1] + (previous + next) / (2 * CURVE_STEPS);
+    previous = next;
+  }
+  const total = cumulative[CURVE_STEPS];
+  const curve = (progress) => {
+    const s = clamp(progress, 0, 1);
+    if (s === 0 || s === 1) return s;
+    const fractional = s * CURVE_STEPS, i = Math.floor(fractional);
+    return (cumulative[i] + (cumulative[i + 1] - cumulative[i]) * (fractional - i)) / total;
+  };
+  // Limit cache growth when controls are swept continuously.
+  if (curveCache.size >= 128) curveCache.delete(curveCache.keys().next().value);
+  curveCache.set(key, curve);
+  return curve;
+}
+
+/** Bounce is an additive pose correction, never a change to deck position. */
+export function bounceOffset(progress, amplitude = 0, cycles = 1) {
+  if (progress <= 0.75 || progress >= 1 || !amplitude) return 0;
+  const z = (progress - 0.75) * 4;
+  return amplitude * Math.sin(2 * Math.PI * cycles * z) * Math.sin(Math.PI * z) ** 2;
 }
 
 /** Position in cards; gesture travel is positive upwards and bounded to one neighbor. */

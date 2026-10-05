@@ -1,5 +1,7 @@
 # Card-layout verification
 
+Current October 4 movement-lab acceptance is in [TUNING.md](TUNING.md). The approved reminder is now in the prototype parent. Command swipes, configurable gating, and per-request motion replace the historical continuous-drag and queue contracts below. Earlier reports remain historical evidence rather than acceptance of the new interaction.
+
 Date: 2026-10-03 (America/Los_Angeles).
 
 The slower-touch follow-up below records the latest tuning. The discrete wheel-request implementation remains current, with revised preset durations. Its original timing evidence, the proportional-wheel prototype, and earlier selection, settings, layout, and recordings are retained as historical acceptance baselines.

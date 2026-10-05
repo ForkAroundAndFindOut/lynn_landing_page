@@ -1,4 +1,4 @@
-// Experimental child-branch enhancement. The navigation controls and semantic
+// Approved prototype reminder. The navigation controls and semantic
 // instructions remain available; this decorative cue never handles input.
 export function setupSwipeHint({ stage, cue, dialog, isBlocked, isReduced }) {
   if (!cue) return;

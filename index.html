@@ -59,7 +59,27 @@
       <div id="card-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
     </main>
     <footer class="site-footer"><span>Lynn Renezeder</span><span>People. Perspective. Possibility.</span><a href="#top">Back to top ↑</a></footer>
-    <details id="review-settings" class="review-settings" hidden><summary>POC review <span aria-hidden="true">+</span></summary><div class="settings-body"><p>Exploratory settings, for this preview only. Settings are remembered; refresh starts at the top.</p><label for="motion-preset">Motion<select id="motion-preset"><option value="balanced">Balanced</option><option value="crisp">Crisp</option><option value="gentle">Gentle</option></select></label><label for="desktop-layout">Desktop layout<select id="desktop-layout"><option value="staggered">Staggered cards</option><option value="conventional">Read as document</option></select></label><label class="checkbox-label"><input id="reduce-motion" type="checkbox"> Reduce motion</label><label class="checkbox-label"><input id="show-debug" type="checkbox"> Show gesture state</label><button id="reset-review-settings" class="quiet-button" type="button">Reset review settings</button><small id="review-persistence-status" role="status" hidden></small><output id="debug-state" hidden></output><small id="mode-note"></small></div></details>
+    <details id="review-settings" class="review-settings" hidden>
+      <summary>POC review <span aria-hidden="true">+</span></summary>
+      <div class="settings-body">
+        <p>Exploratory settings, for this preview only. Settings are remembered; refresh starts at the top.</p>
+        <fieldset class="tuning-group"><legend>Preview and motion</legend>
+          <label for="preview-view">Preview view<select id="preview-view"><option value="auto">Automatic</option><option value="deck">Deck</option><option value="page">Read as page</option></select></label>
+          <label for="motion-preset">Motion preset<select id="motion-preset"><option value="balanced">Balanced</option><option value="crisp">Crisp</option><option value="gentle">Gentle</option></select></label>
+          <label for="desktop-layout">Page layout<select id="desktop-layout"><option value="staggered">Staggered cards</option><option value="conventional">Read as document</option></select></label>
+          <label class="checkbox-label"><input id="reduce-motion" type="checkbox"> Reduce motion</label>
+          <label class="checkbox-label"><input id="show-debug" type="checkbox"> Show gesture state</label>
+        </fieldset>
+        <fieldset class="tuning-group"><legend>Test the deck</legend>
+          <div class="tuning-test-buttons"><button id="tuning-previous" class="quiet-button" type="button">Previous</button><button id="tuning-next" class="quiet-button" type="button">Next</button><button id="tuning-top" class="quiet-button" type="button">Back to top</button></div>
+          <output id="gate-status" aria-live="off">Gate ready</output>
+        </fieldset>
+        <p class="tuning-caption">Motion changes apply to the next request. Gate changes apply immediately.</p>
+        <div id="tuning-controls"></div>
+        <div class="tuning-reset-buttons"><button id="reset-tuning" class="quiet-button" type="button">Reset tuning</button><button id="reset-review-settings" class="quiet-button" type="button">Reset all review settings</button></div>
+        <small id="review-persistence-status" role="status" hidden></small><output id="debug-state" hidden></output><small id="mode-note"></small>
+      </div>
+    </details>
   </div>
   <dialog id="contact-dialog" aria-labelledby="dialog-title" aria-describedby="form-notice">
     <div class="dialog-content"><button id="close-contact" class="close-button" type="button" aria-label="Close contact form">×</button><p class="eyebrow">A little context</p><h2 id="dialog-title" tabindex="-1">Tell us what’s on your mind.</h2><p id="form-notice" class="form-notice">Prototype form — nothing is sent. Your draft stays here until you reload.</p>

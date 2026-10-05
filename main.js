@@ -25,29 +25,48 @@ const opener = document.querySelector('#open-contact');
 let layout;
 let contact;
 let debugObserver;
+let reviewFrame = 0;
 let readingFrame = 0;
 let trackReading = false;
-const settings = setupSettings(() => { deck.settle(); contact?.refreshMotion(); layout.refresh(); updateDebug(); });
+const settings = setupSettings(({ kind = 'layout' } = {}) => {
+  if (kind === 'layout' || kind === 'motion') {
+    deck.settle();
+    contact?.refreshMotion();
+    layout.refresh();
+  }
+  updateControls();
+});
 
 function updateControls() {
-  previous.disabled = top.disabled = deck.index === 0;
-  next.disabled = deck.index === cards.length - 1;
-  document.querySelector('#position').innerHTML = `${String(deck.index + 1).padStart(2, '0')} <i>/</i> 06`;
+  const target = layout?.mode === 'deck' ? deck.requestedIndex : deck.index;
+  previous.disabled = target === 0;
+  top.disabled = target === 0 && deck.position === 0;
+  next.disabled = target === cards.length - 1;
+  const testPrevious = document.querySelector('#tuning-previous');
+  const testNext = document.querySelector('#tuning-next');
+  if (testPrevious) testPrevious.disabled = previous.disabled;
+  if (testNext) testNext.disabled = next.disabled;
+  document.querySelector('#position').innerHTML = `${String(target + 1).padStart(2, '0')} <i>/</i> 06`;
   updateDebug();
 }
 function updateDebug() {
   const output = document.querySelector('#debug-state');
   output.hidden = !settings.debug;
+  const remaining = layout?.mode === 'deck' ? deck.gateRemaining : 0;
+  const gateStatus = document.querySelector('#gate-status');
+  if (gateStatus) gateStatus.textContent = remaining > 0 ? `Next request in ${(remaining / 1000).toFixed(2)} s` : 'Ready for next request';
   if (settings.debug) {
-    output.textContent = `${layout?.mode ?? 'flow'} · ${deck.state}\nposition ${deck.position.toFixed(3)} · ${settings.preset}`;
-    if (!debugObserver) { debugObserver = new MutationObserver(updateDebug); debugObserver.observe(stage, { attributes: true, attributeFilter: ['data-deck-position', 'data-deck-state'] }); }
-  } else { debugObserver?.disconnect(); debugObserver = null; }
+    output.textContent = `${layout?.mode ?? 'flow'} · ${deck.state}\nposition ${deck.position.toFixed(3)} · requested ${deck.requestedIndex + 1}\ngate ${(remaining / 1000).toFixed(2)} s · ${deck.lastRejection || 'no rejected request'}`;
+  }
+  if (!reviewFrame && (remaining > 0 || deck.state === 'settling')) reviewFrame = requestAnimationFrame(() => { reviewFrame = 0; updateDebug(); });
 }
 const deck = createDeck({
   stage, cards,
   isBlocked: () => Boolean(contact?.isOpen),
   getPreset: () => settings.preset,
+  getTuning: () => settings.tuning,
   isReduced: () => settings.reduced,
+  onRequest() { updateControls(); },
   onChange(index, { focus, contact: focusContact }) {
     updateControls();
     const heading = cards[index].querySelector('h1,h2');
@@ -73,9 +92,12 @@ previous.addEventListener('click', () => navigate(-1));
 next.addEventListener('click', () => navigate(1));
 top.addEventListener('click', () => deck.jump(0));
 document.querySelector('#read-mode').addEventListener('click', () => {
-  layout.toggleReading();
+  settings.setView(layout.mode === 'deck' ? 'page' : 'deck');
   cards[deck.index].querySelector('h1,h2').focus({ preventScroll: true });
 });
+document.querySelector('#tuning-previous')?.addEventListener('click', () => navigate(-1));
+document.querySelector('#tuning-next')?.addEventListener('click', () => navigate(1));
+document.querySelector('#tuning-top')?.addEventListener('click', () => deck.jump(0));
 document.addEventListener('click', event => {
   const anchor = event.target.closest('a[href^="#"]');
   if (!anchor || contact.isOpen) return;
@@ -120,4 +142,6 @@ if (!restartingReview && initialIndex >= 0) layout.revealCard(cards[initialIndex
 if (initialIndex >= 0 && layout.mode === 'flow') cards[initialIndex].scrollIntoView({ block: 'start' });
 if (restartingReview) window.scrollTo(0, 0);
 updateControls();
+debugObserver = new MutationObserver(updateDebug);
+debugObserver.observe(stage, { attributes: true, attributeFilter: ['data-deck-position', 'data-deck-state', 'data-deck-rejection'] });
 setupSwipeHint({ stage, cue: document.querySelector('#experimental-swipe-cue'), dialog: document.querySelector('#contact-dialog'), isBlocked: () => contact.isOpen, isReduced: () => settings.reduced });

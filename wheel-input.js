@@ -12,6 +12,6 @@ export function normalizeWheel(event, height) {
   return { x, y };
 }
 
-export function wheelTarget(origin, intent, count) {
-  return clamp(origin + (Math.abs(intent) >= WHEEL.commit ? Math.sign(intent) : 0), 0, count - 1);
+export function wheelTarget(origin, intent, count, threshold = WHEEL.commit) {
+  return clamp(origin + (Math.abs(intent) >= threshold ? Math.sign(intent) : 0), 0, count - 1);
 }

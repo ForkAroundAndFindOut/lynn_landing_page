@@ -1,0 +1,1058 @@
+{
+  "checkedAt": "2026-10-05T03:27:27.701Z",
+  "baseURL": "http://127.0.0.1:4191",
+  "revision": {
+    "revision": "b14176fdec35e2460d0aa33abcdc64025d4c5a14",
+    "assets": {
+      "index.html": "e683b60ea08034a222b7a32c59f0cbef1b73bb50ed5ee601bbbd46a42ef9de8d",
+      "styles.css": "a55f2e39ff5aa2b89a10453b087033ee5a0680fcd67b7d1d8276f90c44c9e3b7",
+      "main.js": "a08afcc7e29e40a59f588199b08b93a0274660f51a469b5a9c511315fec9b954",
+      "deck-controller.js": "b4f6793a9480286f318b7a3ac22d030e52db473c14206c7c3c33431c9926ab98",
+      "wheel-input.js": "f1f00cd3303d31026e9cd541c1fa64629b4e9b5176c73651be534b7758d42b28",
+      "swipe-hint.js": "8b767cbee42951385330eb74897e917c60fd39051863b4cca45ffefb7eb53476",
+      "motion.js": "7b45e7452335de26064e02d3a6100cbee298aa14aa612a68db3da00a1bc1a81c",
+      "layout.js": "5814d39d405f0f7fa48ac899db04b2f4cf3044f0a6e31f48bb0ed861d6df2c4e",
+      "contact-dialog.js": "65a551b5dd9bb1ecaa99c53f8fd3fa6178df7acfeff1bd69d6a26daf23173232",
+      "demo-settings.js": "123c04de2f91113701f62833e4a809a4a6ef455700d74e6f19a3e69e97946693",
+      "tuning-config.js": "6e00f61451165807c63c108ca494a65d4e8e9d12a27e6ac87c989cc09687fc30",
+      "favicon.svg": "e44e20099cb05df4fe9e8c5f4ed3b380fdedbb2147aff6d0182206969acaaf15"
+    }
+  },
+  "engine": "Chromium 149.0.7827.55",
+  "results": [
+    {
+      "name": "Android Chrome emulation shows the reminder at 360x740",
+      "status": "PASS",
+      "detail": {
+        "width": 360,
+        "height": 740,
+        "mode": "deck",
+        "shown": {
+          "visible": "true",
+          "opacity": 0.45,
+          "visibility": "visible",
+          "display": "inline-flex",
+          "pointerEvents": "none",
+          "ariaHidden": "true",
+          "tabIndex": -1,
+          "focus": "BODY"
+        },
+        "bounds": {
+          "cue": {
+            "x": 116.125,
+            "y": 614,
+            "width": 127.75,
+            "height": 18.140625,
+            "top": 614,
+            "right": 243.875,
+            "bottom": 632.140625,
+            "left": 116.125
+          },
+          "viewport": {
+            "top": 0,
+            "height": 740,
+            "width": 360
+          }
+        },
+        "method": "Chromium Android user-agent/mobile viewport emulation and rendered viewport bounds; not a physical Android device"
+      }
+    },
+    {
+      "name": "idle first card waits five seconds, stays decorative and does not shift geometry 390",
+      "status": "PASS",
+      "detail": {
+        "width": 390,
+        "height": 844,
+        "hasTouch": true,
+        "timer": {
+          "scheduled": 167.20000004768372
+        },
+        "shown": {
+          "visible": "true",
+          "opacity": 0.45,
+          "visibility": "visible",
+          "display": "inline-flex",
+          "pointerEvents": "none",
+          "ariaHidden": "true",
+          "tabIndex": -1,
+          "focus": "BODY"
+        },
+        "animation": {
+          "duration": "1.2s",
+          "iterations": "2",
+          "timing": {
+            "delay": 0,
+            "direction": "normal",
+            "duration": 1200,
+            "easing": "linear",
+            "endDelay": 0,
+            "fill": "none",
+            "iterationStart": 0,
+            "iterations": 2
+          }
+        },
+        "geometryUnchanged": true,
+        "method": "Actual browser timer and CSS animation; physical/native browser coverage remains unverified"
+      }
+    },
+    {
+      "name": "idle first card waits five seconds, stays decorative and does not shift geometry 800",
+      "status": "PASS",
+      "detail": {
+        "width": 800,
+        "height": 900,
+        "hasTouch": false,
+        "timer": {
+          "scheduled": 160.40000009536743
+        },
+        "shown": {
+          "visible": "true",
+          "opacity": 0.45,
+          "visibility": "visible",
+          "display": "inline-flex",
+          "pointerEvents": "none",
+          "ariaHidden": "true",
+          "tabIndex": -1,
+          "focus": "BODY"
+        },
+        "animation": {
+          "duration": "1.2s",
+          "iterations": "2",
+          "timing": {
+            "delay": 0,
+            "direction": "normal",
+            "duration": 1200,
+            "easing": "linear",
+            "endDelay": 0,
+            "fill": "none",
+            "iterationStart": 0,
+            "iterations": 2
+          }
+        },
+        "geometryUnchanged": true,
+        "method": "Actual browser timer and CSS animation; physical/native browser coverage remains unverified"
+      }
+    },
+    {
+      "name": "Android Chrome emulation shows the reminder at 412x915",
+      "status": "PASS",
+      "detail": {
+        "width": 412,
+        "height": 915,
+        "mode": "deck",
+        "shown": {
+          "visible": "true",
+          "opacity": 0.45,
+          "visibility": "visible",
+          "display": "inline-flex",
+          "pointerEvents": "none",
+          "ariaHidden": "true",
+          "tabIndex": -1,
+          "focus": "BODY"
+        },
+        "bounds": {
+          "cue": {
+            "x": 142.125,
+            "y": 789,
+            "width": 127.75,
+            "height": 18.140625,
+            "top": 789,
+            "right": 269.875,
+            "bottom": 807.140625,
+            "left": 142.125
+          },
+          "viewport": {
+            "top": 0,
+            "height": 915,
+            "width": 412
+          }
+        },
+        "method": "Chromium Android user-agent/mobile viewport emulation and rendered viewport bounds; not a physical Android device"
+      }
+    },
+    {
+      "name": "pointer activity restarts the idle reminder",
+      "status": "PASS",
+      "detail": {
+        "input": "pointer",
+        "events": [
+          {
+            "type": "pointerdown",
+            "trusted": true
+          }
+        ],
+        "timers": [
+          {
+            "scheduled": 82.19999980926514
+          },
+          {
+            "scheduled": 95.39999985694885
+          },
+          {
+            "scheduled": 95.5
+          },
+          {
+            "scheduled": 95.5
+          },
+          {
+            "scheduled": 95.5
+          },
+          {
+            "scheduled": 95.5
+          },
+          {
+            "scheduled": 95.5
+          },
+          {
+            "scheduled": 95.5
+          },
+          {
+            "scheduled": 95.5
+          },
+          {
+            "scheduled": 95.5
+          },
+          {
+            "scheduled": 95.59999990463257
+          },
+          {
+            "scheduled": 95.59999990463257
+          },
+          {
+            "scheduled": 95.59999990463257
+          },
+          {
+            "scheduled": 95.59999990463257
+          },
+          {
+            "scheduled": 95.59999990463257
+          },
+          {
+            "scheduled": 95.59999990463257
+          },
+          {
+            "scheduled": 95.59999990463257
+          },
+          {
+            "scheduled": 95.59999990463257
+          },
+          {
+            "scheduled": 95.59999990463257
+          },
+          {
+            "scheduled": 95.59999990463257
+          },
+          {
+            "scheduled": 95.59999990463257
+          },
+          {
+            "scheduled": 95.69999980926514
+          },
+          {
+            "scheduled": 95.69999980926514
+          },
+          {
+            "scheduled": 95.69999980926514
+          },
+          {
+            "scheduled": 95.69999980926514
+          },
+          {
+            "scheduled": 2103
+          },
+          {
+            "scheduled": 2108.0999999046326,
+            "fired": 7109.299999952316
+          }
+        ],
+        "method": "Playwright browser input before first cue, actual five-second quiet wait"
+      }
+    },
+    {
+      "name": "wheel activity restarts the idle reminder",
+      "status": "PASS",
+      "detail": {
+        "input": "wheel",
+        "events": [
+          {
+            "type": "wheel",
+            "trusted": true
+          }
+        ],
+        "timers": [
+          {
+            "scheduled": 93.09999990463257
+          },
+          {
+            "scheduled": 106.39999985694885
+          },
+          {
+            "scheduled": 106.39999985694885
+          },
+          {
+            "scheduled": 106.39999985694885
+          },
+          {
+            "scheduled": 106.39999985694885
+          },
+          {
+            "scheduled": 106.39999985694885
+          },
+          {
+            "scheduled": 106.39999985694885
+          },
+          {
+            "scheduled": 106.39999985694885
+          },
+          {
+            "scheduled": 106.5
+          },
+          {
+            "scheduled": 106.5
+          },
+          {
+            "scheduled": 106.5
+          },
+          {
+            "scheduled": 106.5
+          },
+          {
+            "scheduled": 106.5
+          },
+          {
+            "scheduled": 106.5
+          },
+          {
+            "scheduled": 106.59999990463257
+          },
+          {
+            "scheduled": 106.59999990463257
+          },
+          {
+            "scheduled": 106.59999990463257
+          },
+          {
+            "scheduled": 106.59999990463257
+          },
+          {
+            "scheduled": 106.59999990463257
+          },
+          {
+            "scheduled": 106.59999990463257
+          },
+          {
+            "scheduled": 106.59999990463257
+          },
+          {
+            "scheduled": 106.70000004768372
+          },
+          {
+            "scheduled": 106.70000004768372
+          },
+          {
+            "scheduled": 106.70000004768372
+          },
+          {
+            "scheduled": 106.70000004768372
+          },
+          {
+            "scheduled": 2136.0999999046326,
+            "fired": 7137.099999904633
+          }
+        ],
+        "method": "Playwright browser input before first cue, actual five-second quiet wait"
+      }
+    },
+    {
+      "name": "keyboard activity restarts the idle reminder",
+      "status": "PASS",
+      "detail": {
+        "input": "keyboard",
+        "events": [
+          {
+            "type": "keydown",
+            "trusted": true
+          }
+        ],
+        "timers": [
+          {
+            "scheduled": 62.90000009536743
+          },
+          {
+            "scheduled": 72.70000004768372
+          },
+          {
+            "scheduled": 72.80000019073486
+          },
+          {
+            "scheduled": 72.80000019073486
+          },
+          {
+            "scheduled": 72.80000019073486
+          },
+          {
+            "scheduled": 72.80000019073486
+          },
+          {
+            "scheduled": 72.80000019073486
+          },
+          {
+            "scheduled": 72.80000019073486
+          },
+          {
+            "scheduled": 72.80000019073486
+          },
+          {
+            "scheduled": 72.80000019073486
+          },
+          {
+            "scheduled": 72.90000009536743
+          },
+          {
+            "scheduled": 72.90000009536743
+          },
+          {
+            "scheduled": 72.90000009536743
+          },
+          {
+            "scheduled": 72.90000009536743
+          },
+          {
+            "scheduled": 72.90000009536743
+          },
+          {
+            "scheduled": 72.90000009536743
+          },
+          {
+            "scheduled": 72.90000009536743
+          },
+          {
+            "scheduled": 72.90000009536743
+          },
+          {
+            "scheduled": 72.90000009536743
+          },
+          {
+            "scheduled": 72.90000009536743
+          },
+          {
+            "scheduled": 72.90000009536743
+          },
+          {
+            "scheduled": 72.90000009536743
+          },
+          {
+            "scheduled": 72.90000009536743
+          },
+          {
+            "scheduled": 72.90000009536743
+          },
+          {
+            "scheduled": 73
+          },
+          {
+            "scheduled": 2079.800000190735,
+            "fired": 7080.5
+          }
+        ],
+        "method": "Playwright browser input before first cue, actual five-second quiet wait"
+      }
+    },
+    {
+      "name": "returning to the first card starts a fresh idle reminder",
+      "status": "PASS",
+      "detail": {
+        "position": "0.000",
+        "timers": [
+          {
+            "scheduled": 70.70000004768372
+          },
+          {
+            "scheduled": 84.09999990463257
+          },
+          {
+            "scheduled": 84.09999990463257
+          },
+          {
+            "scheduled": 84.09999990463257
+          },
+          {
+            "scheduled": 84.20000004768372
+          },
+          {
+            "scheduled": 84.20000004768372
+          },
+          {
+            "scheduled": 84.20000004768372
+          },
+          {
+            "scheduled": 84.20000004768372
+          },
+          {
+            "scheduled": 84.20000004768372
+          },
+          {
+            "scheduled": 84.20000004768372
+          },
+          {
+            "scheduled": 84.20000004768372
+          },
+          {
+            "scheduled": 84.20000004768372
+          },
+          {
+            "scheduled": 84.29999995231628
+          },
+          {
+            "scheduled": 84.29999995231628
+          },
+          {
+            "scheduled": 84.29999995231628
+          },
+          {
+            "scheduled": 84.29999995231628
+          },
+          {
+            "scheduled": 84.40000009536743
+          },
+          {
+            "scheduled": 84.40000009536743
+          },
+          {
+            "scheduled": 84.40000009536743
+          },
+          {
+            "scheduled": 84.40000009536743
+          },
+          {
+            "scheduled": 84.40000009536743
+          },
+          {
+            "scheduled": 84.40000009536743
+          },
+          {
+            "scheduled": 84.40000009536743
+          },
+          {
+            "scheduled": 84.40000009536743
+          },
+          {
+            "scheduled": 84.40000009536743
+          },
+          {
+            "scheduled": 119.09999990463257
+          },
+          {
+            "scheduled": 1240.4000000953674,
+            "fired": 6240.799999952316
+          }
+        ],
+        "method": "Card navigation in Chromium, followed by actual five-second idle wait"
+      }
+    },
+    {
+      "name": "an open review panel pauses the reminder and closing it restarts the interval",
+      "status": "PASS",
+      "detail": {
+        "panelOpen": false,
+        "timers": [
+          {
+            "scheduled": 80.79999995231628
+          },
+          {
+            "scheduled": 91.39999985694885
+          },
+          {
+            "scheduled": 91.39999985694885
+          },
+          {
+            "scheduled": 91.39999985694885
+          },
+          {
+            "scheduled": 91.39999985694885
+          },
+          {
+            "scheduled": 91.39999985694885
+          },
+          {
+            "scheduled": 91.39999985694885
+          },
+          {
+            "scheduled": 91.39999985694885
+          },
+          {
+            "scheduled": 91.39999985694885
+          },
+          {
+            "scheduled": 91.39999985694885
+          },
+          {
+            "scheduled": 91.39999985694885
+          },
+          {
+            "scheduled": 91.59999990463257
+          },
+          {
+            "scheduled": 91.59999990463257
+          },
+          {
+            "scheduled": 91.59999990463257
+          },
+          {
+            "scheduled": 91.59999990463257
+          },
+          {
+            "scheduled": 91.59999990463257
+          },
+          {
+            "scheduled": 91.59999990463257
+          },
+          {
+            "scheduled": 91.59999990463257
+          },
+          {
+            "scheduled": 91.59999990463257
+          },
+          {
+            "scheduled": 91.59999990463257
+          },
+          {
+            "scheduled": 91.59999990463257
+          },
+          {
+            "scheduled": 91.59999990463257
+          },
+          {
+            "scheduled": 91.59999990463257
+          },
+          {
+            "scheduled": 91.59999990463257
+          },
+          {
+            "scheduled": 91.59999990463257
+          },
+          {
+            "scheduled": 5489.200000047684,
+            "fired": 10491.200000047684
+          }
+        ],
+        "method": "Open and close the saved review panel state in Chromium"
+      }
+    },
+    {
+      "name": "a held pointer suppresses the reminder until release",
+      "status": "PASS",
+      "detail": {
+        "timers": [
+          {
+            "scheduled": 63.200000047683716
+          },
+          {
+            "scheduled": 73.5
+          },
+          {
+            "scheduled": 73.5
+          },
+          {
+            "scheduled": 73.5
+          },
+          {
+            "scheduled": 73.60000014305115
+          },
+          {
+            "scheduled": 73.60000014305115
+          },
+          {
+            "scheduled": 73.60000014305115
+          },
+          {
+            "scheduled": 73.60000014305115
+          },
+          {
+            "scheduled": 73.60000014305115
+          },
+          {
+            "scheduled": 73.60000014305115
+          },
+          {
+            "scheduled": 73.60000014305115
+          },
+          {
+            "scheduled": 73.60000014305115
+          },
+          {
+            "scheduled": 73.60000014305115
+          },
+          {
+            "scheduled": 73.60000014305115
+          },
+          {
+            "scheduled": 73.60000014305115
+          },
+          {
+            "scheduled": 73.70000004768372
+          },
+          {
+            "scheduled": 73.70000004768372
+          },
+          {
+            "scheduled": 73.70000004768372
+          },
+          {
+            "scheduled": 73.70000004768372
+          },
+          {
+            "scheduled": 73.70000004768372
+          },
+          {
+            "scheduled": 73.70000004768372
+          },
+          {
+            "scheduled": 73.70000004768372
+          },
+          {
+            "scheduled": 73.70000004768372
+          },
+          {
+            "scheduled": 73.70000004768372
+          },
+          {
+            "scheduled": 73.70000004768372
+          },
+          {
+            "scheduled": 6453.5,
+            "fired": 11457.200000047684
+          }
+        ],
+        "method": "Synthetic held pointer with real timers; release starts the idle interval"
+      }
+    },
+    {
+      "name": "selected text pauses the reminder until selection clears",
+      "status": "PASS",
+      "detail": {
+        "selectedText": "",
+        "timers": [
+          {
+            "scheduled": 69.20000004768372
+          },
+          {
+            "scheduled": 80.39999985694885
+          },
+          {
+            "scheduled": 80.5
+          },
+          {
+            "scheduled": 80.5
+          },
+          {
+            "scheduled": 80.5
+          },
+          {
+            "scheduled": 80.5
+          },
+          {
+            "scheduled": 80.5
+          },
+          {
+            "scheduled": 80.5
+          },
+          {
+            "scheduled": 80.5
+          },
+          {
+            "scheduled": 80.59999990463257
+          },
+          {
+            "scheduled": 80.59999990463257
+          },
+          {
+            "scheduled": 80.59999990463257
+          },
+          {
+            "scheduled": 80.59999990463257
+          },
+          {
+            "scheduled": 80.59999990463257
+          },
+          {
+            "scheduled": 80.59999990463257
+          },
+          {
+            "scheduled": 80.70000004768372
+          },
+          {
+            "scheduled": 80.70000004768372
+          },
+          {
+            "scheduled": 80.70000004768372
+          },
+          {
+            "scheduled": 80.70000004768372
+          },
+          {
+            "scheduled": 80.70000004768372
+          },
+          {
+            "scheduled": 80.70000004768372
+          },
+          {
+            "scheduled": 80.70000004768372
+          },
+          {
+            "scheduled": 80.70000004768372
+          },
+          {
+            "scheduled": 80.70000004768372
+          },
+          {
+            "scheduled": 80.70000004768372
+          },
+          {
+            "scheduled": 6466.599999904633,
+            "fired": 11467.799999952316
+          }
+        ],
+        "method": "Browser text selection change with real timers"
+      }
+    },
+    {
+      "name": "window blur clears a lost pointer and focus starts a new interval",
+      "status": "PASS",
+      "detail": {
+        "timers": [
+          {
+            "scheduled": 65.30000019073486
+          },
+          {
+            "scheduled": 77.60000014305115
+          },
+          {
+            "scheduled": 77.60000014305115
+          },
+          {
+            "scheduled": 77.60000014305115
+          },
+          {
+            "scheduled": 77.60000014305115
+          },
+          {
+            "scheduled": 77.70000004768372
+          },
+          {
+            "scheduled": 77.70000004768372
+          },
+          {
+            "scheduled": 77.70000004768372
+          },
+          {
+            "scheduled": 77.70000004768372
+          },
+          {
+            "scheduled": 77.70000004768372
+          },
+          {
+            "scheduled": 77.80000019073486
+          },
+          {
+            "scheduled": 77.80000019073486
+          },
+          {
+            "scheduled": 77.80000019073486
+          },
+          {
+            "scheduled": 77.80000019073486
+          },
+          {
+            "scheduled": 77.80000019073486
+          },
+          {
+            "scheduled": 77.90000009536743
+          },
+          {
+            "scheduled": 77.90000009536743
+          },
+          {
+            "scheduled": 77.90000009536743
+          },
+          {
+            "scheduled": 77.90000009536743
+          },
+          {
+            "scheduled": 77.90000009536743
+          },
+          {
+            "scheduled": 77.90000009536743
+          },
+          {
+            "scheduled": 77.90000009536743
+          },
+          {
+            "scheduled": 77.90000009536743
+          },
+          {
+            "scheduled": 77.90000009536743
+          },
+          {
+            "scheduled": 77.90000009536743
+          },
+          {
+            "scheduled": 6458.100000143051,
+            "fired": 11459.100000143051
+          }
+        ],
+        "method": "Synthetic hasFocus state and blur/focus events, with actual timers"
+      }
+    },
+    {
+      "name": "cue stays suppressed for desktop",
+      "status": "PASS",
+      "detail": {
+        "variant": "desktop",
+        "mode": "flow",
+        "dialogOpen": false,
+        "method": "Browser viewport/media/input/hash state and actual wait"
+      }
+    },
+    {
+      "name": "hidden tab resets the countdown before cue can reappear",
+      "status": "PASS",
+      "detail": {
+        "timers": [
+          {
+            "scheduled": 65.29999995231628
+          },
+          {
+            "scheduled": 75.5
+          },
+          {
+            "scheduled": 75.5
+          },
+          {
+            "scheduled": 75.5
+          },
+          {
+            "scheduled": 75.5
+          },
+          {
+            "scheduled": 75.60000014305115
+          },
+          {
+            "scheduled": 75.70000004768372
+          },
+          {
+            "scheduled": 75.70000004768372
+          },
+          {
+            "scheduled": 75.79999995231628
+          },
+          {
+            "scheduled": 75.79999995231628
+          },
+          {
+            "scheduled": 75.79999995231628
+          },
+          {
+            "scheduled": 75.90000009536743
+          },
+          {
+            "scheduled": 75.90000009536743
+          },
+          {
+            "scheduled": 75.90000009536743
+          },
+          {
+            "scheduled": 75.90000009536743
+          },
+          {
+            "scheduled": 75.90000009536743
+          },
+          {
+            "scheduled": 75.90000009536743
+          },
+          {
+            "scheduled": 75.90000009536743
+          },
+          {
+            "scheduled": 75.90000009536743
+          },
+          {
+            "scheduled": 75.90000009536743
+          },
+          {
+            "scheduled": 75.90000009536743
+          },
+          {
+            "scheduled": 75.90000009536743
+          },
+          {
+            "scheduled": 75.90000009536743
+          },
+          {
+            "scheduled": 75.90000009536743
+          },
+          {
+            "scheduled": 76
+          },
+          {
+            "scheduled": 6105.100000143051,
+            "fired": 11111.600000143051
+          }
+        ],
+        "method": "Synthetic document.hidden accessor and visibilitychange notifications; actual five-second timers. OS tab/background throttling remains unverified."
+      }
+    },
+    {
+      "name": "cue stays suppressed for reading",
+      "status": "PASS",
+      "detail": {
+        "variant": "reading",
+        "mode": "flow",
+        "dialogOpen": false,
+        "method": "Browser viewport/media/input/hash state and actual wait"
+      }
+    },
+    {
+      "name": "cue stays suppressed for reduced",
+      "status": "PASS",
+      "detail": {
+        "variant": "reduced",
+        "mode": "flow",
+        "dialogOpen": false,
+        "method": "Browser viewport/media/input/hash state and actual wait"
+      }
+    },
+    {
+      "name": "cue stays suppressed for dialog",
+      "status": "PASS",
+      "detail": {
+        "variant": "dialog",
+        "mode": "deck",
+        "dialogOpen": true,
+        "method": "Programmatic native dialog.showModal verifies the open-dialog guard independently of input dismissal"
+      }
+    },
+    {
+      "name": "deep link stays suppressed until first card is revisited",
+      "status": "PASS",
+      "detail": {
+        "variant": "later-hash",
+        "mode": "deck",
+        "dialogOpen": false,
+        "method": "Browser viewport/media/input/hash state and actual wait"
+      }
+    },
+    {
+      "name": "no browser or asset errors",
+      "status": "PASS",
+      "detail": {
+        "faults": 0
+      }
+    }
+  ],
+  "faults": [],
+  "notes": [
+    "Chromium browser input and CSS/timer checks only. Native Safari, Firefox, Edge, physical trackpads/touchscreens, and real hidden-tab throttling remain unverified by this suite.",
+    "Existing browser regressions are reported separately in browser-results.json."
+  ]
+}

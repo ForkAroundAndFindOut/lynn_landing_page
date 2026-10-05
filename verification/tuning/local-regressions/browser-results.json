@@ -1,0 +1,254 @@
+{
+  "checkedAt": "2026-10-05T03:26:08.641Z",
+  "baseURL": "http://127.0.0.1:4191",
+  "revision": {
+    "revision": "b14176fdec35e2460d0aa33abcdc64025d4c5a14",
+    "assets": {
+      "index.html": "e683b60ea08034a222b7a32c59f0cbef1b73bb50ed5ee601bbbd46a42ef9de8d",
+      "styles.css": "4ab70bfe03be3c8967a616bd5b88e3e2ca0599f2613a5fe87921dbbdd9d93e6d",
+      "main.js": "a08afcc7e29e40a59f588199b08b93a0274660f51a469b5a9c511315fec9b954",
+      "deck-controller.js": "6bf762930f107db9d469d3cdf8c29c0b59cc3f68f2026b916fff813313084e61",
+      "wheel-input.js": "f1f00cd3303d31026e9cd541c1fa64629b4e9b5176c73651be534b7758d42b28",
+      "swipe-hint.js": "61cff774e54423cffc524f6f784f97097b8fdd48405b57dfcfb1209cd849342f",
+      "motion.js": "7b45e7452335de26064e02d3a6100cbee298aa14aa612a68db3da00a1bc1a81c",
+      "layout.js": "5814d39d405f0f7fa48ac899db04b2f4cf3044f0a6e31f48bb0ed861d6df2c4e",
+      "contact-dialog.js": "65a551b5dd9bb1ecaa99c53f8fd3fa6178df7acfeff1bd69d6a26daf23173232",
+      "demo-settings.js": "123c04de2f91113701f62833e4a809a4a6ef455700d74e6f19a3e69e97946693",
+      "tuning-config.js": "6e00f61451165807c63c108ca494a65d4e8e9d12a27e6ac87c989cc09687fc30",
+      "favicon.svg": "e44e20099cb05df4fe9e8c5f4ed3b380fdedbb2147aff6d0182206969acaaf15"
+    }
+  },
+  "results": [
+    {
+      "name": "cold direct section links preserve destination",
+      "status": "PASS"
+    },
+    {
+      "name": "query settings override valid cookies, invalid inputs fall back, blocked cookies remain usable",
+      "status": "PASS",
+      "detail": {
+        "method": "Blocked cookie accessor emulates browser storage denial"
+      }
+    },
+    {
+      "name": "viewport desktop-1440",
+      "status": "PASS",
+      "detail": {
+        "mode": "flow",
+        "position": null,
+        "focus": ""
+      }
+    },
+    {
+      "name": "viewport desktop-1280",
+      "status": "PASS",
+      "detail": {
+        "mode": "flow",
+        "position": null,
+        "focus": ""
+      }
+    },
+    {
+      "name": "viewport mobile-390",
+      "status": "PASS",
+      "detail": {
+        "mode": "deck",
+        "state": "idle",
+        "position": 0,
+        "active": "top",
+        "focus": ""
+      }
+    },
+    {
+      "name": "viewport mobile-320",
+      "status": "PASS",
+      "detail": {
+        "mode": "flow",
+        "position": null,
+        "focus": ""
+      }
+    },
+    {
+      "name": "viewport landscape-844",
+      "status": "PASS",
+      "detail": {
+        "mode": "flow",
+        "position": null,
+        "focus": ""
+      }
+    },
+    {
+      "name": "viewport breakpoint-899",
+      "status": "PASS",
+      "detail": {
+        "mode": "deck",
+        "state": "idle",
+        "position": 0,
+        "active": "top",
+        "focus": ""
+      }
+    },
+    {
+      "name": "viewport breakpoint-900",
+      "status": "PASS",
+      "detail": {
+        "mode": "flow",
+        "position": null,
+        "focus": ""
+      }
+    },
+    {
+      "name": "desktop comparison and native scrolling",
+      "status": "PASS",
+      "detail": {
+        "order": [
+          "top",
+          "services",
+          "how-it-works",
+          "example",
+          "working-together",
+          "contact"
+        ]
+      }
+    },
+    {
+      "name": "desktop entrances wait until 15 percent inside viewport, delay 80 ms, run 380 ms once without flash",
+      "status": "PASS",
+      "detail": {
+        "observer": [
+          {
+            "rootMargin": "0px 0px -135px 0px",
+            "threshold": 0
+          }
+        ],
+        "entrance": {
+          "delay": 80,
+          "duration": 380,
+          "easing": "ease-out",
+          "fill": "backwards"
+        },
+        "pendingOpacity": "0"
+      }
+    },
+    {
+      "name": "desktop direct links, resize, conventional layout, and reduced motion reveal reachable content",
+      "status": "PASS"
+    },
+    {
+      "name": "desktop reduced motion while dialog is open suppresses late observer animations",
+      "status": "PASS"
+    },
+    {
+      "name": "desktop cards read in conventional flow stay revealed when staggered layout returns",
+      "status": "PASS"
+    },
+    {
+      "name": "desktop card exactly at entrance observer boundary does not remain pending",
+      "status": "PASS",
+      "detail": {
+        "edge": 765,
+        "report": {
+          "id": "example",
+          "ratio": 0,
+          "intersecting": true,
+          "time": 553.6000001430511
+        },
+        "method": "Chromium exact boundary with test-only subpixel compensation for integer scroll offsets"
+      }
+    },
+    {
+      "name": "contact opening during deck settlement freezes position and inside-to-outside release stays open",
+      "status": "PASS",
+      "detail": {
+        "frozenPosition": 0
+      }
+    },
+    {
+      "name": "live OS reduced motion finishes contact opening and closing immediately",
+      "status": "PASS"
+    },
+    {
+      "name": "initial boundaries and keyboard navigation",
+      "status": "PASS"
+    },
+    {
+      "name": "resize settles drag and switches short viewport to flow",
+      "status": "PASS"
+    },
+    {
+      "name": "Read as page and card return preserve section",
+      "status": "PASS"
+    },
+    {
+      "name": "contact direct jump, expansion, title focus, modal keyboard containment",
+      "status": "PASS"
+    },
+    {
+      "name": "validation summary and invalid email preserve values",
+      "status": "PASS"
+    },
+    {
+      "name": "2000+ character message, optional blank organization, review and edit",
+      "status": "PASS",
+      "detail": {
+        "messageCharacters": 2439
+      }
+    },
+    {
+      "name": "close and reopen preserve draft, opener focus, and section",
+      "status": "PASS"
+    },
+    {
+      "name": "overlay viewport resize locks background mode and keeps fields reachable",
+      "status": "PASS",
+      "detail": {
+        "method": "resized browser viewport; real on-screen keyboard unverified"
+      }
+    },
+    {
+      "name": "Finish demo states nothing was sent and makes no submission request",
+      "status": "PASS"
+    },
+    {
+      "name": "reduced motion readable flow and immediate modal",
+      "status": "PASS"
+    },
+    {
+      "name": "enlarged 200 percent text preserves content in flow",
+      "status": "PASS"
+    },
+    {
+      "name": "two-times page-scale zoom keeps document reachable",
+      "status": "PASS",
+      "detail": {
+        "scale": 2,
+        "height": 422,
+        "width": 195,
+        "method": "Chromium CDP page-scale emulation; desktop browser UI zoom unverified"
+      }
+    },
+    {
+      "name": "JavaScript disabled semantic fallback and disabled prototype form",
+      "status": "PASS"
+    },
+    {
+      "name": "WebKit desktop/mobile navigation and form smoke",
+      "status": "UNVERIFIED",
+      "message": "Skipped because local installed WebKit launch created a context but hung creating its first page and exceeded a 25-second process timeout."
+    },
+    {
+      "name": "no browser/asset errors or unexpected contact network",
+      "status": "PASS",
+      "detail": {
+        "requestsObserved": 473,
+        "errors": 0
+      }
+    }
+  ],
+  "faults": [],
+  "notes": [
+    "Chromium 149.0.7827.55; installed browser executable explicitly selected.",
+    "Firefox, native Safari, Android Chrome, and iPhone Safari are unavailable/unverified in this environment. No real-device performance, browser pinch behavior, or on-screen keyboard claim is made."
+  ],
+  "artifacts": "PNG captures; slow-reversible-drag.webm, short-flick.webm, contact-expansion.webm, touch-text-reversal.webm, touch-text-flick.webm when RECORD_DEMOS is enabled"
+}

@@ -21,7 +21,7 @@ body[data-mode=deck] .deck-stage.is-deck-dragging,body[data-mode=deck] .deck-sta
 @media(min-width:900px){body[data-mode=flow][data-desktop=staggered][data-reduced=false] .card[data-entrance=pending]{opacity:0}}
 #reset-review-settings{margin-top:10px;text-decoration:underline;text-underline-offset:3px}
 
-/* Child-branch experiment: reserved instruction space prevents layout shift. */
+/* Approved prototype reminder: reserved instruction space prevents layout shift. */
 .experimental-gesture-hint{height:19px;position:relative;pointer-events:none}
 .swipe-cue{display:inline-flex;align-items:center;gap:7px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity 300ms ease-out}
 .swipe-cue[data-visible=true]{visibility:visible;opacity:.45}
@@ -29,3 +29,33 @@ body[data-mode=deck] .deck-stage.is-deck-dragging,body[data-mode=deck] .deck-sta
 body[data-mode=flow] .swipe-cue{display:none}
 @keyframes swipe-cue-nudge{0%,100%{transform:translateY(2px)}50%{transform:translateY(-2px)}}
 @media(prefers-reduced-motion:reduce){.swipe-cue{transition:none}.swipe-cue svg{animation:none!important}}
+
+/* Review controls keep native scrolling and never become a deck gesture surface. */
+.review-settings{width:340px;max-width:calc(100vw - 32px);right:20px}
+.review-settings[open]{display:flex;flex-direction:column;max-height:calc(100dvh - 28px)}
+.review-settings summary{flex:none}
+.settings-body{min-height:0;max-height:calc(100dvh - 74px);overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;scrollbar-gutter:stable}
+.settings-body .tuning-group{border-top:1px solid var(--border);padding:14px 0 18px;margin-top:16px}
+.settings-body .tuning-group legend{font-size:13px;font-weight:bold;padding-right:8px}
+.settings-body .tuning-field{margin-top:12px}
+.settings-body .tuning-field label{margin-top:0;font-size:12px}
+.tuning-inputs{display:grid;grid-template-columns:minmax(0,1fr) 74px 48px;gap:8px;align-items:center;margin-top:4px}
+.settings-body .tuning-inputs input[type=range]{width:100%;min-width:0;min-height:44px;padding:0;border:0;background:transparent;touch-action:pan-x}
+.settings-body .tuning-inputs input[type=number]{width:100%;min-width:0;min-height:36px;padding:6px 3px 6px 6px;border-radius:6px;font-size:13px}
+.tuning-unit{color:var(--muted);font-size:10px}
+.settings-body .checkbox-label input{width:20px;min-height:24px;padding:0;flex:none}
+.tuning-test-buttons,.tuning-reset-buttons{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+#gate-status{display:block;min-height:20px;margin-top:6px;font:11px monospace;color:var(--muted)}
+.settings-body .tuning-caption{font-size:12px;line-height:1.5;margin-top:4px}
+#reset-review-settings{margin-top:0}
+@media(min-width:900px){
+  body[data-mode=deck] .site-header{max-width:none;width:calc(100% - 360px);margin-left:0}
+  body[data-mode=deck] .deck-stage{width:calc(100% - 360px);margin-left:0;margin-right:360px}
+  body[data-mode=deck] .deck-navigation{width:min(650px,calc(100% - 360px));margin-left:max(0px,calc((100% - 360px - 650px)/2));margin-right:360px}
+  body[data-mode=deck] .review-settings{right:20px;bottom:14px}
+}
+@media(max-width:899px){
+  .review-settings,body[data-mode=deck] .review-settings{bottom:max(8px,env(safe-area-inset-bottom));right:16px;width:min(340px,calc(100vw - 32px))}
+  .review-settings[open]{max-height:45dvh;max-height:45vh}
+  .review-settings[open] .settings-body{max-height:calc(45vh - 44px);max-height:calc(45dvh - 44px)}
+}

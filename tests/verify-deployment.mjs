@@ -25,7 +25,7 @@ const assets = await Promise.all(Object.entries(metadata.assets).map(async ([fil
   assert.equal(deployedHash, sourceHash, `${file} must match committed source`);
   return { file, status: response.status, sha256: deployedHash, matchesManifestAndCommit: true };
 }));
-const expectedAssetCount = process.env.EXPECTED_ASSET_COUNT ? Number(process.env.EXPECTED_ASSET_COUNT) : 11;
+const expectedAssetCount = process.env.EXPECTED_ASSET_COUNT ? Number(process.env.EXPECTED_ASSET_COUNT) : 12;
 assert.equal(assets.length, expectedAssetCount);
 const productionResponse = await fetch(production);
 assert.equal(productionResponse.status, 200);
@@ -38,6 +38,7 @@ const preservedLocalHeads = {
   'theme-2-pallette-1': 'e0b332ca07172745692d3e3060656ab0501acb64',
   'theme-2-pallette-1-heavy': '15c96a3d15e07d7f3505d3b51d1fac729e784fb1',
   'theme-2-pallette-2': 'de9cc08ed6feacc080ed3844bc925ce2aa1e8458',
+  'codex/card-layout-swipe-hint': 'b14176fdec35e2460d0aa33abcdc64025d4c5a14',
 };
 const localHeads = Object.fromEntries(Object.keys(preservedLocalHeads).map(branch => [branch, git('rev-parse', `refs/heads/${branch}`).toString().trim()]));
 assert.deepEqual(localHeads, preservedLocalHeads, 'All original local branches must retain their heads');
@@ -46,7 +47,7 @@ const remoteHeads = Object.fromEntries(git('ls-remote', '--heads', remoteURL).to
   const [revision, ref] = line.trim().split(/\s+/);
   return [ref.replace('refs/heads/', ''), revision];
 }));
-for (const branch of ['main', 'floating-card', 'scrolling-reveal']) assert.equal(remoteHeads[branch], preservedLocalHeads[branch], `Original remote branch ${branch} must remain unchanged`);
+for (const branch of ['main', 'floating-card', 'scrolling-reveal', 'codex/card-layout-swipe-hint']) assert.equal(remoteHeads[branch], preservedLocalHeads[branch], `Preserved remote branch ${branch} must remain unchanged`);
 const originalRoot = path.dirname(path.resolve(root, git('rev-parse', '--git-common-dir').toString().trim()));
 const originalBranch = git('-c', `safe.directory=${originalRoot.replaceAll('\\', '/')}`, '-C', originalRoot, 'branch', '--show-current').toString().trim();
 assert.equal(originalBranch, 'main', 'Original checkout must remain on main');

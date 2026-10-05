@@ -1,86 +1,50 @@
-# Stacked card layout proof of concept
+# Stacked-card prototype
 
-## Experimental delayed swipe cue
+The card prototype parent is `codex/card-layout`; production remains `main`. The approved five-second swipe reminder is now part of the prototype. `codex/card-layout-swipe-hint` is retained as its original review baseline. New controls are developed on `codex/card-layout-tuning` and promoted after hosted verification.
 
-This child branch, `codex/card-layout-swipe-hint`, incorporates verified slower-touch parent `codex/card-layout` at `5192f3bcb6317384e8579b9e03aa829ad8ddcb0f`. It includes the same reduced touch sensitivity and fixed 600/900/1300ms card durations. The experiment is not integrated into the parent preview.
+[Prototype preview](https://codex-card-layout-lynn-landing-page.nrct6ycww6.workers.dev/) · [Tuning preview](https://codex-card-layout-tuning-lynn-landing-page.nrct6ycww6.workers.dev/) · [Verification](verification/TUNING.md)
 
-After five foreground seconds without interaction on the first card, a faint upward arrow and “Swipe up · scroll down” appear near the bottom navigation. The arrow nudges twice, then rests. Input hides the cue and restarts the countdown; it no longer disables the reminder for the whole visit. Held pointers, selected text, the expanded POC review panel, dialogs, background tabs, and unfocused windows pause it. Returning to the first card, closing the panel, or returning to the tab starts a fresh interval. Reading/desktop/reduced-motion modes suppress the cue. The existing arrows and screen-reader instructions remain available. The cue is decorative, cannot receive input or focus, and saves no state.
+This isolated exploration retains approved content, Georgia typography, semantic colors, reading order, and privacy rules. Contact completion is simulated: **Nothing was sent.** Drafts stay in memory only. The preview is noindex and is not a production launch.
 
-Experimental preview: https://codex-card-layout-swipe-hint-lynn-landing-page.nrct6ycww6.workers.dev/. Input-support parent: https://codex-card-layout-lynn-landing-page.nrct6ycww6.workers.dev/. To review the experiment, open its URL in card mode, close POC review, leave the first card idle for five seconds, then swipe or scroll. Return to the first card to repeat; refresh is no longer required.
+## Review the movement
 
-An isolated exploration for Lynn Renezeder’s static Fractional HR Consulting site. The parent branch is `codex/card-layout`, based on `main` at `0b10b41b59e717da2cc6f83f9e950250541eac3d`. Existing branches and production are retained. Future card-layout experiments can branch from this parent.
+Open **POC review / movement lab** on mobile or desktop. All tuning groups appear in the expanded panel; scroll the panel to reach them. Numeric inputs accompany sliders. Values are remembered for 30 days on this hostname. Refresh starts at the first card while retaining preferences. No configuration-sharing URL is created.
 
-**[Open the Cloudflare preview](https://codex-card-layout-lynn-landing-page.nrct6ycww6.workers.dev)** · [GitHub branch](https://github.com/ForkAroundAndFindOut/lynn_landing_page/tree/codex/card-layout) · [Verification log](verification/VERIFICATION.md)
+Choose **Card view** to try swiping on a wide desktop. **Automatic** uses cards on eligible narrow screens and native reading on wide screens. **Reading view** uses normal document scrolling. Reduced motion, short screens, and content too large to fit retain a readable flow. Explicit wide Card view reserves a sidebar for the panel.
 
-[STACKED_CARD_SPEC.md](STACKED_CARD_SPEC.md) is the supplied implementation brief. The existing [IMPLEMENTATION_SPEC.md](IMPLEMENTATION_SPEC.md) remains as historical site context; this POC brief supersedes its layout and form design for this branch only. Existing Georgia typography, semantic navy/gold/pink tokens, core service language, privacy rules, and static build workflow are retained. The example engagement is explicitly illustrative and no client claims or personal contact information have been added.
+An upward finger swipe or downward trackpad/wheel burst requests one next card; reverse input requests the previous card. Mouse dragging and arrows also work. Movement below the threshold leaves cards in place, and recognition starts a configured animation. Finger velocity and scroll deltas do not set animation pace. A long stationary touch yields to native selection; ordinary text can start a swipe. Controls, editable fields, horizontal intent, and browser zoom retain native behavior.
 
-Desktop layout, form fields, dimensions, and motion presets are exploratory defaults, not final design approval. The form validates and reviews values in memory; finishing says **Demo complete. Nothing was sent.** Contact values are never stored or transmitted. Only POC review preferences are saved in a cookie.
+The **next-request gate**, in 0.05-second increments, is independent of animation completion. Adjacent touch, wheel, keyboard, and button requests share it. Requests during the gate are discarded. After it opens, a new request can retarget an animation smoothly; duration scales with the remaining card distance. One held contact or wheel burst makes only one attempt, even if rejected. Wheel quiet time defines the boundary between bursts.
 
-## Run locally
+Tuning covers duration, detection distance, gate, wheel threshold/quiet time, direction discrimination, selection hold delay, flick recognition, acceleration/deceleration, magnetic pull/onset, optional landing bounce, rotation, curvature, layer depth/scale, arrival scale, opacity ramp, and shadow. Motion parameters are captured per accepted request; editing them does not cancel a running animation. Gate changes apply immediately relative to the last acceptance. Bounce defaults to zero. These are design-review defaults.
 
-No package installation is needed for the website, build, or unit tests. Use the existing Node.js and Python installations:
+Crisp / Balanced / Gentle set duration to 0.60 / 0.90 / 1.30 seconds and adjust acceleration, deceleration, and magnetic pull. They preserve detection and geometry settings. **Reset tuning** restores movement defaults while retaining view and review preferences; **Reset review settings** clears saved review preferences and URL overrides. OS reduced motion always takes precedence.
+
+The reminder appears after five idle foreground seconds on the first card, nudges twice, then rests. Interaction hides it and restarts the timer. An open panel/dialog, held pointer, selection, hidden tab, or reduced-motion/reading mode suppresses it. Close the panel and return to the first card to review it.
+
+## Run and verify
+
+No new runtime packages or Python environments are required:
 
 ```powershell
 node --test tests/*.test.mjs
 node build.mjs
-python -m http.server 4188 --bind 127.0.0.1 --directory dist
+python -m http.server 4191 --bind 127.0.0.1 --directory dist
 ```
 
-Open [the local preview](http://127.0.0.1:4188). `npm test` and `npm run build` are equivalent conveniences. The build copies public assets only; documentation, tests, verification evidence, and Git metadata are excluded. `dist/revision.json` reports the source commit and SHA-256 hashes of all website assets.
-
-Card mode supports touch swipes, trackpad scrolling, and mouse wheels. Swipe a finger upward or scroll downward to advance; reverse to go back. A deliberate wheel or trackpad burst requests one adjacent card, animated at the selected preset's fixed speed. Raw scroll speed does not drive card position, and momentum tails cannot queue further cards. Touch drags remain continuously reversible. Wide desktop and reading layouts use ordinary page scrolling. Browser checks emulate input delivery; physical Mac/PC trackpads and touchscreens still need device QA.
-
-## Review route
-
-1. At approximately 390 × 844, swipe upward on ordinary **text or open space** for the next card, downward for the previous card, or use the arrows. Move slowly, reverse before release, then try a quick flick. Check left, right, and bottom arrivals and reverse departures. Card mode prioritizes swiping: early selection initiation is suppressed during the first 350ms of an eligible pending touch, and selection is suppressed during acquired dragging. A stationary hold yields to native text selection. The cutoff is application tuning and needs physical-device confirmation; links, controls, mouse selection, and reading/form views retain native behavior. Two fingers yield to pinch zoom. Text remains semantic HTML.
-2. Compare Balanced, Crisp, and Gentle in **POC review**. Crisp settles over 600ms, Balanced over 900ms, and Gentle over 1300ms. Direct touch now needs at least twice the finger travel for the same card progress, with Gentle the least sensitive. Finger tracking and reversal stay immediate; flicks still select one neighbor. Settings and panel open state are remembered for 30 days in this browser on this preview hostname; refreshing starts at the first card/page top. Use **Reset review settings** to clear saved preferences. Optional gesture-state output is off by default. Fresh section links still open their destination.
-3. Try **Read as page**, then **Use card view**. Short screens, enlarged content that cannot fit, and reduced motion use native document flow. A narrow screen alone does not force clipped cards.
-4. On desktop, compare Staggered cards and Read as document. Staggered entrances trigger 15% of viewport height above the bottom, wait 80ms, then fade over 380ms. Already read cards remain visible. DOM reading order stays the same; the wheel remains native.
-5. **Get in touch** in the header jumps to the contact card. Its separate button expands the form. Open it, submit empty details to see errors, then enter test values and a long message. Review, edit, finish, close, and reopen to check draft retention.
-6. Use keyboard arrows/Home/End while focus is in the deck or its controls; Tab through the modal and Escape to close. Try reduced motion, no JavaScript, text enlargement, and orientation changes.
-
-Demo URL options can be combined:
-
-| Query | Behavior |
-| --- | --- |
-| `?preset=balanced` / `?preset=crisp` / `?preset=gentle` | Override the saved settlement preset |
-| `?desktop=conventional` / `?desktop=staggered` | Override the saved desktop comparison |
-| `?motion=reduce` / `?motion=normal` | Override review reduction; OS reduction always wins |
-| `?view=page` | Start in native reading mode |
-| `?debug=1` / `?debug=0` | Override optional gesture state inside the review panel |
-| `#services`, `#how-it-works`, `#example`, `#working-together`, `#contact` | Fresh links select the same section in every layout; reload restarts at top |
-
-Valid URL settings override saved preferences on entry; invalid values are ignored. Changing review controls saves the new choices and removes review URL overrides while retaining unrelated parameters. Cookies are host-only (`lynn_review_settings`, schema version 1, SameSite=Lax, Secure on HTTPS); local and Cloudflare preferences are separate. Cookie failures leave settings usable with a short notice. No contact draft or section history is saved.
-
-## Cloudflare branch preview
-
-This repository uses an asset-only Worker named `lynn-landing-page`, with version URLs enabled in `wrangler.jsonc`. `main` is production. **Use version upload for this test branch; do not run `wrangler deploy`, promote a version, or change production routing.**
-
-The existing Workers Builds commands are:
-
-```text
-Build command: None
-Production deploy command (existing main only): node build.mjs && npx wrangler deploy
-Non-production version command: node build.mjs && npx wrangler versions upload
-```
-
-Allow `codex/card-layout` in non-production branch builds alongside any existing allowed branches. A push to this new branch can then create a version preview. Do not remove existing branches or migrate the existing Worker’s preview system as part of this POC.
-
-With authenticated Wrangler, an explicit version upload can create the review alias without touching production:
+Public assets exclude documentation, tests, evidence, and Git metadata. `dist/revision.json` records the source commit and hashes of twelve assets. Browser tooling uses the workstation's existing Playwright/Chromium; set `PW_MODULE` and `CHROMIUM_PATH` for other installations.
 
 ```powershell
-node build.mjs
-npx wrangler versions upload --preview-alias codex-card-layout --message 'Stacked card layout proof of concept'
+node tests/tuning-checks.mjs
+node tests/hint-checks.mjs
 ```
 
-Record the actual returned URL and deployed revision in [verification/VERIFICATION.md](verification/VERIFICATION.md), then compare `/revision.json` and run hosted browser checks. A guessed alias is not deployment evidence.
+`BASE_URL` and `EVIDENCE_DIR` select the preview and report directory. Historical continuous-drag tests in `tests/browser-checks.mjs` describe the earlier interaction; its unaffected reading, layout, and contact checks remain useful with `CHECK_FILTER`. Current command acceptance is in the tuning suite. Native Firefox, Safari, Edge, physical trackpads, and mobile keyboards are recorded separately from Chromium emulation.
 
-## Verification
+## Preview deployment
 
-Focused tests check deterministic paths, scale-compensated stack depth, reverse continuity, release projection, bounds, queued navigation, touch arbitration and interruption cleanup, cookie schema, URL precedence, and persistence failure handling. Browser coverage and unavailable devices are recorded in [verification/VERIFICATION.md](verification/VERIFICATION.md). Browser automation is development tooling only and is not bundled into the site.
+The existing non-production Workers Builds workflow runs `node build.mjs && npx wrangler versions upload`. Production `main` retains its existing workflow. Do not deploy or promote a Worker version to production as part of this prototype.
 
-Short recordings: [text-start reversible dragging](verification/hosted/touch-text-reversal.webm), [text-start flick](verification/hosted/touch-text-flick.webm), [contact expansion](verification/hosted/contact-expansion.webm).
+After upload, `node tests/verify-deployment.mjs <commit>` compares every preview asset with the commit and manifest, production HTML with its captured baseline, and preserved local/remote branch heads. The owner's Cloudflare-only device QA is separate from local and hosted automation.
 
-To rerun browser checks with an installed Playwright module and browsers, set `PW_MODULE` (module path) and `PW_BROWSERS` (browser installation directory), then run `node tests/browser-checks.mjs`. The defaults target the existing Codex-bundled installation on this workstation. `BASE_URL` selects local or hosted testing and `EVIDENCE_DIR` selects the output folder. See the script for engine paths and bounded WebKit coverage. `node tests/verify-deployment.mjs <commit>` separately verifies every hosted asset against the commit and build manifest, and compares production to its captured baseline.
-
-Physical iPhone Safari and Android touch/keyboard behavior require device review. Emulated pointers and screenshots do not establish native touch quality or performance. This is a non-delivering, noindex preview, not a production launch.
+[STACKED_CARD_SPEC.md](STACKED_CARD_SPEC.md) contains the supplied brief and current amendment. [IMPLEMENTATION_SPEC.md](IMPLEMENTATION_SPEC.md) is historical site context.

@@ -1,404 +1,270 @@
-import { MOTION, clamp, easeOut, evaluateStack, positionFromTravel, presetFor, releaseTarget, releaseVelocity, travelDistance } from './motion.js';
-import { WHEEL, normalizeWheel, wheelTarget } from './wheel-input.js';
+import { MOTION, clamp, easeOut, evaluateStack, presetFor, releaseVelocity, smoothstep, velocityCurve, bounceOffset } from './motion.js';
+import { normalizeWheel } from './wheel-input.js';
+import { DEFAULT_TUNING } from './tuning-config.js';
 
 const INTERACTIVE_START = 'a, button, input, textarea, select, option, label, summary, [contenteditable], [data-no-drag], [role="button"], [role="link"], [role="checkbox"], [role="combobox"], [role="listbox"], [role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"], [role="option"], [role="radio"], [role="slider"], [role="spinbutton"], [role="switch"], [role="tab"], [role="textbox"], [role="treeitem"]';
 const MOUSE_EXCLUDED_START = `${INTERACTIVE_START}, p, h1, h2, h3, h4, h5, h6, li, span, strong, em, small, blockquote, code, pre, dt, dd`;
-// Links and ordinary buttons accept wheel navigation just as on a native page.
-// Form controls and scrolling widgets retain their own wheel behavior.
 const WHEEL_EXCLUDED = 'input, textarea, select, option, [contenteditable], [data-no-drag], [data-no-wheel], [role="combobox"], [role="listbox"], [role="slider"], [role="spinbutton"], [role="textbox"], [role="tree"]';
-const TOUCH_HOLD_DELAY = 350;
 const OWNED_STYLES = ['transform', 'opacity', 'visibility', 'z-index', 'will-change', '--card-shadow-strength'];
+const POSE_PROPERTIES = ['x', 'y', 'angle', 'scale', 'opacity', 'shadow'];
 
-export function createDeck({ stage, cards, onChange = () => {}, isBlocked = () => false, getPreset = () => 'balanced', isReduced = () => false }) {
-  let enabled = false;
-  let index = 0;
-  let announcedIndex = 0;
-  let position = 0;
-  let state = 'idle';
-  let gesture = null;
-  let animation = null;
-  let pending = null;
-  let frame = 0;
-  let width = 320;
-  let height = 540;
-  let cardHeight = 0;
-  let fade = 1;
-  let holdTimer = 0;
-  let multiTouch = false;
-  let wheel = null;
-  let wheelTimer = 0;
-  const touchContacts = new Set();
-  const ids = cards.map((card) => card.id);
+export function createDeck({ stage, cards, onChange = () => {}, onRequest = () => {}, isBlocked = () => false, getPreset = () => 'balanced', getTuning, isReduced = () => false }) {
+  let enabled = false, index = 0, requestedIndex = 0, announcedIndex = 0, position = 0;
+  let state = 'idle', gesture = null, animation = null, frame = 0, holdTimer = 0;
+  let width = 320, height = 540, cardHeight = 0, fade = 1;
+  let wheel = null, wheelTimer = 0, multiTouch = false;
+  let lastAcceptedAt = -Infinity, lastRejection = null;
+  const touchContacts = new Set(), ids = cards.map(card => card.id);
+  const readTuning = () => {
+    const preset = presetFor(getPreset());
+    return { ...DEFAULT_TUNING, ...(!getTuning ? { duration: preset.duration / 1000, rotation: preset.rotation, curvature: preset.curvature } : {}), ...(getTuning?.() || {}) };
+  };
+  let poseTuning = readTuning();
+  const clock = () => performance.now();
+  const gateRemaining = () => Math.max(0, readTuning().gate * 1000 - (clock() - lastAcceptedAt));
+  function rejection(reason) { lastRejection = reason; stage.dataset.deckRejection = reason || ''; }
 
   function syncSemantics() {
-    // Never make the currently focused element inert before moving its focus.
     const focused = document.activeElement;
-    if (cards.some((card, cardIndex) => cardIndex !== index && card.contains(focused))) stage.focus({ preventScroll: true });
+    if (cards.some((card, cardIndex) => (state !== 'idle' || cardIndex !== index) && card.contains(focused))) stage.focus({ preventScroll: true });
     cards.forEach((card, cardIndex) => {
-      const active = cardIndex === index;
+      const active = state === 'idle' && cardIndex === index;
       card.inert = !active;
-      if (active) card.removeAttribute('aria-hidden');
-      else card.setAttribute('aria-hidden', 'true');
+      if (active) card.removeAttribute('aria-hidden'); else card.setAttribute('aria-hidden', 'true');
       card.toggleAttribute('data-active', active);
     });
   }
-
-  function render() {
+  function basePoses() {
+    return new Map(evaluateStack({ position, count: cards.length, width, height, cardHeight, ids, tuning: poseTuning }).map(pose => [pose.index, pose]));
+  }
+  function currentPoses(now = clock()) {
+    const poses = basePoses();
+    if (!animation || animation.jump) return poses;
+    const s = clamp((now - animation.started) / animation.duration, 0, 1);
+    const offset = animation.recovery ? 0 : bounceOffset(s, poseTuning.bounceAmplitude, poseTuning.bounceCycles), targetPose = poses.get(animation.target);
+    if (targetPose && offset) {
+      // Forward travel approaches on the stored arrival path; reverse travel
+      // approaches through the resting layer's scale/offset path.
+      const args = { count: cards.length, width, height, cardHeight, ids, tuning: poseTuning };
+      const end = evaluateStack({ ...args, position: animation.target }).find(pose => pose.index === animation.target);
+      const before = evaluateStack({ ...args, position: animation.target - Math.sign(animation.target - animation.from) * 0.001 }).find(pose => pose.index === animation.target);
+      const dx = end.x - before.x, dy = end.y - before.y, length = Math.hypot(dx, dy) || 1;
+      targetPose.x += offset * dx / length; targetPose.y += offset * dy / length;
+    }
+    const blend = 1 - smoothstep((now - animation.started) / animation.residualDuration);
+    if (blend > 0 && animation.residual) for (const [cardIndex, correction] of animation.residual) {
+      const pose = poses.get(cardIndex) || { ...correction.base, opacity: 0 };
+      for (const property of POSE_PROPERTIES) pose[property] += correction[property] * blend;
+      poses.set(cardIndex, pose);
+    }
+    return poses;
+  }
+  function render(now = clock()) {
     if (!enabled) return;
-    const poses = new Map(evaluateStack({ position, count: cards.length, width, height, cardHeight, ids, preset: getPreset() }).map((pose) => [pose.index, pose]));
+    const poses = currentPoses(now);
     cards.forEach((card, cardIndex) => {
       const pose = poses.get(cardIndex);
-      if (!pose || pose.opacity <= 0) {
-        card.style.visibility = 'hidden';
-        card.style.opacity = '0';
-        card.style.removeProperty('will-change');
-        return;
-      }
+      if (!pose || pose.opacity <= 0) { card.style.visibility = 'hidden'; card.style.opacity = '0'; card.style.removeProperty('will-change'); return; }
       card.style.visibility = 'visible';
       card.style.transform = `translate3d(calc(-50% + ${pose.x}px), calc(-50% + ${pose.y}px), 0) rotate(${pose.angle}deg) scale(${pose.scale})`;
-      card.style.opacity = String(pose.opacity * fade);
-      card.style.zIndex = String(pose.zIndex);
+      card.style.opacity = String(clamp(pose.opacity * fade, 0, 1)); card.style.zIndex = String(pose.zIndex);
       card.style.setProperty('--card-shadow-strength', pose.shadow);
-      if (state !== 'idle') card.style.willChange = 'transform, opacity';
-      else card.style.removeProperty('will-change');
+      if (state !== 'idle') card.style.willChange = 'transform, opacity'; else card.style.removeProperty('will-change');
     });
-    stage.dataset.deckState = state;
-    stage.dataset.deckPosition = position.toFixed(3);
+    stage.dataset.deckState = state; stage.dataset.deckPosition = position.toFixed(3);
   }
-
-  function cancelFrame() {
-    if (frame) cancelAnimationFrame(frame);
-    frame = 0;
-  }
-
-  function queueRender() {
-    if (!frame) frame = requestAnimationFrame(() => { frame = 0; render(); });
-  }
-
+  function cancelFrame() { if (frame) cancelAnimationFrame(frame); frame = 0; }
   function releaseCapture() {
-    const pointerId = gesture?.pointerId;
-    gesture = null;
-    if (holdTimer) clearTimeout(holdTimer);
-    holdTimer = 0;
+    const pointerId = gesture?.pointerId; gesture = null;
+    if (holdTimer) clearTimeout(holdTimer); holdTimer = 0;
     stage.classList?.remove('is-deck-dragging');
     if (pointerId !== undefined && stage.hasPointerCapture(pointerId)) stage.releasePointerCapture(pointerId);
   }
-
+  function resetWheel() { if (wheelTimer) clearTimeout(wheelTimer); wheelTimer = 0; wheel = null; }
   function finish(target, options = {}, notify = true) {
-    cancelFrame();
-    animation = null;
-    state = 'idle';
-    if (wheel?.phase === 'settling' && !wheelTimer) wheel = null;
-    position = index = clamp(target, 0, cards.length - 1);
-    fade = 1;
+    cancelFrame(); animation = null; state = 'idle';
+    position = index = requestedIndex = clamp(target, 0, cards.length - 1); fade = 1;
     if (enabled) { syncSemantics(); render(); }
-    if (notify) {
-      announcedIndex = index;
-      onChange(index, { focus: Boolean(options.focus), contact: Boolean(options.contact) });
-    }
+    if (notify) { announcedIndex = index; onChange(index, { focus: Boolean(options.focus), contact: Boolean(options.contact) }); }
   }
-
-  function processPending() {
-    const request = pending;
-    pending = null;
-    if (request && enabled && !isBlocked()) navigate(request.delta, request.options);
+  function sampleAnimation(now) {
+    if (!animation) return;
+    const s = clamp((now - animation.started) / animation.duration, 0, 1);
+    if (animation.jump) {
+      if (s >= 0.5) index = position = animation.target;
+      fade = s < 0.5 ? 1 - easeOut(s * 2) : easeOut((s - 0.5) * 2);
+    } else position = animation.from + (animation.target - animation.from) * animation.curve(s);
   }
-
-  function animateTo(target, options) {
-    cancelFrame();
-    if (isReduced() || Math.abs(position - target) < 0.00001) {
-      finish(target, options);
-      processPending();
-      return;
+  function startTimeline(target, options, configuration, now, previousPoses) {
+    cancelFrame(); poseTuning = { ...configuration }; fade = 1;
+    const travelDuration = configuration.duration * 1000 * Math.abs(target - position);
+    if (isReduced()) { finish(target, options); return; }
+    const bases = basePoses(), residual = new Map();
+    if (previousPoses) for (const cardIndex of new Set([...bases.keys(), ...previousPoses.keys()])) {
+      const old = previousPoses.get(cardIndex), base = bases.get(cardIndex), reference = base || { ...old, opacity: 0 };
+      const correction = { base: reference };
+      for (const property of POSE_PROPERTIES) correction[property] = (old?.[property] ?? (property === 'opacity' ? 0 : reference[property])) - reference[property];
+      residual.set(cardIndex, correction);
     }
+    // A reversal before a jump's midpoint can already be at its destination,
+    // while the painted card is partially faded. Recover only the residual
+    // pose; ordinary travel keeps its exact per-card duration.
+    const recovery = travelDuration <= 0.00001 && [...residual.values()].some(correction => POSE_PROPERTIES.some(property => Math.abs(correction[property]) > 1e-10));
+    if (travelDuration <= 0.00001 && !recovery) { finish(target, options); return; }
+    const duration = recovery ? 100 : travelDuration;
     state = 'settling';
-    const startPosition = position;
-    const duration = presetFor(getPreset()).duration;
-    const motion = { target, options, started: null };
-    animation = motion;
-    function tick(now) {
+    const motion = { target, options, from: position, started: now, duration, recovery, curve: velocityCurve(configuration), residual, residualDuration: recovery ? duration : Math.min(100, duration / 4) };
+    animation = motion; syncSemantics(); render(now);
+    function tick(timestamp) {
       frame = 0;
       if (animation !== motion) return;
-      if (isBlocked()) { settle(); return; }
-      if (motion.started === null) motion.started = now;
-      const progress = clamp((now - motion.started) / duration, 0, 1);
-      position = startPosition + (target - startPosition) * easeOut(progress);
-      render();
-      if (progress < 1) frame = requestAnimationFrame(tick);
-      else { finish(target, options); processPending(); }
+      if (isBlocked() || document.hidden) { settle(); return; }
+      sampleAnimation(timestamp); render(timestamp);
+      if (timestamp - motion.started < duration) frame = requestAnimationFrame(tick); else finish(target, options);
     }
-    render();
     frame = requestAnimationFrame(tick);
   }
-
   function settle() {
-    const target = releaseTarget({ position, origin: index, distance: 1, count: cards.length, passedDeadZone: false });
-    pending = null;
-    resetWheel();
-    releaseCapture();
-    finish(target, {}, target !== announcedIndex);
-    return index;
+    sampleAnimation(clock());
+    const target = clamp(Math.round(position), 0, cards.length - 1);
+    resetWheel(); releaseCapture(); touchContacts.clear(); multiTouch = false;
+    lastAcceptedAt = -Infinity; rejection(null); finish(target, {}, target !== announcedIndex); return index;
   }
-
   function measure() {
-    if (state !== 'idle' || gesture || wheel) settle();
+    if (animation || gesture || wheel) settle();
     height = stage.clientHeight || stage.getBoundingClientRect().height || height;
-    width = cards[index]?.offsetWidth || width;
-    cardHeight = cards[index]?.offsetHeight || 0;
-    render();
+    width = cards[index]?.offsetWidth || width; cardHeight = cards[index]?.offsetHeight || 0; render();
   }
-
   function setEnabled(value) {
     const next = Boolean(value);
     if (next === enabled) { if (next) measure(); return; }
-    settle();
-    enabled = next;
-    if (enabled) {
-      stage.addEventListener('wheel', onWheel, { passive: false });
-      measure();
-      syncSemantics();
-      render();
-    } else {
+    settle(); enabled = next;
+    if (enabled) { stage.addEventListener('wheel', onWheel, { passive: false }); measure(); syncSemantics(); render(); }
+    else {
       stage.removeEventListener?.('wheel', onWheel);
-      cards.forEach((card) => {
-        for (const property of OWNED_STYLES) card.style.removeProperty(property);
-        card.inert = false;
-        card.removeAttribute('aria-hidden');
-        card.removeAttribute('data-active');
-      });
-      delete stage.dataset.deckState;
-      delete stage.dataset.deckPosition;
+      cards.forEach(card => { for (const property of OWNED_STYLES) card.style.removeProperty(property); card.inert = false; card.removeAttribute('aria-hidden'); card.removeAttribute('data-active'); });
+      delete stage.dataset.deckState; delete stage.dataset.deckPosition; delete stage.dataset.deckRejection;
     }
   }
-
-  function navigate(delta, { focus = true } = {}) {
-    if (!enabled || isBlocked() || !delta) return;
-    if (wheel) settle();
-    const direction = Math.sign(delta);
-    if (state === 'settling') { pending = { delta: direction, options: { focus } }; return; }
-    if (state === 'dragging') return;
-    releaseCapture();
-    const target = clamp(index + direction, 0, cards.length - 1);
-    if (target !== index) animateTo(target, { focus });
+  function navigate(delta, { focus = true, source = 'control' } = {}) {
+    if (!enabled || isBlocked() || document.hidden || !delta) { rejection('blocked'); return false; }
+    const configuration = readTuning(), now = clock(), target = clamp(requestedIndex + Math.sign(delta), 0, cards.length - 1);
+    if (target === requestedIndex) { rejection('endpoint'); return false; }
+    if (now - lastAcceptedAt < configuration.gate * 1000) { rejection('gate'); return false; }
+    sampleAnimation(now); const previousPoses = currentPoses(now);
+    // A direct jump may be interrupted during either half of its fade. Preserve
+    // the painted opacity, including that fade, before the new timeline resets it.
+    if (fade !== 1) for (const pose of previousPoses.values()) pose.opacity *= fade;
+    if (source !== 'gesture') releaseCapture();
+    requestedIndex = target; lastAcceptedAt = now; rejection(null); onRequest(target);
+    startTimeline(target, { focus }, configuration, now, previousPoses); return true;
   }
-
   function jump(destination, { focus = true, contact = false } = {}) {
-    if (isBlocked()) return;
+    if (isBlocked()) return false;
     const target = clamp(Math.round(destination), 0, cards.length - 1);
-    settle();
+    settle(); poseTuning = readTuning(); requestedIndex = target; onRequest(target);
     const options = { focus, contact };
-    if (!enabled || isReduced() || target === index) { finish(target, options); return; }
-    state = 'settling';
-    const motion = { target, options, started: null, switched: false };
-    animation = motion;
-    function tick(now) {
+    if (!enabled || isReduced() || target === index) { finish(target, options); return true; }
+    state = 'settling'; syncSemantics();
+    const motion = { jump: true, target, options, started: clock(), duration: MOTION.jumpDuration };
+    animation = motion; render();
+    function tick(timestamp) {
       frame = 0;
       if (animation !== motion) return;
-      if (isBlocked()) { settle(); return; }
-      if (motion.started === null) motion.started = now;
-      const progress = clamp((now - motion.started) / MOTION.jumpDuration, 0, 1);
-      if (progress >= 0.5 && !motion.switched) {
-        motion.switched = true;
-        index = position = target;
-        syncSemantics();
-      }
-      fade = progress < 0.5 ? 1 - easeOut(progress * 2) : easeOut((progress - 0.5) * 2);
-      render();
-      if (progress < 1) frame = requestAnimationFrame(tick);
-      else { finish(target, options); processPending(); }
+      if (isBlocked() || document.hidden) { settle(); return; }
+      sampleAnimation(timestamp); render(timestamp);
+      if (timestamp - motion.started < motion.duration) frame = requestAnimationFrame(tick); else finish(target, options);
     }
-    frame = requestAnimationFrame(tick);
+    frame = requestAnimationFrame(tick); return true;
   }
-
-  function sample(event) {
-    gesture.samples.push({ time: event.timeStamp, position: gesture.startY - event.clientY });
-    // Keep one sample before the window for interpolation at its boundary.
-    while (gesture.samples.length > 2 && gesture.samples[1].time < event.timeStamp - MOTION.velocityWindow) gesture.samples.shift();
-  }
-
-  function hasSelection() {
-    const selection = window.getSelection();
-    return selection && !selection.isCollapsed;
-  }
-
-  function resetWheel() {
-    if (wheelTimer) clearTimeout(wheelTimer);
-    wheelTimer = 0;
-    wheel = null;
-  }
-
-  function cancelWheel() { if (wheel) settle(); }
-
+  function hasSelection() { const selection = window.getSelection(); return selection && !selection.isCollapsed; }
   function nestedScroller(target) {
     for (let node = target; node && node !== stage; node = node.parentElement) {
       if (node.scrollHeight > node.clientHeight && /^(auto|scroll|overlay)$/.test(window.getComputedStyle(node).overflowY)) return true;
     }
     return false;
   }
-
   function wheelQuiet() {
     if (wheelTimer) clearTimeout(wheelTimer);
-    wheelTimer = setTimeout(() => {
-      wheelTimer = 0;
-      if (!wheel) return;
-      if (!enabled || isBlocked() || document.hidden) { settle(); return; }
-      if (wheel.phase === 'tracking' || state === 'idle') wheel = null;
-    }, WHEEL.quiet);
+    wheelTimer = setTimeout(() => { wheelTimer = 0; wheel = null; }, readTuning().wheelQuiet * 1000);
   }
-
   function onWheel(event) {
-    if (!enabled || isBlocked() || document.hidden) { cancelWheel(); return; }
-    const delta = normalizeWheel(event, height);
-    if (!delta || !delta.y || Math.abs(delta.y) < Math.abs(delta.x) * MOTION.verticalRatio || event.ctrlKey || event.metaKey || event.shiftKey || hasSelection() || event.target.closest(WHEEL_EXCLUDED) || nestedScroller(event.target)) {
-      // A native horizontal/zoom/control fragment cannot unlock a committed
-      // burst or alter its animation. Only uncommitted intent is discarded.
-      if (wheel?.phase === 'settling') wheelQuiet();
-      else resetWheel();
-      return;
+    if (!enabled || isBlocked() || document.hidden) { if (wheel || animation) settle(); return; }
+    const configuration = readTuning(), delta = normalizeWheel(event, height);
+    if (!delta || !delta.y || Math.abs(delta.y) < Math.abs(delta.x) * configuration.verticalRatio || event.ctrlKey || event.metaKey || event.shiftKey || hasSelection() || event.target.closest(WHEEL_EXCLUDED) || nestedScroller(event.target)) {
+      if (wheel?.consumed) wheelQuiet(); else resetWheel(); return;
     }
-    if (gesture || multiTouch || state === 'dragging') return;
+    if (gesture || multiTouch) return;
     const targetCard = event.target.closest('.card');
-    if (targetCard && targetCard !== cards[index]) return;
-    event.preventDefault();
-    // Never call navigate here: its keyboard queue would replay inertial tails.
-    // Keep a consumed burst locked until both settlement and quiet have passed.
-    if (state === 'settling' || wheel?.phase === 'settling') {
-      wheel ||= { phase: 'settling' };
-      wheelQuiet();
-      return;
-    }
-    wheel ||= { intent: 0, phase: 'tracking' };
+    if (state === 'idle' && targetCard && targetCard !== cards[index]) return;
+    event.preventDefault(); wheel ||= { intent: 0, consumed: false }; wheelQuiet();
+    if (wheel.consumed) return;
     wheel.intent += delta.y;
-    wheelQuiet();
-    if (Math.abs(wheel.intent) < WHEEL.commit) return;
-    const target = wheelTarget(index, wheel.intent, cards.length);
-    wheel.phase = 'settling';
-    // Exactly one command per burst. Delta size and input speed never affect
-    // the preset animation, and later momentum never enters the pending queue.
-    if (target !== index) animateTo(target, { focus: false });
+    if (Math.abs(wheel.intent) < configuration.wheelThreshold) return;
+    wheel.consumed = true; navigate(Math.sign(wheel.intent), { focus: false, source: 'wheel' });
   }
-
   function trackTouchDown(event) {
-    cancelWheel();
     if (event.pointerType !== 'touch') return;
     touchContacts.add(event.pointerId);
-    if (touchContacts.size > 1) {
-      multiTouch = true;
-      cancelGesture();
-    }
+    if (touchContacts.size > 1) { multiTouch = true; releaseCapture(); }
   }
-
   function trackTouchEnd(event) {
-    if (event.pointerType !== 'touch') return;
-    touchContacts.delete(event.pointerId);
-    if (!touchContacts.size) multiTouch = false;
-    // Pending input never acquires explicit capture. Clear it even when a
-    // browser delivers the ending event outside the stage.
-    if (gesture?.pointerId === event.pointerId && state !== 'dragging') cancelGesture(event);
+    if (event.pointerType === 'touch') { touchContacts.delete(event.pointerId); if (!touchContacts.size) multiTouch = false; }
+    if (gesture?.pointerId === event.pointerId && !stage.contains?.(event.target) && event.target !== stage) releaseCapture();
   }
-
   document.addEventListener('pointerdown', trackTouchDown, true);
   document.addEventListener('pointerup', trackTouchEnd, true);
-  document.addEventListener('pointercancel', (event) => {
-    trackTouchEnd(event);
-    cancelGesture(event);
-  }, true);
-
-  stage.addEventListener('pointerdown', (event) => {
-    // This also handles synthetic events that do not traverse document capture.
-    // Track contacts before every eligibility guard, including interactive UI.
+  document.addEventListener('pointercancel', event => { trackTouchEnd(event); cancelGesture(event); }, true);
+  stage.addEventListener('pointerdown', event => {
     trackTouchDown(event);
-    if (!enabled || isBlocked() || multiTouch || gesture || state !== 'idle' || !event.isPrimary || event.button !== 0) return;
+    if (!enabled || isBlocked() || document.hidden || multiTouch || gesture || !event.isPrimary || event.button !== 0) return;
     const excluded = event.pointerType === 'mouse' ? MOUSE_EXCLUDED_START : INTERACTIVE_START;
     if (event.target.closest(excluded) || hasSelection()) return;
     const targetCard = event.target.closest('.card');
-    if (targetCard && targetCard !== cards[index]) return;
-    // Native mouse selection starts on pointerdown, before movement reaches the
-    // drag dead zone. Prevent it only on eligible blank space; text-origin
-    // gestures have already returned above and retain their native selection.
+    if (state === 'idle' && targetCard && targetCard !== cards[index]) return;
     if (event.pointerType === 'mouse') event.preventDefault();
-    gesture = {
-      pointerId: event.pointerId,
-      pointerType: event.pointerType,
-      deadline: event.timeStamp + TOUCH_HOLD_DELAY,
-      origin: index,
-      startX: event.clientX,
-      startY: event.clientY,
-      distance: travelDistance(height, getPreset()),
-      samples: [{ time: event.timeStamp, position: 0 }],
-    };
+    const configuration = readTuning();
+    gesture = { pointerId: event.pointerId, pointerType: event.pointerType, acquired: false, consumed: false, deadline: event.timeStamp + configuration.holdDelay * 1000, startX: event.clientX, startY: event.clientY, samples: [{ time: event.timeStamp, position: 0 }] };
     if (event.pointerType === 'touch') {
       const candidate = gesture;
-      holdTimer = setTimeout(() => {
-        holdTimer = 0;
-        if (gesture === candidate && state !== 'dragging') cancelGesture();
-      }, TOUCH_HOLD_DELAY);
+      holdTimer = setTimeout(() => { holdTimer = 0; if (gesture === candidate && !gesture.acquired) releaseCapture(); }, configuration.holdDelay * 1000);
     }
   });
-
-  stage.addEventListener('pointermove', (event) => {
+  function recognize(event) {
     if (!gesture || event.pointerId !== gesture.pointerId) return;
-    if (event.pointerType === 'mouse' && event.buttons === 0) { cancelGesture(event); return; }
-    if (isBlocked()) { settle(); return; }
-    if (hasSelection() || (gesture.pointerType === 'touch' && state !== 'dragging' && event.timeStamp >= gesture.deadline)) { cancelGesture(event); return; }
-    const horizontal = event.clientX - gesture.startX;
-    const travel = gesture.startY - event.clientY;
-    sample(event);
-    if (state !== 'dragging') {
-      if (Math.hypot(horizontal, travel) < MOTION.deadZone) return;
-      if (Math.abs(travel) < Math.abs(horizontal) * MOTION.verticalRatio) { releaseCapture(); return; }
-      state = 'dragging';
-      if (holdTimer) clearTimeout(holdTimer);
-      holdTimer = 0;
-      stage.classList?.add('is-deck-dragging');
-      stage.setPointerCapture(event.pointerId);
+    if (isBlocked() || document.hidden) { settle(); return; }
+    if (hasSelection() || (!gesture.acquired && gesture.pointerType === 'touch' && event.timeStamp >= gesture.deadline)) { releaseCapture(); return; }
+    const configuration = readTuning(), horizontal = event.clientX - gesture.startX, travel = gesture.startY - event.clientY;
+    gesture.samples.push({ time: event.timeStamp, position: travel });
+    while (gesture.samples.length > 2 && gesture.samples[1].time < event.timeStamp - configuration.velocityWindow * 1000) gesture.samples.shift();
+    if (!gesture.acquired) {
+      if (Math.hypot(horizontal, travel) < configuration.deadZone) return;
+      if (Math.abs(travel) < Math.abs(horizontal) * configuration.verticalRatio) { releaseCapture(); return; }
+      gesture.acquired = true;
+      if (holdTimer) clearTimeout(holdTimer); holdTimer = 0;
+      stage.classList?.add('is-deck-dragging'); stage.setPointerCapture(event.pointerId);
     }
     event.preventDefault();
-    position = positionFromTravel(gesture.origin, travel, gesture.distance, cards.length);
-    queueRender();
-  }, { passive: false });
-
-  stage.addEventListener('pointerup', (event) => {
-    trackTouchEnd(event);
-    if (!gesture || event.pointerId !== gesture.pointerId) return;
-    if (state !== 'dragging') { releaseCapture(); return; }
-    sample(event);
-    position = positionFromTravel(gesture.origin, gesture.startY - event.clientY, gesture.distance, cards.length);
-    const target = releaseTarget({ position, origin: gesture.origin, velocity: releaseVelocity(gesture.samples), distance: gesture.distance, count: cards.length });
-    releaseCapture();
-    animateTo(target, { focus: false });
-  });
-
-  function cancelGesture(event) {
-    if (!gesture || (event && event.pointerId !== gesture.pointerId)) return;
-    const origin = gesture.origin;
-    pending = null;
-    releaseCapture();
-    finish(origin, {}, false);
+    if (gesture.consumed) return;
+    const velocity = releaseVelocity(gesture.samples, configuration.velocityWindow * 1000);
+    const flick = configuration.flickEnabled && Math.abs(travel) >= configuration.flickDistance && Math.abs(velocity) >= configuration.flickVelocity && Math.sign(velocity) === Math.sign(travel);
+    if (Math.abs(travel) < configuration.swipeDistance && !flick) return;
+    gesture.consumed = true; navigate(Math.sign(travel), { focus: false, source: 'gesture' });
   }
-  stage.addEventListener('pointercancel', (event) => { trackTouchEnd(event); cancelGesture(event); });
-  stage.addEventListener('lostpointercapture', (event) => {
-    // Touch's implicit capture belongs to the touched descendant. Its loss
-    // bubbles when capture transfers to the stage and is not a cancellation.
-    if (event.target === stage && !stage.hasPointerCapture(event.pointerId)) cancelGesture(event);
+  stage.addEventListener('pointermove', event => { if (event.pointerType === 'mouse' && event.buttons === 0) { cancelGesture(event); return; } recognize(event); }, { passive: false });
+  stage.addEventListener('pointerup', event => { recognize(event); trackTouchEnd(event); if (gesture?.pointerId === event.pointerId) releaseCapture(); });
+  function cancelGesture(event) { if (gesture && (!event || event.pointerId === gesture.pointerId)) releaseCapture(); }
+  stage.addEventListener('pointercancel', event => { trackTouchEnd(event); cancelGesture(event); });
+  stage.addEventListener('lostpointercapture', event => { if (event.target === stage && !stage.hasPointerCapture(event.pointerId)) cancelGesture(event); });
+  stage.addEventListener('pointerleave', event => { if (!gesture?.acquired) cancelGesture(event); });
+  stage.addEventListener('contextmenu', () => { resetWheel(); cancelGesture(); });
+  stage.addEventListener('selectstart', event => {
+    if (gesture && (gesture.acquired || (gesture.pointerType === 'touch' && event.timeStamp < gesture.deadline))) event.preventDefault();
+    else { resetWheel(); cancelGesture(); }
   });
-  stage.addEventListener('pointerleave', (event) => { if (state !== 'dragging') cancelGesture(event); });
-  stage.addEventListener('contextmenu', () => { cancelWheel(); cancelGesture(); });
-  stage.addEventListener('selectstart', (event) => {
-    // Favor an ordinary touch swipe until its hold deadline. Event time also
-    // permits intentional hold selection when the timer callback is delayed.
-    if (gesture && (state === 'dragging' || (gesture.pointerType === 'touch' && event.timeStamp < gesture.deadline))) event.preventDefault();
-    else { cancelWheel(); cancelGesture(); }
-  });
-  document.addEventListener('selectionchange', () => { if (hasSelection()) { cancelWheel(); cancelGesture(); } });
-  function interruptInput() {
-    touchContacts.clear();
-    multiTouch = false;
-    if (gesture) cancelGesture();
-    else settle();
-  }
-  document.addEventListener('visibilitychange', () => { if (document.hidden) interruptInput(); });
-  window.addEventListener?.('blur', interruptInput);
-
-  return { setEnabled, measure, navigate, jump, settle, get index() { return index; }, get position() { return position; }, get state() { return state; } };
+  document.addEventListener('selectionchange', () => { if (hasSelection()) { resetWheel(); cancelGesture(); } });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) settle(); });
+  window.addEventListener?.('blur', settle);
+  return { setEnabled, measure, navigate, jump, settle, refreshGate: gateRemaining, get gateRemaining() { return gateRemaining(); },
+    get index() { return index; }, get requestedIndex() { return requestedIndex; }, get position() { return position; }, get state() { return state; }, get lastRejection() { return lastRejection; } };
 }

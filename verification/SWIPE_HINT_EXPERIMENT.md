@@ -1,5 +1,7 @@
 # Delayed swipe-cue experiment
 
+October 4 update: the owner confirmed this reminder working and approved it as part of the card prototype parent. Its original branch remains preserved at `b14176f`; current integration and movement-lab evidence is in [TUNING.md](TUNING.md). Child-only descriptions below record its historical rollout.
+
 Date: 2026-10-03 (America/Los_Angeles).
 
 Branch: `codex/card-layout-swipe-hint`, incorporating verified slower-touch parent `5192f3bcb6317384e8579b9e03aa829ad8ddcb0f`. Core motion/input modules match that parent; the reminder remains child-only. Production and original branches are preserved.

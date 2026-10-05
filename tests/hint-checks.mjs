@@ -87,10 +87,10 @@ jobs.push(()=>check('window blur clears a lost pointer and focus starts a new in
  return{timers:await page.evaluate(()=>window.__hintTimers),method:'Synthetic hasFocus state and blur/focus events, with actual timers'};
 })));
 jobs.push(()=>check('hidden tab resets the countdown before cue can reappear',()=>isolated({},async page=>{
- await elapsed(page,3000);await page.evaluate(()=>{window.__syntheticHidden=true;Object.defineProperty(document,'hidden',{configurable:true,get:()=>window.__syntheticHidden});document.dispatchEvent(new Event('visibilitychange'));});
+ await elapsed(page,3000);const beforeHide=await page.evaluate(()=>window.__hintTimers.at(-1).scheduled);await page.evaluate(()=>{window.__syntheticHidden=true;Object.defineProperty(document,'hidden',{configurable:true,get:()=>window.__syntheticHidden});document.dispatchEvent(new Event('visibilitychange'));});
  await page.waitForTimeout(3000);await hidden(page);await page.evaluate(()=>{window.__syntheticHidden=false;document.dispatchEvent(new Event('visibilitychange'));});
  await elapsed(page,4500);await hidden(page);await elapsed(page,5350);await visible(page);
- const timers=await page.evaluate(()=>window.__hintTimers);assert.equal(timers.length,2);assert.ok(timers[1].scheduled-timers[0].scheduled>=5500);
+ const timers=await page.evaluate(()=>window.__hintTimers);assert.ok(timers.at(-1).scheduled-beforeHide>=5500,'returning from hidden starts a fresh interval after the old deadline');
  return{timers,method:'Synthetic document.hidden accessor and visibilitychange notifications; actual five-second timers. OS tab/background throttling remains unverified.'};
 })));
 for(const variant of ['desktop','reading','reduced','dialog','later-hash'])jobs.push(()=>check(variant==='later-hash'?'deep link stays suppressed until first card is revisited':'cue stays suppressed for '+variant,()=>isolated(variant==='desktop'?{viewport:{width:1280,height:900},hasTouch:false}:variant==='reduced'?{reducedMotion:'reduce'}:{},async page=>{

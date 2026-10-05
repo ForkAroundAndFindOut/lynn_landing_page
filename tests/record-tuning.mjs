@@ -34,4 +34,5 @@ for(const name of ['text-command-and-retarget','text-flick','contact-expansion']
  const video=page.video(),raw=await video.path();await context.close();const dest=path.join(output,name+'.webm');await video.saveAs(dest);if(raw!==dest&&path.resolve(raw).startsWith(output+path.sep))await unlink(raw);
  reports.push({name,file:name+'.webm',status:'PASS',method:'Chromium trusted touch/button input; browser video, not physical-device recording'});
 }
-await browser.close();await writeFile(path.join(output,'recordings.json'),JSON.stringify({baseURL,checkedAt:new Date().toISOString(),reports},null,2)+'\n');console.log(JSON.stringify(reports));
+const revision=await (await fetch(new URL('revision.json',baseURL))).json();
+await browser.close();await writeFile(path.join(output,'recordings.json'),JSON.stringify({baseURL,revision,checkedAt:new Date().toISOString(),reports},null,2)+'\n');console.log(JSON.stringify(reports));

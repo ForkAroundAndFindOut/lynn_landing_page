@@ -102,5 +102,3 @@ test('presets preserve direct tracking and bound travel and settlement duration'
     assert.equal(travelDistance(2000, name), maximum);
   }
 });
-
-

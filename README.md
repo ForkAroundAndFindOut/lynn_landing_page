@@ -41,6 +41,8 @@ node tests/hint-checks.mjs
 
 `BASE_URL` and `EVIDENCE_DIR` select the preview and report directory. Historical continuous-drag tests in `tests/browser-checks.mjs` describe the earlier interaction; its unaffected reading, layout, and contact checks remain useful with `CHECK_FILTER`. Current command acceptance is in the tuning suite. Native Firefox, Safari, Edge, physical trackpads, and mobile keyboards are recorded separately from Chromium emulation.
 
+Current hosted recordings: [text-start command and retarget](verification/tuning/hosted-recordings/text-command-and-retarget.webm), [short flick](verification/tuning/hosted-recordings/text-flick.webm), and [contact expansion](verification/tuning/hosted-recordings/contact-expansion.webm).
+
 ## Preview deployment
 
 The existing non-production Workers Builds workflow runs `node build.mjs && npx wrangler versions upload`. Production `main` retains its existing workflow. Do not deploy or promote a Worker version to production as part of this prototype.

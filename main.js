@@ -29,6 +29,7 @@ let reviewFrame = 0;
 let readingFrame = 0;
 let trackReading = false;
 const settings = setupSettings(({ kind = 'layout' } = {}) => {
+  globalThis.__cardQA?.record('settings', { kind, view: settings.view, tuning: settings.tuning, reducedReview: document.querySelector('#reduce-motion').checked, reducedEffective: settings.reduced });
   if (kind === 'layout' || kind === 'motion') {
     deck.settle();
     contact?.refreshMotion();
@@ -66,6 +67,7 @@ const deck = createDeck({
   getPreset: () => settings.preset,
   getTuning: () => settings.tuning,
   isReduced: () => settings.reduced,
+  onDiagnostic: globalThis.__cardQA?.record,
   onRequest() { updateControls(); },
   onChange(index, { focus, contact: focusContact }) {
     updateControls();
@@ -82,7 +84,7 @@ const deck = createDeck({
   },
 });
 contact = setupContact({ dialog: document.querySelector('#contact-dialog'), opener, sourceCard: cards[5], beforeOpen: () => deck.settle(), onClose: () => layout.refresh(), isReduced: () => settings.reduced });
-layout = setupLayout({ stage, cards, deck, settings, isBlocked: () => contact.isOpen, onMode: () => { trackReading = false; updateControls(); } });
+layout = setupLayout({ stage, cards, deck, settings, isBlocked: () => contact.isOpen, onDiagnostic: globalThis.__cardQA?.record, onMode: () => { trackReading = false; updateControls(); } });
 function navigate(delta) {
   if (contact.isOpen) return;
   if (layout.mode === 'deck') deck.navigate(delta);
@@ -145,3 +147,5 @@ updateControls();
 debugObserver = new MutationObserver(updateDebug);
 debugObserver.observe(stage, { attributes: true, attributeFilter: ['data-deck-position', 'data-deck-state', 'data-deck-rejection'] });
 setupSwipeHint({ stage, cue: document.querySelector('#experimental-swipe-cue'), dialog: document.querySelector('#contact-dialog'), isBlocked: () => contact.isOpen, isReduced: () => settings.reduced });
+
+globalThis.__cardQA?.attach({ deck, layout, settings });

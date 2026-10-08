@@ -1,5 +1,5 @@
 // Responsive layout owns geometry. Pointer rendering never measures the DOM.
-export function setupLayout({ stage, cards, deck, settings, isBlocked, onMode }) {
+export function setupLayout({ stage, cards, deck, settings, isBlocked, onMode, onDiagnostic }) {
   let mode = 'flow';
   let frame = 0;
   let readingOverride;
@@ -90,6 +90,7 @@ export function setupLayout({ stage, cards, deck, settings, isBlocked, onMode })
     if (isBlocked()) return;
     deck.settle();
     const previous = mode;
+    let geometry = null;
     const viewportHeight = window.visualViewport?.height ?? innerHeight;
     const viewportWidth = window.visualViewport?.width ?? innerWidth;
     const narrow = viewportWidth < 900;
@@ -112,7 +113,9 @@ export function setupLayout({ stage, cards, deck, settings, isBlocked, onMode })
       stage.style.setProperty('--card-width', `${cardWidth}px`);
       stage.style.setProperty('--card-height', `${Math.min(stageHeight - 46, Math.max(cardWidth, 450))}px`);
       // All six semantic cards stay in the document; measure content before enabling.
-      const neededHeight = Math.max(...cards.map(card => card.scrollHeight + 2));
+      const neededHeights = cards.map(card => card.scrollHeight + 2);
+      const neededHeight = Math.max(...neededHeights);
+      if (onDiagnostic) geometry = { headerHeight, stageHeight, cardWidth, limit: stageHeight - 42, neededHeight, cards: cards.map((card, i) => ({ id: card.id, neededHeight: neededHeights[i] })) };
       const currentHeight = cards[0].offsetHeight;
       if (neededHeight > currentHeight) stage.style.setProperty('--card-height', `${neededHeight}px`);
       if (neededHeight <= stageHeight - 42) {
@@ -146,6 +149,7 @@ export function setupLayout({ stage, cards, deck, settings, isBlocked, onMode })
     }
     if (!initialized && mode === 'deck' && deck.index === 0 && !settings.reduced) initialEntrance = cards[0].animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300 });
     initialized = true;
+    if (onDiagnostic) try { onDiagnostic('layout', { mode, previous, reason, viewportHeight, viewportWidth, requestedView, reduced: settings.reduced, shortScreen: viewportHeight < 540, eligible, cardButtonDisabled: readButton.disabled, geometry }); } catch { /* Diagnostic output never controls layout. */ }
     onMode(mode);
   }
   function schedule() { if (!frame) frame = requestAnimationFrame(refresh); }

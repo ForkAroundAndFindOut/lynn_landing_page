@@ -9,7 +9,7 @@ const WHEEL_EXCLUDED = 'input, textarea, select, option, [contenteditable], [dat
 const OWNED_STYLES = ['transform', 'opacity', 'visibility', 'z-index', 'will-change', '--card-shadow-strength'];
 const POSE_PROPERTIES = ['x', 'y', 'angle', 'scale', 'opacity', 'shadow'];
 
-export function createDeck({ stage, cards, onChange = () => {}, onRequest = () => {}, isBlocked = () => false, getPreset = () => 'balanced', getTuning, isReduced = () => false }) {
+export function createDeck({ stage, cards, onChange = () => {}, onRequest = () => {}, isBlocked = () => false, getPreset = () => 'balanced', getTuning, isReduced = () => false, onDiagnostic }) {
   let enabled = false, index = 0, requestedIndex = 0, announcedIndex = 0, position = 0;
   let state = 'idle', gesture = null, animation = null, frame = 0, holdTimer = 0;
   let width = 320, height = 540, cardHeight = 0, fade = 1;
@@ -24,6 +24,10 @@ export function createDeck({ stage, cards, onChange = () => {}, onRequest = () =
   let poseTuning = readTuning();
   const clock = () => performance.now();
   const gateRemaining = () => Math.max(0, readTuning().gate * 1000 - (clock() - lastAcceptedAt));
+  function diagnose(type, detail = {}) {
+    if (!onDiagnostic) return;
+    try { onDiagnostic('deck/' + type, { state, index, requestedIndex, position, wheelConsumed: Boolean(wheel?.consumed), wheelIntent: wheel?.intent ?? 0, gateRemaining: gateRemaining(), ...(type === 'request' ? { tuning: readTuning() } : {}), ...(typeof detail === 'function' ? detail() : detail) }); } catch { /* Diagnostics cannot change input handling. */ }
+  }
   function rejection(reason) { lastRejection = reason; stage.dataset.deckRejection = reason || ''; }
 
   function syncSemantics() {
@@ -87,6 +91,7 @@ export function createDeck({ stage, cards, onChange = () => {}, onRequest = () =
     cancelFrame(); animation = null; state = 'idle';
     position = index = requestedIndex = clamp(target, 0, cards.length - 1); fade = 1;
     if (enabled) { syncSemantics(); render(); }
+    diagnose('finish', { target });
     if (notify) { announcedIndex = index; onChange(index, { focus: Boolean(options.focus), contact: Boolean(options.contact) }); }
   }
   function sampleAnimation(now) {
@@ -117,6 +122,7 @@ export function createDeck({ stage, cards, onChange = () => {}, onRequest = () =
     state = 'settling';
     const motion = { target, options, from: position, started: now, duration, recovery, curve: velocityCurve(configuration), residual, residualDuration: recovery ? duration : Math.min(100, duration / 4) };
     animation = motion; syncSemantics(); render(now);
+    diagnose('animation-start', { from: motion.from, target, duration });
     function tick(timestamp) {
       frame = 0;
       if (animation !== motion) return;
@@ -127,6 +133,7 @@ export function createDeck({ stage, cards, onChange = () => {}, onRequest = () =
     frame = requestAnimationFrame(tick);
   }
   function settle() {
+    diagnose('settle');
     sampleAnimation(clock());
     const target = clamp(Math.round(position), 0, cards.length - 1);
     resetWheel(); releaseCapture(); touchContacts.clear(); multiTouch = false;
@@ -149,17 +156,18 @@ export function createDeck({ stage, cards, onChange = () => {}, onRequest = () =
     }
   }
   function navigate(delta, { focus = true, source = 'control' } = {}) {
-    if (!enabled || isBlocked() || document.hidden || !delta) { rejection('blocked'); return false; }
+    if (!enabled || isBlocked() || document.hidden || !delta) { rejection('blocked'); diagnose('request', { source, delta, accepted: false, reason: 'blocked' }); return false; }
     const configuration = readTuning(), now = clock(), target = clamp(requestedIndex + Math.sign(delta), 0, cards.length - 1);
-    if (target === requestedIndex) { rejection('endpoint'); return false; }
-    if (now - lastAcceptedAt < configuration.gate * 1000) { rejection('gate'); return false; }
+    if (target === requestedIndex) { rejection('endpoint'); diagnose('request', { source, delta, accepted: false, reason: 'endpoint' }); return false; }
+    if (now - lastAcceptedAt < configuration.gate * 1000) { rejection('gate'); diagnose('request', { source, delta, accepted: false, reason: 'gate' }); return false; }
     sampleAnimation(now); const previousPoses = currentPoses(now);
     // A direct jump may be interrupted during either half of its fade. Preserve
     // the painted opacity, including that fade, before the new timeline resets it.
     if (fade !== 1) for (const pose of previousPoses.values()) pose.opacity *= fade;
     if (source !== 'gesture') releaseCapture();
     requestedIndex = target; lastAcceptedAt = now; rejection(null); onRequest(target);
-    startTimeline(target, { focus }, configuration, now, previousPoses); return true;
+    startTimeline(target, { focus }, configuration, now, previousPoses);
+    diagnose('request', { source, delta, accepted: true, target }); return true;
   }
   function jump(destination, { focus = true, contact = false } = {}) {
     if (isBlocked()) return false;
@@ -188,21 +196,22 @@ export function createDeck({ stage, cards, onChange = () => {}, onRequest = () =
   }
   function wheelQuiet() {
     if (wheelTimer) clearTimeout(wheelTimer);
-    wheelTimer = setTimeout(() => { wheelTimer = 0; wheel = null; }, readTuning().wheelQuiet * 1000);
+    wheelTimer = setTimeout(() => { wheelTimer = 0; wheel = null; diagnose('wheel-quiet'); }, readTuning().wheelQuiet * 1000);
   }
   function onWheel(event) {
-    if (!enabled || isBlocked() || document.hidden) { if (wheel || animation) settle(); return; }
+    if (!enabled || isBlocked() || document.hidden) { diagnose('wheel-blocked'); if (wheel || animation) settle(); return; }
     const configuration = readTuning(), delta = normalizeWheel(event, height);
     if (!delta || !delta.y || Math.abs(delta.y) < Math.abs(delta.x) * configuration.verticalRatio || event.ctrlKey || event.metaKey || event.shiftKey || hasSelection() || event.target.closest(WHEEL_EXCLUDED) || nestedScroller(event.target)) {
+      diagnose('wheel-native', () => ({ horizontal: Math.abs(delta?.y ?? 0) < Math.abs(delta?.x ?? 0) * configuration.verticalRatio, modified: Boolean(event.ctrlKey || event.metaKey || event.shiftKey), selection: Boolean(hasSelection()), excluded: Boolean(event.target.closest(WHEEL_EXCLUDED)), nestedScroller: nestedScroller(event.target) }));
       if (wheel?.consumed) wheelQuiet(); else resetWheel(); return;
     }
-    if (gesture || multiTouch) return;
+    if (gesture || multiTouch) { diagnose('wheel-pointer-active'); return; }
     const targetCard = event.target.closest('.card');
-    if (state === 'idle' && targetCard && targetCard !== cards[index]) return;
+    if (state === 'idle' && targetCard && targetCard !== cards[index]) { diagnose('wheel-inactive-target', { targetCard: targetCard.id }); return; }
     event.preventDefault(); wheel ||= { intent: 0, consumed: false }; wheelQuiet();
-    if (wheel.consumed) return;
+    if (wheel.consumed) { diagnose('wheel-consumed'); return; }
     wheel.intent += delta.y;
-    if (Math.abs(wheel.intent) < configuration.wheelThreshold) return;
+    if (Math.abs(wheel.intent) < configuration.wheelThreshold) { diagnose('wheel-threshold'); return; }
     wheel.consumed = true; navigate(Math.sign(wheel.intent), { focus: false, source: 'wheel' });
   }
   function trackTouchDown(event) {

@@ -1,0 +1,534 @@
+{
+  "checkedAt": "2026-10-08T22:21:49.144Z",
+  "baseURL": "http://127.0.0.1:4193",
+  "revision": {
+    "revision": "5c3b63d77af003f326483e083ae120c40969fa33",
+    "assets": {
+      "index.html": "79469709d9970ef55bfa176c262c8589caf30ce5ba147ad758e51e3b6d63f6c4",
+      "styles.css": "efb1c7a6e84c668c5c7b1cf63da7270470c201dcb30fc5755f410ff6549f4a9f",
+      "main.js": "30b90bae04d7ac42c5210775a91f446e9719bc52a18ceabf8a77d0334afef8c9",
+      "deck-controller.js": "0f39d6472970018ad25ba7f3968a34c098fdc58ba8d934b1b5aebc73a1f120cd",
+      "wheel-input.js": "47476741e603ab316a828ed8aeb59039ac69622d75775141330cf2ff0df3cd70",
+      "swipe-hint.js": "cce66a33ec9a0cd12c8fa3f65b41e04cf340cc9ff6f9a67b468a030b6791db84",
+      "motion.js": "d1120cf5c38d737078f5e98e3b72dba925c3453019901c16b10b5118576bb9a6",
+      "layout.js": "f38b47d4c26d3962d0fcfdd0f9976657db236e11c59bc942b954f10cb772def8",
+      "contact-dialog.js": "65a551b5dd9bb1ecaa99c53f8fd3fa6178df7acfeff1bd69d6a26daf23173232",
+      "demo-settings.js": "ba1c39c4c2553000c5e9c1e20060e94db37e64f17284c691674652c9b7cb06c6",
+      "tuning-config.js": "9898904305b3eac32749d0b3b801c59064e7f06790b286cf7de756253b348dd3",
+      "qa-diagnostics.js": "9e6a495b9f2584a54b0475098a6b5a5b397928e9c430faf7af4498e2609eee75",
+      "favicon.svg": "e44e20099cb05df4fe9e8c5f4ed3b380fdedbb2147aff6d0182206969acaaf15"
+    }
+  },
+  "engine": "Chromium 149.0.7827.55",
+  "counts": {
+    "pass": 26,
+    "fail": 0,
+    "total": 26
+  },
+  "results": [
+    {
+      "name": "link swipe: stationary trusted taps activate the intended section and contact form once",
+      "status": "PASS",
+      "detail": {
+        "linkActivations": 1,
+        "focusedSection": "services-title",
+        "contactActivations": 1,
+        "clicks": [
+          {
+            "trusted": true,
+            "detail": 1,
+            "pointerType": "touch",
+            "target": "SPAN",
+            "activation": "#services",
+            "prevented": true
+          },
+          {
+            "trusted": true,
+            "detail": 1,
+            "pointerType": "mouse",
+            "target": "A",
+            "activation": "#contact",
+            "prevented": true
+          },
+          {
+            "trusted": true,
+            "detail": 1,
+            "pointerType": "touch",
+            "target": "SPAN",
+            "activation": "open-contact",
+            "prevented": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "link swipe: 20px acquired gestures do not shuffle or activate; 5px mouse jitter retains native activation",
+      "status": "PASS",
+      "detail": {
+        "rapidTouchDistance": 20,
+        "mouseDistance": 20,
+        "acquisitionDistance": 6,
+        "commandDistance": 48,
+        "nativeJitterDistance": 5,
+        "heldMilliseconds": 420,
+        "selectionPreservedTarget": 0,
+        "targetAfterAcquiredRelease": 0,
+        "targetAfterNativeJitterActivation": 1,
+        "clicks": [
+          {
+            "trusted": true,
+            "detail": 1,
+            "pointerType": "mouse",
+            "target": "deck-stage",
+            "activation": null,
+            "prevented": true
+          },
+          {
+            "trusted": true,
+            "detail": 1,
+            "pointerType": "mouse",
+            "target": "A",
+            "activation": "#services",
+            "prevented": true
+          }
+        ],
+        "nativeDrags": [
+          {
+            "trusted": true,
+            "prevented": true
+          },
+          {
+            "trusted": true,
+            "prevented": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "link swipe: trusted reverse from link and contact-button child advances exactly one card",
+      "status": "PASS",
+      "detail": {
+        "linkReverse": [
+          4,
+          3
+        ],
+        "buttonReverse": [
+          5,
+          4
+        ],
+        "dialogOpen": false,
+        "clicks": [
+          {
+            "trusted": true,
+            "detail": 1,
+            "pointerType": "mouse",
+            "target": "A",
+            "activation": "#contact",
+            "prevented": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "link swipe: mouse threshold consumes its returned pointer click and leaves immediate unrelated activation usable",
+      "status": "PASS",
+      "detail": {
+        "swipeTarget": 1,
+        "unrelatedClickTarget": 5,
+        "clicks": [
+          {
+            "trusted": true,
+            "detail": 1,
+            "pointerType": "mouse",
+            "target": "deck-stage",
+            "activation": null,
+            "prevented": true
+          },
+          {
+            "trusted": true,
+            "detail": 1,
+            "pointerType": "mouse",
+            "target": "A",
+            "activation": "#contact",
+            "prevented": true
+          }
+        ],
+        "nativeDrags": [
+          {
+            "trusted": true,
+            "prevented": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "link swipe: trusted touch on nested arrow waits for full distance and reverse card-child swipe returns",
+      "status": "PASS",
+      "detail": {
+        "linkChildThreshold": 48,
+        "belowThreshold": 47,
+        "nearLinkAccepted": true,
+        "reverseActualCardChild": "#services .small-mark",
+        "finalTarget": 0,
+        "clicks": []
+      }
+    },
+    {
+      "name": "numeric controls clamp committed out-of-range values and recover an empty edit",
+      "status": "PASS",
+      "detail": {
+        "maximumDuration": 3,
+        "minimumGate": 0,
+        "emptySwipeDistance": 48
+      }
+    },
+    {
+      "name": "link swipe: gate and endpoint rejected button swipes consume click but preserve keyboard and later pointer activation",
+      "status": "PASS",
+      "detail": {
+        "endpoint": {
+          "target": 5,
+          "touchEndpointDialogOpen": false,
+          "keyboardActivated": true,
+          "clicks": [
+            {
+              "trusted": true,
+              "detail": 1,
+              "pointerType": "mouse",
+              "target": "deck-stage",
+              "activation": null,
+              "prevented": true
+            },
+            {
+              "trusted": true,
+              "detail": 0,
+              "pointerType": "",
+              "target": "open-contact",
+              "activation": "open-contact",
+              "prevented": false
+            }
+          ]
+        },
+        "gate": {
+          "rejectedTarget": 5,
+          "rejection": "gate",
+          "freshPointerActivated": true,
+          "clicks": [
+            {
+              "trusted": true,
+              "detail": 1,
+              "pointerType": "mouse",
+              "target": "deck-stage",
+              "activation": null,
+              "prevented": true
+            },
+            {
+              "trusted": true,
+              "detail": 1,
+              "pointerType": "mouse",
+              "target": "open-contact",
+              "activation": "open-contact",
+              "prevented": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "motion presets change only duration, acceleration, deceleration and magnetic strength",
+      "status": "PASS",
+      "detail": [
+        {
+          "preset": "crisp",
+          "duration": 0.6,
+          "acceleration": 0.1,
+          "deceleration": 0.25,
+          "magneticStrength": 0.15
+        },
+        {
+          "preset": "balanced",
+          "duration": 0.9,
+          "acceleration": 0.15,
+          "deceleration": 0.35,
+          "magneticStrength": 0.25
+        },
+        {
+          "preset": "gentle",
+          "duration": 1.3,
+          "acceleration": 0.25,
+          "deceleration": 0.45,
+          "magneticStrength": 0.4
+        }
+      ]
+    },
+    {
+      "name": "trusted adjacent controls honor crisp transition duration",
+      "status": "PASS",
+      "detail": {
+        "preset": "crisp",
+        "milliseconds": 615.5,
+        "frames": 88,
+        "startPosition": 0
+      }
+    },
+    {
+      "name": "trusted adjacent controls honor balanced transition duration",
+      "status": "PASS",
+      "detail": {
+        "preset": "balanced",
+        "milliseconds": 907.3000001907349,
+        "frames": 125,
+        "startPosition": 0
+      }
+    },
+    {
+      "name": "all 25 tuning controls expose metadata, synchronize numeric/range pairs and save edits",
+      "status": "PASS",
+      "detail": {
+        "fields": 25,
+        "numericPairs": 24,
+        "version": 2,
+        "expiresDays": 30
+      }
+    },
+    {
+      "name": "trusted adjacent controls honor gentle transition duration",
+      "status": "PASS",
+      "detail": {
+        "preset": "gentle",
+        "milliseconds": 1312.7999999523163,
+        "frames": 175,
+        "startPosition": 0
+      }
+    },
+    {
+      "name": "flick shortcut recognizes recent velocity and can be disabled; held text remains native",
+      "status": "PASS",
+      "detail": {
+        "slowFlickRejected": true,
+        "fastFlickAccepted": true,
+        "disabledFlickRejected": true,
+        "holdDelayMilliseconds": 350
+      }
+    },
+    {
+      "name": "gate rejects adjacent buttons and keyboard requests, then retargets continuously toward last requested card",
+      "status": "PASS",
+      "detail": {
+        "rejectedTarget": 1,
+        "firstRetarget": 2,
+        "lastRequestedTarget": 1,
+        "before": {
+          "mode": "deck",
+          "state": "settling",
+          "position": 0.325,
+          "target": 1,
+          "rejection": "gate",
+          "reduced": "false"
+        },
+        "after": {
+          "mode": "deck",
+          "state": "settling",
+          "position": 0.328,
+          "target": 2,
+          "rejection": "",
+          "reduced": "false"
+        }
+      }
+    },
+    {
+      "name": "text-start touch swipes are commands: no finger tracking, one card per contact, speed-independent timing",
+      "status": "PASS",
+      "detail": {
+        "threshold": 48,
+        "subThresholdPose": 0,
+        "heldContactTarget": 1,
+        "fastMilliseconds": 908.5999999046326,
+        "slowMilliseconds": 916
+      }
+    },
+    {
+      "name": "wheel uses one attempt per burst including gate rejection and honors the 400ms quiet boundary",
+      "status": "PASS",
+      "detail": {
+        "quietMilliseconds": 400,
+        "rejectedBurstTarget": 1,
+        "freshBurstTarget": 2
+      }
+    },
+    {
+      "name": "a touch rejected by gate remains consumed for its entire contact",
+      "status": "PASS",
+      "detail": {
+        "rejectedContactTarget": 1,
+        "freshContactTarget": 2
+      }
+    },
+    {
+      "name": "wheel delta magnitude cannot alter duration or advance more than one card",
+      "status": "PASS",
+      "detail": {
+        "tinyDelta": 4,
+        "ordinaryDelta": 20,
+        "largeDelta": 2000,
+        "ordinaryMilliseconds": 909.7000000476837,
+        "largeMilliseconds": 913.7000000476837
+      }
+    },
+    {
+      "name": "v2 cookie restores review preferences and tuning, reload starts at top, reset scopes remain distinct",
+      "status": "PASS",
+      "detail": {
+        "cookieVersion": 2,
+        "startsAtTop": true,
+        "resetTuningPreservesReview": true,
+        "resetAllDeletesCookie": true
+      }
+    },
+    {
+      "name": "zero gate accumulates rapid adjacent requests and duration scales with remaining card distance",
+      "status": "PASS",
+      "detail": {
+        "from": 0,
+        "lastRequestedTarget": 3,
+        "measuredMilliseconds": 2708.0999999046326,
+        "expectedMilliseconds": 2700
+      }
+    },
+    {
+      "name": "live tuning edits preserve active animation and gate changes apply immediately",
+      "status": "PASS",
+      "detail": {
+        "before": {
+          "mode": "deck",
+          "state": "settling",
+          "position": 0.037,
+          "target": 1,
+          "rejection": "",
+          "reduced": "false"
+        },
+        "after": {
+          "mode": "deck",
+          "state": "settling",
+          "position": 0.109,
+          "target": 1,
+          "rejection": "",
+          "reduced": "false"
+        },
+        "retargetFrom": 0.18,
+        "retargetMilliseconds": 1080.5,
+        "playButtons": [
+          "previous",
+          "next",
+          "top"
+        ]
+      }
+    },
+    {
+      "name": "preview modes and independently scrolling panel fit 390x844",
+      "status": "PASS",
+      "detail": {
+        "width": 390,
+        "height": 844,
+        "geometry": {
+          "stage": {
+            "x": 0,
+            "y": 75,
+            "width": 390,
+            "height": 643,
+            "top": 75,
+            "right": 390,
+            "bottom": 718,
+            "left": 0
+          },
+          "panel": {
+            "x": 34,
+            "y": 460.203125,
+            "width": 340,
+            "height": 375.796875,
+            "top": 460.203125,
+            "right": 374,
+            "bottom": 836,
+            "left": 34
+          },
+          "scrollHeight": 2981,
+          "clientHeight": 336,
+          "overflowY": "auto",
+          "touchAction": "pan-y"
+        },
+        "nativePageScroll": true
+      }
+    },
+    {
+      "name": "OS reduced motion overrides explicit deck and manual normal motion preference",
+      "status": "PASS",
+      "detail": {
+        "OSPrecedence": true,
+        "explicitDeckRestoredAfterOSChange": true,
+        "nativeScroll": true
+      }
+    },
+    {
+      "name": "preview modes and independently scrolling panel fit 1280x900",
+      "status": "PASS",
+      "detail": {
+        "width": 1280,
+        "height": 900,
+        "geometry": {
+          "stage": {
+            "x": 0,
+            "y": 75,
+            "width": 920,
+            "height": 699,
+            "top": 75,
+            "right": 920,
+            "bottom": 774,
+            "left": 0
+          },
+          "panel": {
+            "x": 920,
+            "y": 20,
+            "width": 340,
+            "height": 866,
+            "top": 20,
+            "right": 1260,
+            "bottom": 886,
+            "left": 920
+          },
+          "scrollHeight": 2981,
+          "clientHeight": 826,
+          "overflowY": "auto",
+          "touchAction": "pan-y"
+        },
+        "nativePageScroll": true
+      }
+    },
+    {
+      "name": "compact height and JavaScript-disabled pages preserve readable native document flow",
+      "status": "PASS",
+      "detail": {
+        "short": {
+          "explicitDeckFallback": "flow"
+        },
+        "noJavaScript": {
+          "cards": 6,
+          "nativeScroll": true
+        }
+      }
+    },
+    {
+      "name": "no browser or asset errors",
+      "status": "PASS",
+      "detail": {
+        "faults": 0
+      }
+    }
+  ],
+  "faults": [],
+  "notes": [
+    "Trusted CDP touch, Playwright mouse wheel, buttons, and keyboard in Chromium; independent cases run with at most three contexts.",
+    "Browser frame measurements allow 70ms below and 180ms above the configured duration for frame scheduling and sampling.",
+    "Physical phones, touchscreens, trackpads, native Safari/Firefox/Edge, and OS long-press/selection behavior remain unverified.",
+    "Existing historical drag-tracking browser checks describe an earlier interaction contract; this suite checks the tunable command-swipe contract."
+  ]
+}

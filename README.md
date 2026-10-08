@@ -50,3 +50,6 @@ The existing non-production Workers Builds workflow runs `node build.mjs && npx 
 After upload, `node tests/verify-deployment.mjs <commit>` compares every preview asset with the commit and manifest, production HTML with its captured baseline, and preserved local/remote branch heads. The owner's Cloudflare-only device QA is separate from local and hosted automation.
 
 [STACKED_CARD_SPEC.md](STACKED_CARD_SPEC.md) contains the supplied brief and current amendment. [IMPLEMENTATION_SPEC.md](IMPLEMENTATION_SPEC.md) is historical site context.
+
+
+Safari investigation branch: see [findings](verification/safari-qa/FINDINGS.md) and [guided device checks](verification/safari-qa/DEVICE_CHECKS.md). This child adds opt-in local diagnostics and preserves baseline behavior.

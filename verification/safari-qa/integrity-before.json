@@ -1,0 +1,183 @@
+{
+  "checkedAt": "2026-10-08T22:21:12.941Z",
+  "previews": {
+    "codex-card-layout": {
+      "url": "https://codex-card-layout-lynn-landing-page.nrct6ycww6.workers.dev/",
+      "revision": "5c3b63d77af003f326483e083ae120c40969fa33",
+      "assets": [
+        {
+          "name": "index.html",
+          "match": true
+        },
+        {
+          "name": "styles.css",
+          "match": true
+        },
+        {
+          "name": "main.js",
+          "match": true
+        },
+        {
+          "name": "deck-controller.js",
+          "match": true
+        },
+        {
+          "name": "wheel-input.js",
+          "match": true
+        },
+        {
+          "name": "swipe-hint.js",
+          "match": true
+        },
+        {
+          "name": "motion.js",
+          "match": true
+        },
+        {
+          "name": "layout.js",
+          "match": true
+        },
+        {
+          "name": "contact-dialog.js",
+          "match": true
+        },
+        {
+          "name": "demo-settings.js",
+          "match": true
+        },
+        {
+          "name": "tuning-config.js",
+          "match": true
+        },
+        {
+          "name": "favicon.svg",
+          "match": true
+        }
+      ]
+    },
+    "codex-card-layout-tuning": {
+      "url": "https://codex-card-layout-tuning-lynn-landing-page.nrct6ycww6.workers.dev/",
+      "revision": "5c3b63d77af003f326483e083ae120c40969fa33",
+      "assets": [
+        {
+          "name": "index.html",
+          "match": true
+        },
+        {
+          "name": "styles.css",
+          "match": true
+        },
+        {
+          "name": "main.js",
+          "match": true
+        },
+        {
+          "name": "deck-controller.js",
+          "match": true
+        },
+        {
+          "name": "wheel-input.js",
+          "match": true
+        },
+        {
+          "name": "swipe-hint.js",
+          "match": true
+        },
+        {
+          "name": "motion.js",
+          "match": true
+        },
+        {
+          "name": "layout.js",
+          "match": true
+        },
+        {
+          "name": "contact-dialog.js",
+          "match": true
+        },
+        {
+          "name": "demo-settings.js",
+          "match": true
+        },
+        {
+          "name": "tuning-config.js",
+          "match": true
+        },
+        {
+          "name": "favicon.svg",
+          "match": true
+        }
+      ]
+    },
+    "codex-card-layout-swipe-hint": {
+      "url": "https://codex-card-layout-swipe-hint-lynn-landing-page.nrct6ycww6.workers.dev/",
+      "revision": "b14176fdec35e2460d0aa33abcdc64025d4c5a14",
+      "assets": [
+        {
+          "name": "index.html",
+          "match": true
+        },
+        {
+          "name": "styles.css",
+          "match": true
+        },
+        {
+          "name": "main.js",
+          "match": true
+        },
+        {
+          "name": "deck-controller.js",
+          "match": true
+        },
+        {
+          "name": "wheel-input.js",
+          "match": true
+        },
+        {
+          "name": "swipe-hint.js",
+          "match": true
+        },
+        {
+          "name": "motion.js",
+          "match": true
+        },
+        {
+          "name": "layout.js",
+          "match": true
+        },
+        {
+          "name": "contact-dialog.js",
+          "match": true
+        },
+        {
+          "name": "demo-settings.js",
+          "match": true
+        },
+        {
+          "name": "favicon.svg",
+          "match": true
+        }
+      ]
+    }
+  },
+  "productionSHA256": "4e48750db67c9167ae8cde0d95bc5eaf4f326e9613143f39b976474e50c8cae3",
+  "localHeads": {
+    "refs/heads/codex/card-layout": "5c3b63d77af003f326483e083ae120c40969fa33",
+    "refs/heads/codex/card-layout-swipe-hint": "b14176fdec35e2460d0aa33abcdc64025d4c5a14",
+    "refs/heads/codex/card-layout-tuning": "5c3b63d77af003f326483e083ae120c40969fa33",
+    "refs/heads/floating-card": "f5311c548a57cc409ef20773b6e45b17fdacf43e",
+    "refs/heads/main": "0b10b41b59e717da2cc6f83f9e950250541eac3d",
+    "refs/heads/scrolling-reveal": "1733fa7bb7a5c53233da83df93b334ab78441611",
+    "refs/heads/theme-2-pallette-1": "e0b332ca07172745692d3e3060656ab0501acb64",
+    "refs/heads/theme-2-pallette-1-heavy": "15c96a3d15e07d7f3505d3b51d1fac729e784fb1",
+    "refs/heads/theme-2-pallette-2": "de9cc08ed6feacc080ed3844bc925ce2aa1e8458"
+  },
+  "remoteHeads": {
+    "refs/heads/codex/card-layout": "5c3b63d77af003f326483e083ae120c40969fa33",
+    "refs/heads/codex/card-layout-swipe-hint": "b14176fdec35e2460d0aa33abcdc64025d4c5a14",
+    "refs/heads/codex/card-layout-tuning": "5c3b63d77af003f326483e083ae120c40969fa33",
+    "refs/heads/floating-card": "f5311c548a57cc409ef20773b6e45b17fdacf43e",
+    "refs/heads/main": "0b10b41b59e717da2cc6f83f9e950250541eac3d",
+    "refs/heads/scrolling-reveal": "1733fa7bb7a5c53233da83df93b334ab78441611"
+  }
+}

@@ -32,7 +32,7 @@ node build.mjs
 python -m http.server 4191 --bind 127.0.0.1 --directory dist
 ```
 
-Public assets exclude documentation, tests, evidence, and Git metadata. `dist/revision.json` records the source commit and hashes of twelve assets. Browser tooling uses the workstation's existing Playwright/Chromium; set `PW_MODULE` and `CHROMIUM_PATH` for other installations.
+Public assets exclude documentation, tests, evidence, and Git metadata. `dist/revision.json` records the source commit and hashes of thirteen assets in this diagnostic branch. Browser tooling uses the workstation's existing Playwright/Chromium; set `PW_MODULE` and `CHROMIUM_PATH` for other installations.
 
 ```powershell
 node tests/tuning-checks.mjs

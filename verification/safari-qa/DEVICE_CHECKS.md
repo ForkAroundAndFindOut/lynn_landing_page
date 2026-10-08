@@ -52,7 +52,12 @@ Branch/preview protection checks:
 node tests/qa-integrity.mjs before
 node tests/qa-integrity.mjs after
 
-Build and isolated version upload:
+Publishing used the existing Git-connected non-production workflow for codex/card-layout-safari-qa:
+node build.mjs && npx wrangler versions upload
+
+The local Wrangler session had no credentials, so only the isolated QA branch was pushed to trigger the already configured build. Non-production triggers exclude main; production uses a separate main-only deploy trigger. No Cloudflare configuration was changed.
+
+For a separately authenticated local session, the equivalent preview-only command is:
 node build.mjs
 npx --yes wrangler@4.149.0 versions upload --preview-alias codex-card-layout-safari-qa
 

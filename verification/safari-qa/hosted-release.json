@@ -1,0 +1,101 @@
+{
+  "checkedAt": "2026-10-08T22:28:23.901Z",
+  "url": "https://codex-card-layout-safari-qa-lynn-landing-page.nrct6ycww6.workers.dev/",
+  "revision": "1ef26df88b6fa993199095fdab896eb0c5a29d49",
+  "status": 200,
+  "assets": [
+    {
+      "name": "index.html",
+      "status": 200,
+      "expected": "1843af30f154961dcd0b031823356a59d6c64ad3aaeece1d9ec3fd01dab8caa8",
+      "actual": "1843af30f154961dcd0b031823356a59d6c64ad3aaeece1d9ec3fd01dab8caa8",
+      "match": true
+    },
+    {
+      "name": "styles.css",
+      "status": 200,
+      "expected": "397b941bf89daa8a9ffe4def802c086fb9b7b35f0087174bf15510ddc19c6305",
+      "actual": "397b941bf89daa8a9ffe4def802c086fb9b7b35f0087174bf15510ddc19c6305",
+      "match": true
+    },
+    {
+      "name": "main.js",
+      "status": 200,
+      "expected": "30b90bae04d7ac42c5210775a91f446e9719bc52a18ceabf8a77d0334afef8c9",
+      "actual": "30b90bae04d7ac42c5210775a91f446e9719bc52a18ceabf8a77d0334afef8c9",
+      "match": true
+    },
+    {
+      "name": "deck-controller.js",
+      "status": 200,
+      "expected": "0f39d6472970018ad25ba7f3968a34c098fdc58ba8d934b1b5aebc73a1f120cd",
+      "actual": "0f39d6472970018ad25ba7f3968a34c098fdc58ba8d934b1b5aebc73a1f120cd",
+      "match": true
+    },
+    {
+      "name": "wheel-input.js",
+      "status": 200,
+      "expected": "ab176b85e924776e5e043df1bc94a25846a8d8de6db196b1cf613cb837a8f7eb",
+      "actual": "ab176b85e924776e5e043df1bc94a25846a8d8de6db196b1cf613cb837a8f7eb",
+      "match": true
+    },
+    {
+      "name": "swipe-hint.js",
+      "status": 200,
+      "expected": "9297dc2c882d5e8619775b0a6b0eaaae1e56f3a8ee261d1ae4e444bf80942128",
+      "actual": "9297dc2c882d5e8619775b0a6b0eaaae1e56f3a8ee261d1ae4e444bf80942128",
+      "match": true
+    },
+    {
+      "name": "motion.js",
+      "status": 200,
+      "expected": "c9aa21e9740d5de846405e0bbf6be94de1f4af601c2b439f5442230da8fe08c1",
+      "actual": "c9aa21e9740d5de846405e0bbf6be94de1f4af601c2b439f5442230da8fe08c1",
+      "match": true
+    },
+    {
+      "name": "layout.js",
+      "status": 200,
+      "expected": "f38b47d4c26d3962d0fcfdd0f9976657db236e11c59bc942b954f10cb772def8",
+      "actual": "f38b47d4c26d3962d0fcfdd0f9976657db236e11c59bc942b954f10cb772def8",
+      "match": true
+    },
+    {
+      "name": "contact-dialog.js",
+      "status": 200,
+      "expected": "deadb51618db4ca8d011d6aaf5781bc0eae2f01d80463c7096be83520148953b",
+      "actual": "deadb51618db4ca8d011d6aaf5781bc0eae2f01d80463c7096be83520148953b",
+      "match": true
+    },
+    {
+      "name": "demo-settings.js",
+      "status": 200,
+      "expected": "123c04de2f91113701f62833e4a809a4a6ef455700d74e6f19a3e69e97946693",
+      "actual": "123c04de2f91113701f62833e4a809a4a6ef455700d74e6f19a3e69e97946693",
+      "match": true
+    },
+    {
+      "name": "tuning-config.js",
+      "status": 200,
+      "expected": "6e00f61451165807c63c108ca494a65d4e8e9d12a27e6ac87c989cc09687fc30",
+      "actual": "6e00f61451165807c63c108ca494a65d4e8e9d12a27e6ac87c989cc09687fc30",
+      "match": true
+    },
+    {
+      "name": "qa-diagnostics.js",
+      "status": 200,
+      "expected": "9e6a495b9f2584a54b0475098a6b5a5b397928e9c430faf7af4498e2609eee75",
+      "actual": "9e6a495b9f2584a54b0475098a6b5a5b397928e9c430faf7af4498e2609eee75",
+      "match": true
+    },
+    {
+      "name": "favicon.svg",
+      "status": 200,
+      "expected": "7993edfb7fa472661ba552f25bbea5eecb841a65da7f04ace9956e1898248b94",
+      "actual": "7993edfb7fa472661ba552f25bbea5eecb841a65da7f04ace9956e1898248b94",
+      "match": true
+    }
+  ],
+  "cloudflareBuild": "ed919106-43da-4be1-9c8c-0b56d54c1dd4",
+  "buildOutcome": "success"
+}

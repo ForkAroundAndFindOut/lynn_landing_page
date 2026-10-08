@@ -1,0 +1,1091 @@
+{
+  "checkedAt": "2026-10-08T22:27:51.186Z",
+  "base": "https://codex-card-layout-safari-qa-lynn-landing-page.nrct6ycww6.workers.dev",
+  "counts": {
+    "pass": 10,
+    "fail": 0,
+    "total": 10
+  },
+  "results": [
+    {
+      "name": "logging is absent by default",
+      "status": "PASS",
+      "detail": {
+        "mode": "deck"
+      },
+      "faults": []
+    },
+    {
+      "name": "opt-in session captures initial geometry and final trusted wheel results",
+      "status": "PASS",
+      "detail": {
+        "initial": {
+          "mode": "deck",
+          "modeNote": "Card view: swipe or scroll vertically, or use the arrows.",
+          "cardButtonDisabled": false,
+          "previewSelectorDisabled": false,
+          "requestedView": "auto",
+          "reducedOS": false,
+          "reducedReview": false,
+          "reducedEffective": false,
+          "viewport": {
+            "innerWidth": 390,
+            "innerHeight": 844,
+            "clientWidth": 390,
+            "clientHeight": 844,
+            "visualWidth": 390,
+            "visualHeight": 844,
+            "scale": 1,
+            "offsetTop": 0,
+            "offsetLeft": 0
+          },
+          "orientation": "landscape-primary",
+          "rootFontSize": "16px",
+          "fonts": "loaded",
+          "features": {
+            "pointerEvents": true,
+            "resizeObserver": true,
+            "inert": true,
+            "animate": true,
+            "visualViewport": true
+          },
+          "deck": {
+            "state": "idle",
+            "index": 0,
+            "requestedIndex": 0,
+            "position": 0,
+            "gateRemaining": 0,
+            "lastRejection": null
+          },
+          "tuning": {
+            "duration": 0.9,
+            "gate": 0.3,
+            "swipeDistance": 48,
+            "deadZone": 6,
+            "verticalRatio": 1.2,
+            "holdDelay": 0.35,
+            "flickEnabled": true,
+            "flickDistance": 16,
+            "flickVelocity": 0.45,
+            "velocityWindow": 0.08,
+            "wheelThreshold": 16,
+            "wheelQuiet": 0.4,
+            "acceleration": 0.15,
+            "deceleration": 0.35,
+            "magneticStrength": 0.25,
+            "magneticOnset": 0.65,
+            "bounceAmplitude": 0,
+            "bounceCycles": 1,
+            "rotation": 1,
+            "curvature": 1,
+            "layerOffset": 10,
+            "layerScale": 0.03,
+            "arrivalScale": 0.965,
+            "opacityRamp": 0.125,
+            "shadowStrength": 1
+          },
+          "layoutDecision": {
+            "mode": "deck",
+            "previous": "deck",
+            "reason": "Card view: swipe or scroll vertically, or use the arrows.",
+            "viewportHeight": 844,
+            "viewportWidth": 390,
+            "requestedView": "auto",
+            "reduced": false,
+            "shortScreen": false,
+            "eligible": true,
+            "cardButtonDisabled": false,
+            "geometry": {
+              "headerHeight": 75,
+              "stageHeight": 643,
+              "cardWidth": 358,
+              "limit": 601,
+              "neededHeight": 504,
+              "cards": [
+                {
+                  "id": "top",
+                  "neededHeight": 450
+                },
+                {
+                  "id": "services",
+                  "neededHeight": 504
+                },
+                {
+                  "id": "how-it-works",
+                  "neededHeight": 495
+                },
+                {
+                  "id": "example",
+                  "neededHeight": 496
+                },
+                {
+                  "id": "working-together",
+                  "neededHeight": 463
+                },
+                {
+                  "id": "contact",
+                  "neededHeight": 471
+                }
+              ]
+            }
+          }
+        },
+        "report": {
+          "session": "55ee00c0-1a18-4428-b812-cb55c8f2c85d",
+          "startedAt": "2026-10-08T22:27:38.890Z",
+          "page": "https://codex-card-layout-safari-qa-lynn-landing-page.nrct6ycww6.workers.dev/",
+          "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.0.0 Safari/537.36",
+          "platform": "Win32",
+          "revision": "1ef26df88b6fa993199095fdab896eb0c5a29d49",
+          "logging": true,
+          "limit": 1200,
+          "dropped": 0,
+          "snapshot": {
+            "mode": "deck",
+            "modeNote": "Card view: swipe or scroll vertically, or use the arrows.",
+            "cardButtonDisabled": false,
+            "previewSelectorDisabled": false,
+            "requestedView": "auto",
+            "reducedOS": false,
+            "reducedReview": false,
+            "reducedEffective": false,
+            "viewport": {
+              "innerWidth": 390,
+              "innerHeight": 844,
+              "clientWidth": 390,
+              "clientHeight": 844,
+              "visualWidth": 390,
+              "visualHeight": 844,
+              "scale": 1,
+              "offsetTop": 0,
+              "offsetLeft": 0
+            },
+            "orientation": "landscape-primary",
+            "rootFontSize": "16px",
+            "fonts": "loaded",
+            "features": {
+              "pointerEvents": true,
+              "resizeObserver": true,
+              "inert": true,
+              "animate": true,
+              "visualViewport": true
+            },
+            "deck": {
+              "state": "settling",
+              "index": 0,
+              "requestedIndex": 2,
+              "position": 0.9975654349336813,
+              "gateRemaining": 136.09999990463257,
+              "lastRejection": null
+            },
+            "tuning": {
+              "duration": 0.9,
+              "gate": 0.3,
+              "swipeDistance": 48,
+              "deadZone": 6,
+              "verticalRatio": 1.2,
+              "holdDelay": 0.35,
+              "flickEnabled": true,
+              "flickDistance": 16,
+              "flickVelocity": 0.45,
+              "velocityWindow": 0.08,
+              "wheelThreshold": 16,
+              "wheelQuiet": 0.4,
+              "acceleration": 0.15,
+              "deceleration": 0.35,
+              "magneticStrength": 0.25,
+              "magneticOnset": 0.65,
+              "bounceAmplitude": 0,
+              "bounceCycles": 1,
+              "rotation": 1,
+              "curvature": 1,
+              "layerOffset": 10,
+              "layerScale": 0.03,
+              "arrivalScale": 0.965,
+              "opacityRamp": 0.125,
+              "shadowStrength": 1
+            },
+            "layoutDecision": {
+              "mode": "deck",
+              "previous": "deck",
+              "reason": "Card view: swipe or scroll vertically, or use the arrows.",
+              "viewportHeight": 844,
+              "viewportWidth": 390,
+              "requestedView": "auto",
+              "reduced": false,
+              "shortScreen": false,
+              "eligible": true,
+              "cardButtonDisabled": false,
+              "geometry": {
+                "headerHeight": 75,
+                "stageHeight": 643,
+                "cardWidth": 358,
+                "limit": 601,
+                "neededHeight": 504,
+                "cards": [
+                  {
+                    "id": "top",
+                    "neededHeight": 450
+                  },
+                  {
+                    "id": "services",
+                    "neededHeight": 504
+                  },
+                  {
+                    "id": "how-it-works",
+                    "neededHeight": 495
+                  },
+                  {
+                    "id": "example",
+                    "neededHeight": 496
+                  },
+                  {
+                    "id": "working-together",
+                    "neededHeight": 463
+                  },
+                  {
+                    "id": "contact",
+                    "neededHeight": 471
+                  }
+                ]
+              }
+            }
+          },
+          "counts": {
+            "session-start": 1,
+            "revision": 1,
+            "deck/settle": 3,
+            "deck/finish": 3,
+            "layout": 2,
+            "app-ready": 1,
+            "selection": 25,
+            "window/pageshow": 1,
+            "input/pointermove": 1,
+            "result/pointermove": 1,
+            "input/wheel": 2,
+            "deck/animation-start": 2,
+            "deck/request": 2,
+            "result/wheel": 2,
+            "deck/wheel-quiet": 1
+          },
+          "events": [
+            {
+              "at": 421.8,
+              "type": "session-start",
+              "session": "55ee00c0-1a18-4428-b812-cb55c8f2c85d"
+            },
+            {
+              "at": 528.3,
+              "type": "revision",
+              "revision": "1ef26df88b6fa993199095fdab896eb0c5a29d49"
+            },
+            {
+              "at": 976,
+              "type": "deck/settle",
+              "state": "idle",
+              "index": 0,
+              "requestedIndex": 0,
+              "position": 0,
+              "wheelConsumed": false,
+              "wheelIntent": 0,
+              "gateRemaining": 0
+            },
+            {
+              "at": 976.1,
+              "type": "deck/finish",
+              "state": "idle",
+              "index": 0,
+              "requestedIndex": 0,
+              "position": 0,
+              "wheelConsumed": false,
+              "wheelIntent": 0,
+              "gateRemaining": 0,
+              "target": 0
+            },
+            {
+              "at": 982.3,
+              "type": "deck/settle",
+              "state": "idle",
+              "index": 0,
+              "requestedIndex": 0,
+              "position": 0,
+              "wheelConsumed": false,
+              "wheelIntent": 0,
+              "gateRemaining": 0
+            },
+            {
+              "at": 982.3,
+              "type": "deck/finish",
+              "state": "idle",
+              "index": 0,
+              "requestedIndex": 0,
+              "position": 0,
+              "wheelConsumed": false,
+              "wheelIntent": 0,
+              "gateRemaining": 0,
+              "target": 0
+            },
+            {
+              "at": 983.8,
+              "type": "layout",
+              "mode": "deck",
+              "previous": "flow",
+              "reason": "Card view: swipe or scroll vertically, or use the arrows.",
+              "viewportHeight": 844,
+              "viewportWidth": 390,
+              "requestedView": "auto",
+              "reduced": false,
+              "shortScreen": false,
+              "eligible": true,
+              "cardButtonDisabled": false,
+              "geometry": {
+                "headerHeight": 75,
+                "stageHeight": 643,
+                "cardWidth": 358,
+                "limit": 601,
+                "neededHeight": 504,
+                "cards": [
+                  {
+                    "id": "top",
+                    "neededHeight": 450
+                  },
+                  {
+                    "id": "services",
+                    "neededHeight": 504
+                  },
+                  {
+                    "id": "how-it-works",
+                    "neededHeight": 495
+                  },
+                  {
+                    "id": "example",
+                    "neededHeight": 496
+                  },
+                  {
+                    "id": "working-together",
+                    "neededHeight": 463
+                  },
+                  {
+                    "id": "contact",
+                    "neededHeight": 471
+                  }
+                ]
+              }
+            },
+            {
+              "at": 985.4,
+              "type": "app-ready",
+              "view": "auto",
+              "tuning": {
+                "duration": 0.9,
+                "gate": 0.3,
+                "swipeDistance": 48,
+                "deadZone": 6,
+                "verticalRatio": 1.2,
+                "holdDelay": 0.35,
+                "flickEnabled": true,
+                "flickDistance": 16,
+                "flickVelocity": 0.45,
+                "velocityWindow": 0.08,
+                "wheelThreshold": 16,
+                "wheelQuiet": 0.4,
+                "acceleration": 0.15,
+                "deceleration": 0.35,
+                "magneticStrength": 0.25,
+                "magneticOnset": 0.65,
+                "bounceAmplitude": 0,
+                "bounceCycles": 1,
+                "rotation": 1,
+                "curvature": 1,
+                "layerOffset": 10,
+                "layerScale": 0.03,
+                "arrivalScale": 0.965,
+                "opacityRamp": 0.125,
+                "shadowStrength": 1
+              },
+              "reducedOS": false,
+              "reducedReview": false,
+              "reducedEffective": false
+            },
+            {
+              "at": 999.4,
+              "type": "selection",
+              "active": false
+            },
+            {
+              "at": 999.5,
+              "type": "selection",
+              "active": false
+            },
+            {
+              "at": 999.6,
+              "type": "selection",
+              "active": false
+            },
+            {
+              "at": 999.6,
+              "type": "selection",
+              "active": false
+            },
+            {
+              "at": 999.6,
+              "type": "selection",
+              "active": false
+            },
+            {
+              "at": 999.6,
+              "type": "selection",
+              "active": false
+            },
+            {
+              "at": 999.6,
+              "type": "selection",
+              "active": false
+            },
+            {
+              "at": 999.6,
+              "type": "selection",
+              "active": false
+            },
+            {
+              "at": 999.6,
+              "type": "selection",
+              "active": false
+            },
+            {
+              "at": 999.7,
+              "type": "selection",
+              "active": false
+            },
+            {
+              "at": 999.7,
+              "type": "selection",
+              "active": false
+            },
+            {
+              "at": 999.7,
+              "type": "selection",
+              "active": false
+            },
+            {
+              "at": 999.7,
+              "type": "selection",
+              "active": false
+            },
+            {
+              "at": 999.7,
+              "type": "selection",
+              "active": false
+            },
+            {
+              "at": 999.7,
+              "type": "selection",
+              "active": false
+            },
+            {
+              "at": 999.7,
+              "type": "selection",
+              "active": false
+            },
+            {
+              "at": 999.7,
+              "type": "selection",
+              "active": false
+            },
+            {
+              "at": 999.7,
+              "type": "selection",
+              "active": false
+            },
+            {
+              "at": 999.7,
+              "type": "selection",
+              "active": false
+            },
+            {
+              "at": 999.7,
+              "type": "selection",
+              "active": false
+            },
+            {
+              "at": 999.7,
+              "type": "selection",
+              "active": false
+            },
+            {
+              "at": 999.7,
+              "type": "selection",
+              "active": false
+            },
+            {
+              "at": 999.7,
+              "type": "selection",
+              "active": false
+            },
+            {
+              "at": 999.7,
+              "type": "selection",
+              "active": false
+            },
+            {
+              "at": 1000,
+              "type": "window/pageshow",
+              "width": 390,
+              "height": 844
+            },
+            {
+              "at": 1000.1,
+              "type": "deck/settle",
+              "state": "idle",
+              "index": 0,
+              "requestedIndex": 0,
+              "position": 0,
+              "wheelConsumed": false,
+              "wheelIntent": 0,
+              "gateRemaining": 0
+            },
+            {
+              "at": 1000.3,
+              "type": "deck/finish",
+              "state": "idle",
+              "index": 0,
+              "requestedIndex": 0,
+              "position": 0,
+              "wheelConsumed": false,
+              "wheelIntent": 0,
+              "gateRemaining": 0,
+              "target": 0
+            },
+            {
+              "at": 1001.6,
+              "type": "layout",
+              "mode": "deck",
+              "previous": "deck",
+              "reason": "Card view: swipe or scroll vertically, or use the arrows.",
+              "viewportHeight": 844,
+              "viewportWidth": 390,
+              "requestedView": "auto",
+              "reduced": false,
+              "shortScreen": false,
+              "eligible": true,
+              "cardButtonDisabled": false,
+              "geometry": {
+                "headerHeight": 75,
+                "stageHeight": 643,
+                "cardWidth": 358,
+                "limit": 601,
+                "neededHeight": 504,
+                "cards": [
+                  {
+                    "id": "top",
+                    "neededHeight": 450
+                  },
+                  {
+                    "id": "services",
+                    "neededHeight": 504
+                  },
+                  {
+                    "id": "how-it-works",
+                    "neededHeight": 495
+                  },
+                  {
+                    "id": "example",
+                    "neededHeight": 496
+                  },
+                  {
+                    "id": "working-together",
+                    "neededHeight": 463
+                  },
+                  {
+                    "id": "contact",
+                    "neededHeight": 471
+                  }
+                ]
+              }
+            },
+            {
+              "at": 1306.4,
+              "type": "input/pointermove",
+              "inputId": 1,
+              "target": "div",
+              "card": "top",
+              "cardInert": false,
+              "trusted": true,
+              "x": 195,
+              "y": 460.79998779296875,
+              "pointerType": "mouse",
+              "pointerId": 1,
+              "stageInPath": true
+            },
+            {
+              "at": 1306.4,
+              "type": "result/pointermove",
+              "inputId": 1,
+              "target": "div",
+              "prevented": false,
+              "state": "idle",
+              "position": "0.000",
+              "requestedIndex": 0
+            },
+            {
+              "at": 1321.3,
+              "type": "input/wheel",
+              "inputId": 2,
+              "target": "div",
+              "card": "top",
+              "cardInert": false,
+              "trusted": true,
+              "x": 195,
+              "y": 460,
+              "stageInPath": true,
+              "deltaX": 0,
+              "deltaY": 80,
+              "deltaMode": 0,
+              "cancelable": true,
+              "ctrl": false,
+              "meta": false,
+              "shift": false,
+              "hit": "div",
+              "path": [
+                "div",
+                "section#top",
+                "div#deck-stage",
+                "main#main-content",
+                "div#site-shell",
+                "body",
+                "html"
+              ]
+            },
+            {
+              "at": 1323.4,
+              "type": "deck/animation-start",
+              "state": "settling",
+              "index": 0,
+              "requestedIndex": 1,
+              "position": 0,
+              "wheelConsumed": true,
+              "wheelIntent": 80,
+              "gateRemaining": 298.19999980926514,
+              "from": 0,
+              "target": 1,
+              "duration": 900
+            },
+            {
+              "at": 1323.4,
+              "type": "deck/request",
+              "state": "settling",
+              "index": 0,
+              "requestedIndex": 1,
+              "position": 0,
+              "wheelConsumed": true,
+              "wheelIntent": 80,
+              "gateRemaining": 298.19999980926514,
+              "tuning": {
+                "duration": 0.9,
+                "gate": 0.3,
+                "swipeDistance": 48,
+                "deadZone": 6,
+                "verticalRatio": 1.2,
+                "holdDelay": 0.35,
+                "flickEnabled": true,
+                "flickDistance": 16,
+                "flickVelocity": 0.45,
+                "velocityWindow": 0.08,
+                "wheelThreshold": 16,
+                "wheelQuiet": 0.4,
+                "acceleration": 0.15,
+                "deceleration": 0.35,
+                "magneticStrength": 0.25,
+                "magneticOnset": 0.65,
+                "bounceAmplitude": 0,
+                "bounceCycles": 1,
+                "rotation": 1,
+                "curvature": 1,
+                "layerOffset": 10,
+                "layerScale": 0.03,
+                "arrivalScale": 0.965,
+                "opacityRamp": 0.125,
+                "shadowStrength": 1
+              },
+              "source": "wheel",
+              "delta": 1,
+              "accepted": true,
+              "target": 1
+            },
+            {
+              "at": 1324,
+              "type": "result/wheel",
+              "inputId": 2,
+              "target": "div",
+              "prevented": true,
+              "state": "settling",
+              "position": "0.000",
+              "requestedIndex": 1
+            },
+            {
+              "at": 1724.6,
+              "type": "deck/wheel-quiet",
+              "state": "settling",
+              "index": 0,
+              "requestedIndex": 1,
+              "position": 0.4811781612135977,
+              "wheelConsumed": false,
+              "wheelIntent": 0,
+              "gateRemaining": 0
+            },
+            {
+              "at": 2004.4,
+              "type": "input/wheel",
+              "inputId": 3,
+              "target": "div#deck-stage",
+              "trusted": true,
+              "x": 195,
+              "y": 460,
+              "stageInPath": true,
+              "deltaX": 0,
+              "deltaY": 80,
+              "deltaMode": 0,
+              "cancelable": true,
+              "ctrl": false,
+              "meta": false,
+              "shift": false,
+              "hit": "div#deck-stage",
+              "path": [
+                "div#deck-stage",
+                "main#main-content",
+                "div#site-shell",
+                "body",
+                "html"
+              ]
+            },
+            {
+              "at": 2004.7,
+              "type": "deck/animation-start",
+              "state": "settling",
+              "index": 0,
+              "requestedIndex": 2,
+              "position": 0.8819980910170957,
+              "wheelConsumed": true,
+              "wheelIntent": 80,
+              "gateRemaining": 299.7999999523163,
+              "from": 0.8819980910170957,
+              "target": 2,
+              "duration": 1006.2017180846138
+            },
+            {
+              "at": 2004.7,
+              "type": "deck/request",
+              "state": "settling",
+              "index": 0,
+              "requestedIndex": 2,
+              "position": 0.8819980910170957,
+              "wheelConsumed": true,
+              "wheelIntent": 80,
+              "gateRemaining": 299.7999999523163,
+              "tuning": {
+                "duration": 0.9,
+                "gate": 0.3,
+                "swipeDistance": 48,
+                "deadZone": 6,
+                "verticalRatio": 1.2,
+                "holdDelay": 0.35,
+                "flickEnabled": true,
+                "flickDistance": 16,
+                "flickVelocity": 0.45,
+                "velocityWindow": 0.08,
+                "wheelThreshold": 16,
+                "wheelQuiet": 0.4,
+                "acceleration": 0.15,
+                "deceleration": 0.35,
+                "magneticStrength": 0.25,
+                "magneticOnset": 0.65,
+                "bounceAmplitude": 0,
+                "bounceCycles": 1,
+                "rotation": 1,
+                "curvature": 1,
+                "layerOffset": 10,
+                "layerScale": 0.03,
+                "arrivalScale": 0.965,
+                "opacityRamp": 0.125,
+                "shadowStrength": 1
+              },
+              "source": "wheel",
+              "delta": 1,
+              "accepted": true,
+              "target": 2
+            },
+            {
+              "at": 2005.2,
+              "type": "result/wheel",
+              "inputId": 3,
+              "target": "div#deck-stage",
+              "prevented": true,
+              "state": "settling",
+              "position": "0.882",
+              "requestedIndex": 2
+            },
+            {
+              "at": 2116.6,
+              "type": "selection",
+              "active": false
+            }
+          ]
+        }
+      },
+      "faults": []
+    },
+    {
+      "name": "OS reduction and a false review override are shown separately",
+      "status": "PASS",
+      "detail": {
+        "mode": "flow",
+        "modeNote": "Reduced motion: all content in document flow.",
+        "cardButtonDisabled": true,
+        "previewSelectorDisabled": false,
+        "requestedView": "auto",
+        "reducedOS": true,
+        "reducedReview": false,
+        "reducedEffective": true,
+        "viewport": {
+          "innerWidth": 390,
+          "innerHeight": 844,
+          "clientWidth": 390,
+          "clientHeight": 844,
+          "visualWidth": 390,
+          "visualHeight": 844,
+          "scale": 1,
+          "offsetTop": 0,
+          "offsetLeft": 0
+        },
+        "orientation": "landscape-primary",
+        "rootFontSize": "16px",
+        "fonts": "loaded",
+        "features": {
+          "pointerEvents": true,
+          "resizeObserver": true,
+          "inert": true,
+          "animate": true,
+          "visualViewport": true
+        },
+        "deck": {
+          "state": "idle",
+          "index": 0,
+          "requestedIndex": 0,
+          "position": 0,
+          "gateRemaining": 0,
+          "lastRejection": null
+        },
+        "tuning": {
+          "duration": 0.9,
+          "gate": 0.3,
+          "swipeDistance": 48,
+          "deadZone": 6,
+          "verticalRatio": 1.2,
+          "holdDelay": 0.35,
+          "flickEnabled": true,
+          "flickDistance": 16,
+          "flickVelocity": 0.45,
+          "velocityWindow": 0.08,
+          "wheelThreshold": 16,
+          "wheelQuiet": 0.4,
+          "acceleration": 0.15,
+          "deceleration": 0.35,
+          "magneticStrength": 0.25,
+          "magneticOnset": 0.65,
+          "bounceAmplitude": 0,
+          "bounceCycles": 1,
+          "rotation": 1,
+          "curvature": 1,
+          "layerOffset": 10,
+          "layerScale": 0.03,
+          "arrivalScale": 0.965,
+          "opacityRamp": 0.125,
+          "shadowStrength": 1
+        },
+        "layoutDecision": {
+          "mode": "flow",
+          "previous": "deck",
+          "reason": "Reduced motion: all content in document flow.",
+          "viewportHeight": 844,
+          "viewportWidth": 390,
+          "requestedView": "auto",
+          "reduced": true,
+          "shortScreen": false,
+          "eligible": false,
+          "cardButtonDisabled": true,
+          "geometry": null
+        }
+      },
+      "faults": []
+    },
+    {
+      "name": "content-fit fallback reports candidate measurements and leaves card button enabled",
+      "status": "PASS",
+      "detail": {
+        "mode": "flow",
+        "modeNote": "Reading view keeps enlarged or compact-screen content fully visible.",
+        "cardButtonDisabled": false,
+        "previewSelectorDisabled": false,
+        "requestedView": "auto",
+        "reducedOS": false,
+        "reducedReview": false,
+        "reducedEffective": false,
+        "viewport": {
+          "innerWidth": 390,
+          "innerHeight": 667,
+          "clientWidth": 390,
+          "clientHeight": 667,
+          "visualWidth": 390,
+          "visualHeight": 667,
+          "scale": 1,
+          "offsetTop": 0,
+          "offsetLeft": 0
+        },
+        "orientation": "landscape-primary",
+        "rootFontSize": "16px",
+        "fonts": "loaded",
+        "features": {
+          "pointerEvents": true,
+          "resizeObserver": true,
+          "inert": true,
+          "animate": true,
+          "visualViewport": true
+        },
+        "deck": {
+          "state": "idle",
+          "index": 0,
+          "requestedIndex": 0,
+          "position": 0,
+          "gateRemaining": 0,
+          "lastRejection": null
+        },
+        "tuning": {
+          "duration": 0.9,
+          "gate": 0.3,
+          "swipeDistance": 48,
+          "deadZone": 6,
+          "verticalRatio": 1.2,
+          "holdDelay": 0.35,
+          "flickEnabled": true,
+          "flickDistance": 16,
+          "flickVelocity": 0.45,
+          "velocityWindow": 0.08,
+          "wheelThreshold": 16,
+          "wheelQuiet": 0.4,
+          "acceleration": 0.15,
+          "deceleration": 0.35,
+          "magneticStrength": 0.25,
+          "magneticOnset": 0.65,
+          "bounceAmplitude": 0,
+          "bounceCycles": 1,
+          "rotation": 1,
+          "curvature": 1,
+          "layerOffset": 10,
+          "layerScale": 0.03,
+          "arrivalScale": 0.965,
+          "opacityRamp": 0.125,
+          "shadowStrength": 1
+        },
+        "layoutDecision": {
+          "mode": "flow",
+          "previous": "flow",
+          "reason": "Reading view keeps enlarged or compact-screen content fully visible.",
+          "viewportHeight": 667,
+          "viewportWidth": 390,
+          "requestedView": "auto",
+          "reduced": false,
+          "shortScreen": false,
+          "eligible": true,
+          "cardButtonDisabled": false,
+          "geometry": {
+            "headerHeight": 75,
+            "stageHeight": 466,
+            "cardWidth": 358,
+            "limit": 424,
+            "neededHeight": 504,
+            "cards": [
+              {
+                "id": "top",
+                "neededHeight": 420
+              },
+              {
+                "id": "services",
+                "neededHeight": 504
+              },
+              {
+                "id": "how-it-works",
+                "neededHeight": 495
+              },
+              {
+                "id": "example",
+                "neededHeight": 496
+              },
+              {
+                "id": "working-together",
+                "neededHeight": 463
+              },
+              {
+                "id": "contact",
+                "neededHeight": 471
+              }
+            ]
+          }
+        }
+      },
+      "faults": []
+    },
+    {
+      "name": "session logging excludes contact values and selected text",
+      "status": "PASS",
+      "detail": {
+        "contactValuesAbsent": true
+      },
+      "faults": []
+    },
+    {
+      "name": "bounded session supports pause and resume",
+      "status": "PASS",
+      "detail": {
+        "limit": 1200,
+        "dropped": 86
+      },
+      "faults": []
+    },
+    {
+      "name": "clipboard fallback provides a readable report without developer tools",
+      "status": "PASS",
+      "detail": {
+        "fallback": true
+      },
+      "faults": []
+    },
+    {
+      "name": "early module failure remains visible in the diagnostic session",
+      "status": "PASS",
+      "detail": {
+        "expectedErrorCaptured": true
+      },
+      "faults": [
+        "QA_STARTUP_FAILURE"
+      ]
+    },
+    {
+      "name": "paused layout stays current and tuning changes/reset are associated with requests",
+      "status": "PASS",
+      "detail": {
+        "pausedSnapshotCurrent": true,
+        "settingsHistory": true
+      },
+      "faults": []
+    },
+    {
+      "name": "collapsed diagnostics leave mobile navigation controls unobstructed",
+      "status": "PASS",
+      "detail": {
+        "navigationAccessible": true
+      },
+      "faults": []
+    }
+  ],
+  "coverage": "Chromium automation; physical Safari remains unverified."
+}
